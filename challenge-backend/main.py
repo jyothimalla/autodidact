@@ -13,6 +13,10 @@ from division_routes import router as division_router
 
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello from autodidact!"}
+
 # CORS setup
 app.add_middleware(
     CORSMiddleware,
