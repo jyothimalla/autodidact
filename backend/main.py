@@ -14,7 +14,6 @@ from division_routes import router as division_router
 
 app = FastAPI()
 
-
 @app.get("/")
 async def index():
     return RedirectResponse(url="/index.html")
