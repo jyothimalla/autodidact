@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { ConfigService } from '../services/config.service'; 
+
 
 @Injectable({ providedIn: 'root' })
 
@@ -11,7 +13,7 @@ export class QuizService {
 
   constructor(
     private router: Router,
-    private http: HttpClient) {}
+    private http: HttpClient,  private config: ConfigService) {}
   
   startSession(name: string, operation: string, level: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/start-session`, { name, operation, level });
