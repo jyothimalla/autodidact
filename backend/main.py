@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 from pydantic import BaseModel
 import random
-from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from quiz_routes import router 
 from sudoku_routes import sudoku_router  # ✅ import your new router
 from addition_routes import router as addition_router
@@ -13,9 +14,15 @@ from division_routes import router as division_router
 
 app = FastAPI()
 
+
 @app.get("/")
+async def index():
+    return RedirectResponse(url="/index.html")
+
 def read_root():
     return {"message": "Hello from autodidact!"}
+
+app.mount("/", StaticFiles(directory="frontend"), name="frontend")
 
 # CORS setup
 app.add_middleware(
