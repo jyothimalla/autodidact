@@ -1,0 +1,122 @@
+
+ 
+  /* Centered main quiz box */
+  .quiz-main-card {
+    flex: 1;
+    max-width: 650px;
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+ 
+  
+  /* Feedback box */
+  .feedback {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    color: #333;
+  }
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 10%;
+  }
+  
+  .button-group button {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    background-color: #2196f3;
+    color: white;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .button-group button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .button-group button:hover:not(:disabled) {
+    background-color: #1976d2;
+  }  
+  .volume-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  .volume-btn:hover {
+    color: #2196f3;
+  }
+  .question-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .character-container img {
+    width: 60px;
+    height: auto;
+    cursor: pointer;
+    filter: grayscale(50%);
+    transition: filter 0.3s ease;
+  }
+  
+  .character-container img.animate {
+    filter: grayscale(0%);
+    animation: bounce 0.6s ease-in-out infinite;
+  }
+  
+  @keyframes bounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-10px); }
+  }
+  .lottie-anim {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 1rem;
+  }
+  .answer-input {
+    width: 60px;
+    border: 2px solid #2196f3;
+    border-radius: 5px;
+    padding: 4px 8px;
+    font-size: 1.1rem;
+    margin-left: 8px;
+  }
+  .feedback {
+    margin-top: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  .quiz-title.subtraction {
+    background-color: #ffeeaa;
+    padding: 0.8rem;
+    border-radius: 10px;
+    text-align: center;
+  }
+  
+  .quiz-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
+    margin: 2rem auto;
+    font-family: 'Poppins', sans-serif;
+    flex-wrap: wrap;
+  }
+  
+  .left-sidebar, .right-sidebar {
+    width: 220px;
+  }
+  
+  

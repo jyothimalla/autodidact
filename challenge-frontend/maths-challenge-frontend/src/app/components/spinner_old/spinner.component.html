@@ -1,0 +1,33 @@
+<div class="spinner-container">
+    <div class="wheel-wrapper">
+      <div class="arrow">▼</div>
+      <div class="wheel" #wheel>
+        <div
+          class="label"
+          *ngFor="let label of labels; let i = index"
+          [style.transform]="'rotate(' + (i * (360 / labels.length)) + 'deg)'"
+        >
+          <span>{{ label }}</span>
+        </div>
+      </div>
+    </div>
+  
+    <button (click)="spinWheel()" [disabled]="spinning">
+      {{ spinning ? 'Spinning...' : 'Spin the Wheel' }}
+    </button>
+  
+    <div *ngIf="showResult" style="margin-top: 10px; font-size: 13px; color: gray;">
+        [Debug] Selected Index: {{ labels.indexOf(selectedLabel) }} / {{ selectedLabel }}
+      </div>
+      
+    <!-- ✅ Show result after spin -->
+    <div *ngIf="showResult && selectedLabel !== 'Spin Again'" class="result">
+      🎯 You got: <strong>{{ selectedLabel }}</strong>!
+    </div>
+  
+    <!-- Optional: message for spin again -->
+    <div *ngIf="showResult && selectedLabel === 'Spin Again'" class="result">
+      🔁 Spin Again!
+    </div>
+  </div>
+  

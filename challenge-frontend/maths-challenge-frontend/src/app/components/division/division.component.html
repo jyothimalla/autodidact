@@ -1,0 +1,37 @@
+<app-header></app-header>
+<div class="quiz-wrapper" *ngIf="questions.length > 0">
+  <div class="left-sidebar"><app-left-sidebar></app-left-sidebar></div>
+
+  <div class="quiz-main-card">
+    <div class="quiz-header">
+      <h2 class="quiz-title division">Division – Level {{ level }}</h2>
+    </div>
+
+    <div class="quiz-question">
+      <p>
+        {{ questions[currentQIndex].question.split('=')[0] }} =
+        <input type="text" [(ngModel)]="answerInput" (keyup.enter)="submitAnswer()" class="answer-input" />
+      </p>
+    </div>
+
+    <div class="feedback" *ngIf="feedbackMessage">
+      <p>{{ feedbackMessage }}</p>
+    </div>
+
+    <div class="button-group">
+      <button (click)="submitAnswer()">Submit</button>
+      <button *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()" class="try-again">🔁 Try Again</button>
+    </div>
+  </div>
+
+  <div class="right-sidebar">
+    <app-right-sidebar
+      [userName]="userName"
+      [score]="score"
+      [currentQIndex]="currentQIndex"
+      [totalQuestions]="questions.length"
+      [elapsedTime]="elapsedTime">
+    </app-right-sidebar>
+  </div>
+</div>
+<app-footer></app-footer>

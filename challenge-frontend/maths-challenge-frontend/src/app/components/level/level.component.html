@@ -1,0 +1,6 @@
+<h2>Select Level for {{ operation | titlecase }}</h2>
+<div class="level-buttons">
+  <button *ngFor="let lvl of levels" (click)="selectLevel(lvl)">
+    Level {{ lvl }}
+  </button>
+</div>

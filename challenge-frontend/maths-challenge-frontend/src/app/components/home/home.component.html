@@ -1,0 +1,14 @@
+<div>
+    <h1>Welcome to the Maths Challenge!</h1>
+    
+    <input type="text" [(ngModel)]="userName" placeholder="Enter your name" />
+    <br />
+  
+    <button (click)="startQuiz()">Start Quiz</button>
+  
+    <!-- ✅ Error Message -->
+    <div *ngIf="errorMessage" style="color: red; margin-top: 10px;">
+      {{ errorMessage }}
+    </div>
+  </div>
+  

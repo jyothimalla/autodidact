@@ -1,0 +1,160 @@
+.result-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .result-card {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    width: 100%;
+  }
+  
+  .score-box, .retry-box {
+    margin: 1rem 0;
+    text-align: center;
+  }
+  
+  .score-heading {
+    color: blue;
+    font-size: 1.5rem;
+  }
+  
+  .score-value {
+    color: blue;
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .btn {
+    padding: 0.6rem 1.2rem;
+    margin: 0.5rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .green { background-color: #82e02e; color: white; }
+  .orange { background-color: chocolate; color: white; }
+  .blue { background-color: #4784da; color: white; }
+  
+  .chat-thread {
+    margin-top: 2rem;
+  }
+  
+  .chat-message {
+    margin-bottom: 1.5rem;
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .qa-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  @media (min-width: 768px) {
+    .qa-wrapper {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+  
+    .left-part, .right-part {
+      width: 48%;
+    }
+  }
+  
+  .q-index {
+    font-weight: bold;
+  }
+  
+  .message-user span.correct {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .message-user span.incorrect {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .explanation {
+    background-color: #eef6ff;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+  .correct {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .incorrect {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .message-correct {
+    color: green;
+    margin-top: 4px;
+  }
+  
+  .message-explanation {
+    font-style: italic;
+    font-size: 0.95rem;
+    color: #555;
+    margin-top: 4px;
+  }
+  .message-user {
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  .message-user span {
+    font-weight: normal;
+  }
+  .message-user span.correct {
+    color: green;
+  }
+  .message-user span.incorrect {
+    color: red;
+  }
+footer {
+    margin-top: 2rem;
+    text-align: center;
+    margin: auto;
+    padding: 1rem;
+    width: 50%;}
+  
+  .footer-text {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .footer-link {
+    color: #4784da;
+    text-decoration: none;
+  }
+  
+  .footer-link:hover {
+    text-decoration: underline;
+  }
+  
+  .footer-link a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .footer-link a:hover {
+    text-decoration: underline;
+  }

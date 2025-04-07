@@ -1,0 +1,148 @@
+
+<div *ngIf="currentOperation !== 'sudoku'">
+  
+  <div class="quiz-wrapper" *ngIf="questions.length">
+  <!-- LEFT SIDEBAR (Operations) -->
+  <div class="quiz-sidebar left-sidebar">
+    
+    <div
+      class="operation-block addition"
+      [class.active]="currentOperation === 'addition'"
+      (click)="switchOperation('addition')"
+    >Addition</div>
+
+    <div
+      class="operation-block subtraction"
+      [class.active]="currentOperation === 'subtraction'"
+      (click)="switchOperation('subtraction')"
+    >Subtraction</div>
+
+    <div
+      class="operation-block multiplication"
+      [class.active]="currentOperation === 'multiplication'"
+      (click)="switchOperation('multiplication')"
+    >Multiplication</div>
+
+    <div
+      class="operation-block division"
+      [class.active]="currentOperation === 'division'"
+      (click)="switchOperation('division')"
+    >Division</div>
+
+    <div
+      class="operation-block fmc"
+      [class.active]="currentOperation === 'fmc'"
+      (click)="switchOperation('fmc')"
+    >FMC</div>
+
+    <div
+      class="operation-block sudoku"
+      [class.active]="currentOperation === 'sudoku'"
+      (click)="switchOperation('sudoku')"
+    >SUDOKU</div>
+  </div>
+
+  <!-- MAIN QUIZ AREA -->
+    
+    <div class="quiz-main-card">
+    <div class="quiz-header">
+      <!--<h2 style="color:#dd439d">{{ currentOperation | titlecase }} - Level {{level}}</h2> -->
+      <div class="quiz-title" [ngClass]="currentOperation.toLowerCase()">
+        <h2>
+          {{ currentOperation | titlecase }} –
+          {{
+            currentOperation === 'sudoku'
+              ? (level === 1 ? 'Easy' : level === 2 ? 'Medium' : 'Difficult')
+              : 'Level ' + level
+          }}
+        </h2>
+      </div>
+    </div>
+  
+    <div class="quiz-question">
+      <p>
+        {{ questions[currentQIndex].question.split('=')[0] }} =
+        <input type="text" [(ngModel)]="answerInput" class="answer-input" />
+      </p>
+    </div>
+    <div *ngIf="quizCompleted && score < questions.length" style="text-align: right; margin-top: 1rem;">
+      <button class="try-again-btn" (click)="restartQuiz()">🔁 Try Again</button>
+    </div>
+  
+    <div class="button-group">
+      <!--<button (click)="prev()" [disabled]="currentQIndex === 0">Previous</button>-->
+      
+      <button style="background-color:#73AD21" *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
+    
+      <button *ngIf="quizCompleted" (click)="restartQuiz()" class="try-again">Try Again</button>
+    </div>
+    
+
+    <!-- CONTROLS -->
+    <div class="button-group">
+      <!--<button (click)="prev()" [disabled]="currentQIndex === 0">Previous</button>
+      <button (click)="next()" *ngIf="currentQIndex < questions.length - 1">Next</button>
+      <button (click)="submitAnswer()" *ngIf="currentQIndex === questions.length - 1">Submit</button>-->
+    </div>
+
+    <!-- FEEDBACK -->
+    <div class="feedback" *ngIf="feedbackMessage">
+      <p style="white-space: pre-line;">{{ feedbackMessage }}</p>
+    </div>
+  </div>
+  
+
+
+  <!-- RIGHT SIDEBAR (Stats) -->
+  <div class="quiz-sidebar">
+    <div class="sidebar-box">
+      <div class="user-head" style="text-decoration: white; margin: auto;
+      width: 30%;
+      background-color: rgb(86, 170, 8);
+      height: 30%;
+      border: 3px solid #73AD21;
+      padding: 10px; color:white"> User</div>
+      <div class="user-cont" 
+      style="width:30%; height: 30%; padding: 10px; margin: auto;">
+      {{ userName }}</div>
+   
+      <div class="user-head" style="text-decoration: white; margin: auto;
+      width: 30%;
+      background-color: rgb(235, 106, 19);
+      height: 30%;
+      border: 3px solid #d76e18;
+      padding: 10px; color:white"> Score</div>
+      <div class="user-cont" 
+      style="width:30%; height: 30%; padding: 10px; margin: auto;">{{ score }} / {{ questions.length }}</div>
+
+      <div class="user-head" style="text-decoration: white; margin: auto;
+      width: 30%;
+      background-color: rgb(20, 177, 216);
+      height: 30%;
+      border: 3px solid #1bc5e7;
+      padding: 10px; color:white"> Progress</div>
+      <div class="user-cont" 
+      style="width:30%; height: 30%; padding: 10px; margin: auto;">{{ currentQIndex + 1 }} of {{ questions.length }}</div>
+
+    <!--<div class="sidebar-box">
+      <h4>Attempted</h4>
+      <div>{{ attemptedCount }} / {{ questions.length }}</div>
+    </div> -->
+
+      <div class="user-head" style="text-decoration: white; margin: auto;
+      width: 30%;
+      background-color: #dd439d;
+      height: 30%;
+      border: 3px solid #dd439d;
+      padding: 10px; color:white"> Time</div>
+      <div class="user-cont" 
+      style="width:30%; height: 30%; padding: 10px; margin: auto;">{{ elapsedTime }}</div>
+    </div>
+  </div>
+</div>
+</div>
+  <!-- SUDOKU COMPONENT -->
+  <div *ngIf="isSudoku">
+    <app-sudoku></app-sudoku>
+  </div>
+  

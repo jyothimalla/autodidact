@@ -1,0 +1,31 @@
+<div class="operation-wrapper">
+    <h2>Select an Operation</h2>
+    <div class="operation-buttons">
+      <!-- Operation Buttons -->
+    <button 
+    *ngFor="let op of operations"
+    [ngClass]="op.toLowerCase()"
+    (click)="selectOperation(op)"
+    >
+    {{ op }}
+    </button>
+    </div>
+  <div class="levels-wrapper">
+    <button
+    *ngFor="let level of levels"
+    [disabled]="isLevelLocked(level)"
+    (click)="selectLevel(level)"
+    [ngClass]="[
+      'level-button',
+      selectedOperation.toLowerCase() + '-level',
+      isLevelLocked(level) ? 'locked' : 'unlocked'
+    ]"
+  >
+    {{ getLevelLabel(level) }}
+  </button>
+
+  
+</div>
+    
+  </div>
+  

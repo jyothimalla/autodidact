@@ -1,0 +1,76 @@
+/* Operation background colors */
+.addition       { background-color: #ffe0e0; }
+.subtraction    { background-color: #fff4cc; }
+.multiplication { background-color: #d0f0d0; }
+.division       { background-color: #d6eaff; }
+.fmc            { background-color: #f3d6ff; }
+.sudoku         { background-color: #44e5eb; }
+
+/* General button style */
+button {
+  border: none;
+  padding: 10px 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-width: 100px;
+}
+
+.btn-nextlevel {
+  background-color: #21b519;
+  color: white;
+  margin-right: 10px;
+}
+
+/* Layout styling */
+.operation-wrapper {
+  text-align: center;
+  margin-top: 40px;
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .operation-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .level-section {
+    margin-top: 30px;
+  }
+}
+
+/* Level buttons base style */
+.level-button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  margin: 6px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+/* Color by operation */
+.level-button.addition-level        { background-color: #ffd6d6; }
+.level-button.subtraction-level     { background-color: #ffeeaa; }
+.level-button.multiplication-level  { background-color: #b3e6b3; }
+.level-button.division-level        { background-color: #b8ddff; }
+.level-button.fmc-level             { background-color: #e6bfff; }
+.level-button.sudoku-level          { background-color: #2bd3d9; }
+
+/* Locked / Unlocked */
+.level-button.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.level-button.unlocked:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}

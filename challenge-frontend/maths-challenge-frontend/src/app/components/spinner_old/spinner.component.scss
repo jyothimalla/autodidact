@@ -1,0 +1,76 @@
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+  }
+  
+  .wheel {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    border: 10px solid #333;
+    position: relative;
+    transition: transform 3s ease-out;
+    transform: rotate(0deg);
+    background: conic-gradient(
+      #ff9a9e 0deg 51.4deg,
+      #fad0c4 51.4deg 102.8deg,
+      #fbc2eb 102.8deg 154.2deg,
+      #a1c4fd 154.2deg 205.6deg,
+      #c2e9fb 205.6deg 257deg,
+      #d4fc79 257deg 308.4deg,
+      #ffecd2 308.4deg 360deg
+    );
+    margin-bottom: 40px;
+  }
+  
+  .label {
+    position: absolute;
+    width: 50%;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0% 0%;
+    text-align: left;
+  }
+  
+  .label span {
+    transform: rotate(11deg);
+    display: inline-block;
+    margin-left: 40px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+  }
+  
+  .arrow {
+    position: absolute;
+    top: 240px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5rem;
+    color: red;
+    z-index: 10;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background-color: #2196f3;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .result {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+  }
+  

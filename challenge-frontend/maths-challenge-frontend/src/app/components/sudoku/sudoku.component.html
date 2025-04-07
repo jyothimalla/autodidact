@@ -1,0 +1,17 @@
+<div class="sudoku-grid">
+    <div class="row" *ngFor="let row of grid; let i = index">
+      <div 
+        class="cell" 
+        *ngFor="let cell of row; let j = index"
+        [class.prefilled]="fixedCells[i][j]"
+      >
+        <input 
+          [value]="cell || ''"
+          [readOnly]="fixedCells[i][j]"
+          [class.filled]="cell > 0"
+          maxlength="1"
+        />
+      </div>
+    </div>
+  </div>
+  
