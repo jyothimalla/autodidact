@@ -4,12 +4,16 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 import { ConfigService } from './app/services/config.service';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
 
 // ✅ Bootstrap using a wrapper to load config before launching app
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withFetch()),
-    provideRouter(routes),
+    provideRouter(routes),FormsModule,
+    
     ConfigService
   ]
 }).then(appRef => {

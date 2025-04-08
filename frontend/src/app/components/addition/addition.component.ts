@@ -84,6 +84,7 @@ export class AdditionComponent implements OnInit {
   }
 
   @HostListener('document:keydown.enter', ['$event'])
+  
   handleEnter(event: KeyboardEvent) {
   if (!this.isEnterDisabled) {
     this.isEnterDisabled = true;  // Prevent rapid fire

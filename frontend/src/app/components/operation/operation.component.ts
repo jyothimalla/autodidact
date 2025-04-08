@@ -52,36 +52,30 @@ export class OperationComponent {
 
     if (operation === 'addition') {
       this.router.navigate(['/addition']);
-    } 
-    else if (operation === 'subtraction') {
+    } else if (operation === 'subtraction') {
       this.router.navigate(['/subtraction']);
-    }
-    else if (operation === 'multiplication') {
+    } else if (operation === 'multiplication') {
       this.router.navigate(['/multiplication']);
-    }
-    else if (operation === 'division') {
+    } else if (operation === 'division') {
       this.router.navigate(['/division']);
-    }
+    } 
     else if (operation === 'fmc') {
       this.router.navigate(['/fmc']);
-    }
-    else if (operation === 'sudoku') {
+    } else if (operation === 'sudoku') {
       this.router.navigate(['/sudoku']);
-    }
-    else {
+    } else {
       this.quizService.startSession(userName, operation, level).subscribe({
         next: () => this.router.navigate(['/quiz']),
         error: (err) => console.error('❌ Failed to start session:', err)
       });
     }
   }
-   
+
   getLevelLabel(level: number): string {
-      if (this.selectedOperation.toLowerCase() === 'sudoku') {
-        const found = this.sudokuLevels.find(l => l.value === level);
-        return found ? found.label : `Level ${level}`;
-      }
-      return `Level ${level}`;
-    
+    if (this.selectedOperation.toLowerCase() === 'sudoku') {
+      const found = this.sudokuLevels.find(l => l.value === level);
+      return found ? found.label : `Level ${level}`;
+    }
+    return `Level ${level}`;
   }
 }
