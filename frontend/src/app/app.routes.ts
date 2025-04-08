@@ -17,6 +17,8 @@ import { SubtractionComponent } from './components/subtraction/subtraction.compo
 import { MultiplicationComponent } from './components/multiplication/multiplication.component';
 import { SudokuComponent } from './components/sudoku/sudoku.component';
 import { DivisionComponent } from './components/division/division.component';
+import { AnswerUploadComponent } from './components/answer-upload/answer-upload.component';
+import { FmcComponent } from './components/fmc/fmc.component';
 
 
 export const routes: Routes = [
@@ -30,10 +32,16 @@ export const routes: Routes = [
   {path: 'subtraction', loadComponent: () => import('./components/subtraction/subtraction.component').then(m => m.SubtractionComponent)},
   {path: 'multiplication', loadComponent: () => import('./components/multiplication/multiplication.component').then(m => m.MultiplicationComponent)},
   {path: 'division', loadComponent: () => import('./components/division/division.component').then(m => m.DivisionComponent)},
+  {
+    path: 'fmc',
+    loadComponent: () => import('./components/fmc/fmc.component').then(m => m.FmcComponent)
+  },
+  
   {path: 'left_sidebar', component: LeftSidebarComponent},
   {path: 'header', component: HeaderComponent},
   {path: 'footer', component: FooterComponent},
   {path: 'lottie', component: LottieComponent},
   {path: 'sudoku', component: SudokuComponent},
-  {path: 'right_sidebar', component: RightSidebarComponent}
+  {path: 'right_sidebar', component: RightSidebarComponent},
+  { path: 'upload-answers', component: AnswerUploadComponent },
 ];

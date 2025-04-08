@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 import random
 
-sudoku_router = APIRouter()
+router = APIRouter()
 
 def generate_easy_sudoku():
     # Simple placeholder: a 4x4 grid with some cells filled
@@ -13,6 +13,6 @@ def generate_easy_sudoku():
     ]
     return board
 
-@sudoku_router.get("/sudoku/easy")
+@router.get("/sudoku/easy")
 def get_easy_sudoku():
     return {"puzzle": generate_easy_sudoku()}
