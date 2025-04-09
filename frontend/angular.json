@@ -26,6 +26,8 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/favicon.ico",
+              "src/assets",
               { 
                 "glob": "**/*",
                 "input": "public"
@@ -37,11 +39,8 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "baseHref": "./"
+            
           },
           "configurations": {
             "production": {
@@ -72,11 +71,11 @@
           "configurations": {
             "production": {
               
-              "buildTarget": "frontend:build:production"
+              "buildTarget": "autodidact-frontend:build:production"
               
             },
             "development": {
-              "buildTarget": "frontend:build:development"
+              "buildTarget": "autodidact-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
