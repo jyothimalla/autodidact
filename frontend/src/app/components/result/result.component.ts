@@ -90,16 +90,18 @@ export class ResultComponent implements OnInit {
   }
   nextLevel(): void {
     const nextLevel = this.level + 1;
+    const currentOperation = localStorage.getItem('operation'); // or pass it in as input
     localStorage.setItem('level', nextLevel.toString());
-    this.router.navigate(['/quiz']);
+    this.router.navigate([`/operation/${currentOperation}/${nextLevel}`]);
   }
+  
   retryLevel(): void {
     localStorage.setItem('level', this.level.toString());
-    this.router.navigate(['/quiz']);
+    this.router.navigate(['/operation']);
   }
   restartQuiz(): void { 
     localStorage.setItem('level', this.level.toString());
-    this.router.navigate(['/quiz']);
+    this.router.navigate(['/operation']);
   }
   retryOperation(): void {
     localStorage.setItem('level', this.level.toString());
@@ -129,9 +131,19 @@ export class ResultComponent implements OnInit {
 
     // ✅ Call backend to start session for next level
     this.quizService.startSession(userName, this.operation, nextLevel).subscribe({
-      next: () => this.router.navigate(['/quiz']),
-      error: (err) => console.error('Failed to start next level:', err)
+      next: (res) => {
+        console.log('Session started for next level:', res);
+        this.router.navigate(['/operation']);
+      },
+      error: (err) => {
+        console.error('Failed to start session for next level:', err);
+        // Fallback to local navigation if API call fails
+        this.router.navigate(['/operation']);
+      }
     });
+  }
+  reviewAnswers(): void {
+    this.router.navigate(['/review']);
   }
   retrySameLevel(): void {
     localStorage.setItem('operation', 'addition');

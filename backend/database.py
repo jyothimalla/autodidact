@@ -67,19 +67,18 @@ class QuizSession(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), nullable=False)
-    answers = relationship("UserAnswer", back_populates="user")
+    name = Column(String, nullable=False)
 
+    
 class UserAnswer(Base):
     __tablename__ = "user_answers"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     question_id = Column(Integer, nullable=False)
     selected_answer = Column(String(10), nullable=False)
     correct_answer = Column(String(10), nullable=False)
-    user = relationship("User", back_populates="answers")
 
 class GeneratedProblem(Base):
     __tablename__ = "generated_problems"
@@ -115,6 +114,17 @@ class UserProgress(Base):
     level_completed = Column(Integer, nullable=False)
     dojo_points = Column(Integer, nullable=False)
     
+class FMCQuestionBank(Base):
+    __tablename__ = "fmc_question_bank"
+
+    id = Column(Integer, primary_key=True, index=True)
+    level = Column(Integer, nullable=False)
+    question_type = Column(String, nullable=False)
+    question = Column(String, nullable=False)
+    answer = Column(String, nullable=False)
+    explanation = Column(String, nullable=False)
+    image = Column(String, nullable=True)  # ✅ Optional image
+    is_exam_ready = Column(Boolean, default=False)  # ✅ Admin toggle
 
 def get_db():
     db = SessionLocal()
