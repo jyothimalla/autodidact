@@ -26,7 +26,6 @@ export function playerFactory() {
     FormsModule,
     RightSidebarComponent,
     LeftSidebarComponent,
-    HeaderComponent,
     FooterComponent,
   ],
   templateUrl: './addition.component.html',
@@ -116,7 +115,7 @@ export class AdditionComponent implements OnInit {
 
     this.userAnswers[this.currentQIndex] = user;
     this.answerInput = '';
-
+    
     setTimeout(() => {
       this.feedbackMessage = '';
     }, 1500);
@@ -126,7 +125,9 @@ export class AdditionComponent implements OnInit {
     } else {
       this.completeQuiz();
     }
+    
   }
+  
 
   completeQuiz(): void {
     this.quizCompleted = true;

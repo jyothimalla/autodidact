@@ -31,13 +31,22 @@ export class QuizService {
   }
   getDivisionQuestions(level: number): Observable<any[]> {
   return this.http.get<any[]>(`${this.baseUrl}/division/questions?level=${level}`);
-}
+  }
 
-getMultiplicationQuestions(level: number): Observable<any[]> {
-  return this.http.get<any[]>(`${this.baseUrl}/multiplication/questions?level=${level}`);
-}
-
+  getMultiplicationQuestions(level: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/multiplication/questions?level=${level}`);
+  }
+  getWordProblems(userName: string, operation: string, difficulty: number) {
+    const url = `http://localhost:8000/word-problem?user_name=${userName}&operation=${operation}&difficulty=${difficulty}`;
+    return this.http.get<any[]>(url);
+  }
+  getFMCQuestions(level: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/fmc/questions?level=${level}`);
+  }
   submitResult(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/quiz/submit-result`, data);
+  }
+  saveProgress(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/save-progress`, data);
   }
 }

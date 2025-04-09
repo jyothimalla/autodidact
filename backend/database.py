@@ -5,6 +5,10 @@ from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 from dotenv import load_dotenv
 from sqlalchemy import text
+from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
+
 # =======================
 # Environment Variables
 # =======================
@@ -17,6 +21,8 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 SCHEMA_PATH = os.path.join(os.path.dirname(__file__), "../postgresql/schema.sql")
 
 engine = create_engine(DATABASE_URL)
+conn = engine.connect()
+print("✅ Connection successful")
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
 
@@ -100,14 +106,41 @@ class UserScore(Base):
     is_completed = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
 
+class UserProgress(Base):
+    __tablename__ = "user_progress"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_name = Column(String, nullable=False)
+    operation = Column(String, nullable=False)
+    level_completed = Column(Integer, nullable=False)
+    dojo_points = Column(Integer, nullable=False)
+    
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 # =======================
 # Initialize DB
 # =======================
 def init_db():
+    table_sql = """
+    CREATE TABLE IF NOT EXISTS generated_problems (
+        id SERIAL PRIMARY KEY,
+        user_name TEXT NOT NULL,
+        question TEXT NOT NULL,
+        answer TEXT NOT NULL,
+        operation TEXT NOT NULL,
+        level INTEGER NOT NULL DEFAULT 1,
+        attempted BOOLEAN DEFAULT FALSE,
+        user_answer TEXT,
+        correct BOOLEAN,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """
     with engine.connect() as connection:
-        with open(SCHEMA_PATH, "r") as file:
-            sql_commands = file.read().split(';')
-            for command in sql_commands:
-                cleaned = command.strip()
-                if cleaned:
-                    connection.execute(text(cleaned))
+        connection.execute(text(table_sql))
+        connection.commit()
