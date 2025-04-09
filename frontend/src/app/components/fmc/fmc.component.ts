@@ -1,86 +1,91 @@
-import { Component , OnInit,  HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { QuizService } from '../../services/quiz.service';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';  // ✅ this is required
-import { WordProblemService, WordProblem } from '../../services/word-problem.service';
-import { HeaderComponent } from "../header/header.component";
-import { LeftSidebarComponent } from "../left-sidebar/left-sidebar.component";
-import { FooterComponent } from "../footer/footer.component";
+import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
+import { FooterComponent } from '../footer/footer.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-fmc',
-  standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent, LeftSidebarComponent, FooterComponent, RightSidebarComponent],  // ✅ enable form handling
   templateUrl: './fmc.component.html',
-  styleUrls: ['./fmc.component.scss']
+  styleUrls: ['./fmc.component.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, LeftSidebarComponent, RightSidebarComponent, FooterComponent],
+  providers: [QuizService]
 })
-export class FmcComponent {
-  questions: WordProblem[] = [];
+export class FMCComponent implements OnInit {
+  questions: any[] = [];
   currentQIndex = 0;
-  userAnswer: string = '';
-  
-  userName: string = '';
-  score: number = 0;
-  isFinished: boolean = false;
-  correctAnswers: string[] = [];
-  isEnterDisabled: boolean = false; // Flag to prevent rapid fire
-  lastUserAnswer: string = '';
-  lastCorrectAnswer: string = '';
-  isCorrect: boolean = true; 
-  elapsedTime: string = '0:00';
+  userAnswer = '';
+  feedbackMessage = '';
+  score = 0;
+  level = 0;
+  userName = '';
+  elapsedTime = '0:00';
+  timer: any;
+  secondsElapsed = 0;
+  isFinished = false;
 
-  constructor(private wordService: WordProblemService) {}
-  
+  constructor(private quizService: QuizService, private router: Router) {}
+
   ngOnInit(): void {
-    console.log('✅ FMC component loaded');
-    this.loadProblems();
-  }
-  
-  loadProblems(): void {
-    this.wordService.getWordProblems('Jyothi', 'addition', 2).subscribe({
-      next: (questions: WordProblem[]) => {
-        this.questions = questions;  // ✅ Important
-        this.currentQIndex = 0;
-        this.score = 0;
-        this.userAnswer = '';
-        this.isFinished = false;
+    this.level = parseInt(localStorage.getItem('level') || '0', 10);
+    this.userName = localStorage.getItem('userName') || 'Guest';
+    localStorage.setItem('operation', 'fmc');
+
+    this.quizService.getFMCQuestions(this.level).subscribe({
+      next: (res) => {
+        this.questions = res;
+        this.startTimer();
       },
-      error: (err) => {
-        console.error('❌ Failed to load word problems:', err);
-      }
+      error: (err) => console.error('FMC fetch error:', err)
     });
   }
-  
 
   submitAnswer(): void {
-    const correct = this.questions[this.currentQIndex].answer.trim();
-    const isCorrect = this.userAnswer.trim() === correct;
-    this.correctAnswers.push(correct);
-    if (isCorrect) this.score++;
-
-    this.userAnswer = '';
-    this.currentQIndex++;
-
-    if (this.currentQIndex >= this.questions.length) {
-      this.isFinished = true;
+    const correct = this.questions[this.currentQIndex]?.answer;
+    const user = this.userAnswer.trim();
+    if (!user) {
+    alert('⚠️ Please enter your answer before submitting!');
+    return;
+  }
+    if (user === correct) {
+      this.score++;
+      this.feedbackMessage = '✅ Correct!';
+    } else {
+      this.feedbackMessage = `❌ Incorrect! Correct answer: ${correct}`;
     }
-  }
-  @HostListener('document:keydown.enter', ['$event'])
   
-  handleEnter(event: KeyboardEvent) {
-  if (!this.isEnterDisabled) {
-    this.isEnterDisabled = true;  // Prevent rapid fire
-    this.submitAnswer();
-
-    // Reset after short delay
+    this.userAnswer = ''; // clears input for the next question
+  
     setTimeout(() => {
-      this.isEnterDisabled = false;
-    }, 11500);  // Adjust timing if needed
+      this.feedbackMessage = '';
+      if (this.currentQIndex < this.questions.length - 1) {
+        this.currentQIndex++;
+      } else {
+        this.finishQuiz();
+      }
+    }, 1500);
   }
-}
 
+  startTimer(): void {
+    this.timer = setInterval(() => {
+      this.secondsElapsed++;
+      const mins = Math.floor(this.secondsElapsed / 60);
+      const secs = this.secondsElapsed % 60;
+      this.elapsedTime = `${mins}:${secs < 10 ? '0' + secs : secs}`;
+    }, 1000);
+  }
+
+  finishQuiz(): void {
+    clearInterval(this.timer);
+    this.isFinished = true;
+    localStorage.setItem('score', this.score.toString());
+  }
 
   tryAgain(): void {
-    this.loadProblems();
+    this.router.navigate(['/operation']);
   }
 }

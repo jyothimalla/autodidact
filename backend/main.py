@@ -15,14 +15,17 @@ from database import init_db
 from routers import submit_score 
 from sqlalchemy import text
 from database import init_db
-init_db()
-
-
+from routers import fmc_routes
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from routers import progress_routes
 from sqladmin import Admin, ModelView
 from database import engine, Question, QuizSession, User, UserScore  # Import your models
 from database import Base, engine
-Base.metadata.create_all(bind=engine)
 
+init_db()
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -68,4 +71,6 @@ app.include_router(multiplication_routes.router)
 app.include_router(sudoku_routes.router)
 app.include_router(word_problem_routes.router)
 app.include_router(submit_score.router)
+app.include_router(fmc_routes.router)
 
+app.include_router(progress_routes.router)

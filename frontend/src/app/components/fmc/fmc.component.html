@@ -1,4 +1,3 @@
-<app-header></app-header>
 
 <div class="quiz-wrapper" *ngIf="questions.length > 0">
   <!-- LEFT SIDEBAR -->
@@ -10,52 +9,58 @@
   <div class="quiz-main-card">
     <div class="quiz-header">
       <h2 class="quiz-title fmc">
-       <!-- {{ currentOperation | titlecase }} – Level {{ level }} -->
+        FMC – Level {{ level }}
       </h2>
+    </div>
 
-<div *ngIf="questions.length > 0"    >
-    <h2>Q{{ currentQIndex + 1 }}: {{ questions[currentQIndex].question }}</h2>
-    <label>
-      Your Answer: <input [(ngModel)]="userAnswer" (keyup.enter)="submitAnswer()" />
-    </label>
-    <button (click)="submitAnswer()">Submit</button>
-  </div>
-  
-  <div *ngIf="isFinished">
-    <h3>You scored {{ score }}/{{ questions.length }}</h3>
-    <button (click)="tryAgain()">Try Again</button>
-  </div>
- <!-- Question -->
- <div class="question-row">
-    
-
-  </div>
+    <!-- Question Section -->
     <div class="question-row">
-        <div class="question-number">
-        <h3>Question {{ currentQIndex + 1 }} of {{ questions.length }}</h3>
-        </div>
-        <div class="question-timer">
-        <h3>Time Left: {{ elapsedTime | date:'mm:ss' }}</h3>
-        </div>
+      <div class="question-container">
+        <p>
+          {{ questions[currentQIndex]?.question }}
+        </p>
+        <label>
+          Your answer:
+          <input
+            type="text"
+            [(ngModel)]="userAnswer"
+            class="answer-input"
+            (keyup.enter)="submitAnswer()" />
+        </label>
+        <button class="submit-btn" (click)="submitAnswer()">Submit</button>
+      </div>
+    </div>
 
-<!-- RIGHT SIDEBAR -->
-<div class="right-sidebar">
-  <app-right-sidebar
-    [userName]="userName"
-    [score]="score"
-    [currentQIndex]="currentQIndex"
-    [totalQuestions]="questions.length"
-    [elapsedTime]="elapsedTime">
-  </app-right-sidebar>
-</div>
+    <!-- Feedback -->
+    <div class="feedback" *ngIf="feedbackMessage">
+      <p>{{ feedbackMessage }}</p>
+    </div>
+
+    <!-- Retry -->
+    <div *ngIf="isFinished">
+      <h3>You scored {{ score }}/{{ questions.length }}</h3>
+      <button (click)="tryAgain()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="right-sidebar">
+    <app-right-sidebar
+      [userName]="userName"
+      [score]="score"
+      [currentQIndex]="currentQIndex"
+      [totalQuestions]="questions.length"
+      [elapsedTime]="elapsedTime">
+    </app-right-sidebar>
+  </div>
 </div>
 
 <!-- Fallback -->
 <div *ngIf="questions.length === 0">
-<p>Loading questions...</p>
+  <p>Loading questions...</p>
 </div>
 
 <!-- Footer -->
 <div class="footer" style="margin: auto; padding: 10px; width: 100%;">
-<app-footer></app-footer>
+  <app-footer></app-footer>
 </div>
