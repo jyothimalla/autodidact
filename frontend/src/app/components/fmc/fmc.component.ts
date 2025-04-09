@@ -27,6 +27,10 @@ export class FMCComponent implements OnInit {
   timer: any;
   secondsElapsed = 0;
   isFinished = false;
+  currentOperation = 'fmc';
+  isEnterDisabled = false;
+  lastUserAnswer = '';
+  lastCorrectAnswer = '';
 
   constructor(private quizService: QuizService, private router: Router) {}
 
@@ -45,12 +49,15 @@ export class FMCComponent implements OnInit {
   }
 
   submitAnswer(): void {
-    const correct = this.questions[this.currentQIndex]?.answer;
+    const currentQ = this.questions[this.currentQIndex];
+    const correct = currentQ?.answer.trim();
     const user = this.userAnswer.trim();
+  
     if (!user) {
-    alert('⚠️ Please enter your answer before submitting!');
-    return;
-  }
+      alert('⚠️ Please enter your answer before submitting!');
+      return;
+    }
+  
     if (user === correct) {
       this.score++;
       this.feedbackMessage = '✅ Correct!';
@@ -58,16 +65,35 @@ export class FMCComponent implements OnInit {
       this.feedbackMessage = `❌ Incorrect! Correct answer: ${correct}`;
     }
   
-    this.userAnswer = ''; // clears input for the next question
+    this.userAnswer = ''; // clear input
   
     setTimeout(() => {
       this.feedbackMessage = '';
       if (this.currentQIndex < this.questions.length - 1) {
         this.currentQIndex++;
       } else {
-        this.finishQuiz();
+        this.completeQuiz();  // or finishQuiz(), whichever is your finalizer
       }
-    }, 1500);
+    }, 1000);  // optional: delay feedback
+  }
+  
+  completeQuiz(): void {
+    clearInterval(this.timer);
+    this.isFinished = true;
+    localStorage.setItem('score', this.score.toString());
+    localStorage.setItem('answers', JSON.stringify(this.questions.map(q => q.answer)));
+    localStorage.setItem('questions', JSON.stringify(this.questions));
+    localStorage.setItem('explanation', JSON.stringify(this.questions.map(q => q.explanation)));
+    
+    const progressKey = `${this.currentOperation}_progress`;
+    const unlockedLevel = parseInt(localStorage.getItem(progressKey) || '0', 10);
+
+    if (this.score === this.questions.length && this.level >= unlockedLevel) {
+      localStorage.setItem(progressKey, (this.level + 1).toString());
+    }
+
+    setTimeout(() => this.router.navigate(['/result']), 1000);
+    
   }
 
   startTimer(): void {
@@ -87,5 +113,8 @@ export class FMCComponent implements OnInit {
 
   tryAgain(): void {
     this.router.navigate(['/operation']);
+  }
+  reviewAnswers(): void {
+    this.router.navigate(['/result'], { queryParams: { score: this.score, elapsedTime: this.elapsedTime } });
   }
 }

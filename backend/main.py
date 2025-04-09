@@ -74,3 +74,7 @@ app.include_router(submit_score.router)
 app.include_router(fmc_routes.router)
 
 app.include_router(progress_routes.router)
+
+class UserAdmin(ModelView, model=User):
+    column_list = [User.id, User.name]
+    form_columns = [User.name]  # 👈 This ensures only 'name' shows in the form

@@ -24,8 +24,10 @@
           <input
             type="text"
             [(ngModel)]="userAnswer"
-            class="answer-input"
-            (keyup.enter)="submitAnswer()" />
+            (keydown.enter)="submitAnswer()"
+            placeholder="Type your answer"
+            />
+
         </label>
         <button class="submit-btn" (click)="submitAnswer()">Submit</button>
       </div>
@@ -40,6 +42,7 @@
     <div *ngIf="isFinished">
       <h3>You scored {{ score }}/{{ questions.length }}</h3>
       <button (click)="tryAgain()">Try Again</button>
+      <button (click)="reviewAnswers()">Review Your Answers</button>
     </div>
   </div>
 

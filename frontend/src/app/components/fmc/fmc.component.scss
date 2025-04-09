@@ -2,6 +2,10 @@
     color: #8a2be2;
     font-size: 1.6rem;
     margin-bottom: 20px;
+    background-color: #f3d6ff;
+    padding: 0.8rem;
+    border-radius: 10px;
+    text-align: center;
   }
   
   .question-container {
@@ -11,6 +15,7 @@
     border-radius: 8px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     margin-bottom: 20px;
+    width: 100%;
   }
   
   .answer-input {
@@ -42,13 +47,6 @@
     color: #d63384;
     font-weight: bold;
   }
-  .quiz-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 2rem;
-    font-family: 'Poppins', sans-serif;
-  }
   
   /* Reserve space for left sidebar */
   .left-sidebar {
@@ -63,7 +61,7 @@
     background-color: #ffffff;
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px #f3d6ff; ;
   }
   
   /* Right sidebar styling */
@@ -149,25 +147,6 @@
     justify-content: flex-end;
     padding-bottom: 1rem;
   }
-  .answer-input {
-    width: 60px;
-    border: 2px solid #2196f3;
-    border-radius: 5px;
-    padding: 4px 8px;
-    font-size: 1.1rem;
-    margin-left: 8px;
-  }
-  .feedback {
-    margin-top: 1rem;
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-  .quiz-title.addition {
-    background-color: #ffe0e0;
-    padding: 0.8rem;
-    border-radius: 10px;
-    text-align: center;
-  }
   
   .quiz-wrapper {
     display: flex;
@@ -178,20 +157,7 @@
     font-family: 'Poppins', sans-serif;
     flex-wrap: wrap;
   }
-  
-  .left-sidebar, .right-sidebar {
-    width: 220px;
-  }
-  
-  .quiz-main-card {
-    flex: 1;
-    min-width: 600px;
-    background: #fff;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  }
-  
+
   .quiz-title {
     background: #ffe0e0;
     padding: 1rem;
@@ -201,48 +167,6 @@
     font-size: 1.4rem;
     margin-bottom: 1rem;
   }
-  
-  .character-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .feedback {
-    margin-top: 1rem;
-    font-size: 1.1rem;
-    padding: 0.5rem;
-  }
-  
-  .correct {
-    color: green;
-  }
-  
-  .incorrect {
-    color: red;
-  }
-  
-  .correct-answer {
-    color: green;
-    margin-top: 0.5rem;
-  }
-  
-  .answer-input {
-    width: 80px;
-    border: 2px solid #2196f3;
-    padding: 5px;
-    border-radius: 6px;
-  }
-  
-  .submit-btn {
-    background-color: #73AD21;
-    padding: 0.6rem 1.2rem;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-  }
   .character-row {
     display: flex;
     align-items: center;
@@ -251,7 +175,7 @@
   }
   
   .question-text {
-    font-size: 1.4rem;
+    font-size: 1.0rem;
     font-weight: 500;
   }
   

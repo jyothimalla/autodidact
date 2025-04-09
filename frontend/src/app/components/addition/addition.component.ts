@@ -105,7 +105,10 @@ export class AdditionComponent implements OnInit {
     this.lastUserAnswer = user;
     this.lastCorrectAnswer = correct;
     this.isCorrect = user === correct;
-
+    if (!user) {
+      alert('⚠️ Please enter your answer before submitting!');
+      return;
+    }
     if (this.isCorrect) {
       this.feedbackMessage = '✅ Correct!';
       this.score++;
