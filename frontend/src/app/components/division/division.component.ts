@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { QuizService } from '../../services/quiz.service';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
-import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 
 @Component({
@@ -17,7 +16,6 @@ import { FooterComponent } from '../footer/footer.component';
     FormsModule,
     RightSidebarComponent,
     LeftSidebarComponent,
-    HeaderComponent,
     FooterComponent,
   ],
   templateUrl: './division.component.html',
@@ -75,7 +73,10 @@ export class DivisionComponent implements OnInit {
     const currentQ = this.questions[this.currentQIndex];
     const correct = currentQ.answer.trim();
     const user = this.answerInput.trim();
-
+    if (!user) {
+      alert('⚠️ Please enter your answer before submitting!');
+      return;
+    }
     this.isCorrect = user === correct;
     this.lastCorrectAnswer = correct;
     this.feedbackMessage = this.isCorrect ? '✅ Correct!' : `❌ Incorrect! Correct is ${correct}`;

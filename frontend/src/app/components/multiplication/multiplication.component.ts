@@ -6,13 +6,12 @@ import { FormsModule } from '@angular/forms';
 import { QuizService } from '../../services/quiz.service';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
-import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 
 
 @Component({
   selector: 'app-multiplication',
-  imports: [CommonModule, FormsModule, RightSidebarComponent, LeftSidebarComponent, HeaderComponent, FooterComponent],
+  imports: [CommonModule, FormsModule, RightSidebarComponent, LeftSidebarComponent, FooterComponent],
   standalone: true,
   templateUrl: './multiplication.component.html',
   styleUrl: './multiplication.component.scss'
@@ -75,7 +74,10 @@ export class MultiplicationComponent implements OnInit {
     this.lastUserAnswer = user;
     this.lastCorrectAnswer = correct;
     this.isCorrect = user === correct;
-
+    if (!user) {
+      alert('⚠️ Please enter your answer before submitting!');
+      return;
+    }
     this.feedbackMessage = this.isCorrect
       ? '✅ Correct!'
       : `❌ Your answer "${user}" is incorrect.\n✅ Correct answer is "${correct}"`;

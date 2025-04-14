@@ -31,55 +31,54 @@ export class ResultComponent implements OnInit {
   constructor(private router: Router, private quizService: QuizService) {}
 
   ngOnInit(): void {
-    const name = localStorage.getItem('userName');
-    const storedScore = localStorage.getItem('score');
-    const storedAnswers = localStorage.getItem('answers');
-    const storedQuestions = localStorage.getItem('questions');
-    const storedExplanation = localStorage.getItem('explanation');
-    const operation = localStorage.getItem('operation') || 'addition';
-    const level = parseInt(localStorage.getItem('level') || '0', 10);
-    
-    this.operation = operation;
-    this.level = level;
-    if (!name || !storedScore || !storedAnswers || !storedQuestions) {
-    this.router.navigate(['/']);
-    return;
-    }
-    try {
-    this.userName = name;
-    this.score = parseInt(storedScore);
-    this.userAnswers = JSON.parse(storedAnswers);
-    this.questions = JSON.parse(storedQuestions);
-    this.total = this.questions.length;
-    }catch (err){
-      console.error("❌ Failed to parse stored data:", err);
-      this.router.navigate(['/']);
-    }
-    // ✅ Load operation/level from local storage
-    this.operation = localStorage.getItem('operation') || 'addition';
-    this.level = parseInt(localStorage.getItem('level') || '0', 10);
-    this.questions.forEach((q, i) => {
-      if (!q.correctValue && q.answer) {
-        q.correctValue = q.answer; // fallback
+    const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  
+    if (isBrowser) {
+      const name = localStorage.getItem('userName');
+      const storedScore = localStorage.getItem('score');
+      const storedAnswers = localStorage.getItem('answers');
+      const storedQuestions = localStorage.getItem('questions');
+      const storedExplanation = localStorage.getItem('explanation');
+      const operation = localStorage.getItem('operation') || 'addition';
+      const level = parseInt(localStorage.getItem('level') || '0', 10);
+  
+      this.operation = operation;
+      this.level = level;
+  
+      if (!name || !storedScore || !storedAnswers || !storedQuestions) {
+        this.router.navigate(['/']);
+        return;
       }
-    });
-
-    // ✅ Update progress if score is 10
-    if (this.score === 10) {
-      const progressKey = `${operation}_progress`;
-      const currentUnlocked = parseInt(localStorage.getItem(progressKey) || '0', 10);
-      if (level >= currentUnlocked) {
-        localStorage.setItem(progressKey, (level + 1).toString());
+  
+      try {
+        this.userName = name;
+        this.score = parseInt(storedScore);
+        this.userAnswers = JSON.parse(storedAnswers);
+        this.questions = JSON.parse(storedQuestions);
+        this.total = this.questions.length;
+      } catch (err) {
+        console.error("❌ Failed to parse stored data:", err);
+        this.router.navigate(['/']);
       }
+  
+      this.questions.forEach((q, i) => {
+        if (!q.correctValue && q.answer) {
+          q.correctValue = q.answer;
+        }
+      });
+  
+      if (this.score === 10) {
+        const progressKey = `${operation}_progress`;
+        const currentUnlocked = parseInt(localStorage.getItem(progressKey) || '0', 10);
+        if (level >= currentUnlocked) {
+          localStorage.setItem(progressKey, (level + 1).toString());
+        }
+      }
+    } else {
+      console.warn("⚠️ Skipping localStorage logic — running on server.");
     }
-    
-    this.questions.forEach(q => {
-      if (!q.correctValue && q.answer) {
-        q.correctValue = q.answer;
-      }
-    });
-    
   }
+  
 
   goHome(): void {
     localStorage.removeItem('score');
