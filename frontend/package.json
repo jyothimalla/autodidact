@@ -4,8 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration=production",
-    "postinstall": "ng build --configuration=production",
+    "build":   "build": "npm install -g @angular/cli && ng build --configuration production --base-href ./",
+    "build:dev": "ng build --configuration development",
+    "build:prod": "ng build --configuration production",
+    "postinstall": "npm install -g @angular/cli",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:maths-chalenge-frontend": "node dist/maths-chalenge-frontend/server/server.mjs"

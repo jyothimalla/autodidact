@@ -1,6 +1,4 @@
-<div class="header">
-    <app-header></app-header>
-</div>
+
 <div class="quiz-wrapper" *ngIf="questions.length > 0">
     <!-- LEFT SIDEBAR (Reserved for future) -->
     <div class="left-sidebar">
@@ -23,16 +21,16 @@
       <!-- Question -->
       <div class="question-row">
         <div class="character-container" (click)="readQuestionAloud()">
-         <!-- <img
-            src="../src/app/images//bird1.png"
+         <img
+            src="assets/images/bird1.png"
             alt="Bird Reader"
             [class.animate]="isReading"
-          /> -->
+          /> 
         </div>
         <div class="question-container">        
             
         <p>
-           <button class="volume-btn" (click)="readQuestionAloud()" aria-label="Read question aloud">🔊</button>
+         <!--  <button class="volume-btn" (click)="readQuestionAloud()" aria-label="Read question aloud">🔊</button>-->
           {{ questions[currentQIndex].question.split('=')[0] }} =
           <input
           type="text"

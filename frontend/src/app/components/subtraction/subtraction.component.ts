@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { QuizService } from '../../services/quiz.service';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
-import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import player from 'lottie-web';
 import { AnimationOptions } from 'ngx-lottie';
@@ -19,7 +18,6 @@ import { AnimationItem } from 'lottie-web';
     FormsModule,
     RightSidebarComponent,
     LeftSidebarComponent,
-    HeaderComponent,
     FooterComponent,
   ],
   templateUrl: './subtraction.component.html',
