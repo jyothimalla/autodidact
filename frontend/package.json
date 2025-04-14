@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build":   "build": "npm install -g @angular/cli && ng build --configuration production --base-href ./",
+    "build":   "npm install -g @angular/cli && ng build --configuration production --base-href ./",
     "build:dev": "ng build --configuration development",
     "build:prod": "ng build --configuration production",
     "postinstall": "npm install -g @angular/cli",
