@@ -1,17 +1,17 @@
 {
-  "name": "maths-chalenge-frontend",
+  "name": "autodidact-frontend",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build":   "npm install -g @angular/cli && ng build --configuration production --base-href ./",
-    "build:dev": "ng build --configuration development",
-    "build:prod": "ng build --configuration production",
-    "postinstall": "npm install -g @angular/cli",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:maths-chalenge-frontend": "node dist/maths-chalenge-frontend/server/server.mjs"
-  },
+  "ng": "node_modules/.bin/ng",
+  "start": "node_modules/.bin/ng serve",
+  "build": "node_modules/.bin/ng build --configuration production --base-href ./",
+  "build:dev": "node_modules/.bin/ng build --configuration development",
+  "build:prod": "node_modules/.bin/ng build --configuration production",
+  "postinstall": "",
+  "watch": "node_modules/.bin/ng build --watch --configuration development",
+  "test": "node_modules/.bin/ng test",
+  "serve:ssr:autodidact-frontend": "node dist/autodidact-frontend/server/server.mjs"
+},
   "private": true,
   "dependencies": {
     "@angular/common": "^19.2.0",
