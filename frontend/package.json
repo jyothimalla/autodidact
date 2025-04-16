@@ -4,7 +4,7 @@
   "scripts": {
   "ng": "node_modules/.bin/ng",
   "start": "node_modules/.bin/ng serve",
-  "build": "node_modules/.bin/ng build --configuration production --base-href ./",
+  "build": "ng build --configuration production --base-href ./",
   "build:dev": "node_modules/.bin/ng build --configuration development",
   "build:prod": "node_modules/.bin/ng build --configuration production",
   "postinstall": "",

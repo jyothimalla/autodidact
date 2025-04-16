@@ -78,7 +78,15 @@ switchOperation(operation: string) {
   );
   
 }
-
+goBack(): void {
+  clearInterval(this.timer);
+  this.router.navigate(['/']);
+  localStorage.removeItem('userName');
+  localStorage.removeItem('operation');
+  localStorage.removeItem('level');
+  localStorage.removeItem('score');
+  this.router.navigate(['/operation']);
+}
 goHome(): void {
   clearInterval(this.timer);
   localStorage.removeItem('userName');

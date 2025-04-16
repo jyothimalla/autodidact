@@ -31,7 +31,7 @@
               { 
                 "glob": "**/*",
                 "input": "public",
-                "output": "./"
+                "output": "/"
               }
             ],
             "styles": [

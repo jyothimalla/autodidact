@@ -22,6 +22,8 @@ from routers import progress_routes
 from sqladmin import Admin, ModelView
 from database import engine, Question, QuizSession, User, UserScore  # Import your models
 from database import Base, engine
+from routers import reasoning_routes
+
 
 init_db()
 
@@ -74,6 +76,7 @@ app.include_router(submit_score.router)
 app.include_router(fmc_routes.router)
 
 app.include_router(progress_routes.router)
+app.include_router(reasoning_routes.router)
 
 class UserAdmin(ModelView, model=User):
     column_list = [User.id, User.name]
