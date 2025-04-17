@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://autodidact.onrender.com'  // Live FastAPI backend
+    apiUrl: 'https://autodidact.uk'  // Live FastAPI backend
   };
   
