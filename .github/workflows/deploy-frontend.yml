@@ -45,4 +45,3 @@ jobs:
           sudo cp -r /tmp/latest-frontend/* /var/www/html/
           sudo systemctl restart nginx
 
-
