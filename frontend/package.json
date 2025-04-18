@@ -1,5 +1,5 @@
 {
-  "name": "maths-chalenge-frontend",
+  "name": "autodidact-frontend",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,7 +8,7 @@
     "postinstall": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:maths-chalenge-frontend": "node dist/maths-chalenge-frontend/server/server.mjs"
+    "serve:ssr:autodidact-frontend": "node dist/autodidact-frontend/server/server.mjs"
   },
   "private": true,
   "dependencies": {
