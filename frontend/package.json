@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --configuration=production",
-    "postinstall": "ng build --configuration=production",
+     "postinstall": "",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:autodidact-frontend": "node dist/autodidact-frontend/server/server.mjs"
