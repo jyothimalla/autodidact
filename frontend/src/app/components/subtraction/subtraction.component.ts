@@ -1,11 +1,10 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuizService } from '../../services/quiz.service';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
-import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import player from 'lottie-web';
 import { AnimationOptions } from 'ngx-lottie';
@@ -19,8 +18,7 @@ import { AnimationItem } from 'lottie-web';
     FormsModule,
     RightSidebarComponent,
     LeftSidebarComponent,
-    HeaderComponent,
-    FooterComponent,
+    
   ],
   templateUrl: './subtraction.component.html',
   styleUrls: ['./subtraction.component.scss']
@@ -37,7 +35,8 @@ export class SubtractionComponent implements OnInit {
   level = 0;
   currentOperation = 'subtraction';
   userAnswers: string[] = [];
-  userName = '';
+  username = '';
+  user_id: number = 0;
   elapsedTime = '0:00'; 
   private timer: any;
   private secondsElapsed = 0;
@@ -47,23 +46,30 @@ export class SubtractionComponent implements OnInit {
   lastCorrectAnswer = '';
   isCorrect = true;
 
-  constructor(private quizService: QuizService, private router: Router) {}
+  constructor(private quizService: QuizService, private router: Router, private route:ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.level = parseInt(localStorage.getItem('level') || '0', 10);
-    this.userName = localStorage.getItem('userName') || 'Guest';
-    localStorage.setItem('operation', 'subtraction');
+    this.route.queryParams.subscribe(params => {
+      this.username = params['username'] || localStorage.getItem('username') || '';
+      this.user_id = parseInt(params['user_id'] || localStorage.getItem('user_id') || '0', 10);
+      this.level = parseInt(params['level'] || '0', 10);
+      this.currentOperation = params['operation'] || 'subtraction';
+      this.currentQIndex = 0;
+      console.log('📡 Fetching questions for level:', this.level);
   
-    this.quizService.getSubtractionQuestions(this.level).subscribe({
-      next: (data) => {
-        this.questions = data;
-        this.userAnswers = new Array(data.length).fill('');
-        this.startTimer();
-      },
-      error: (err) => console.error('❌ Error loading subtraction questions:', err)
+      this.quizService.getSubtractionQuestions(this.level).subscribe({
+        next: (questions) => {
+          this.questions = questions;
+  
+          console.log('✅ Questions received:', questions);
+  
+          this.userAnswers = new Array(questions.length).fill('');
+          this.startTimer();
+        },
+        error: (err) => console.error('❌ Error loading addition questions:', err)
+      });     
     });
   }
-  
 
   startTimer(): void {
     this.timer = setInterval(() => {
@@ -83,7 +89,10 @@ export class SubtractionComponent implements OnInit {
     const currentQ = this.questions[this.currentQIndex];
     const correct = currentQ.answer.trim();
     const user = this.answerInput.trim();
-
+    if (!user) {
+      alert('⚠️ Please enter your answer before submitting!');
+      return;
+    }
     this.lastUserAnswer = user;
     this.lastCorrectAnswer = correct;
     this.isCorrect = user === correct;

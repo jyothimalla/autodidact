@@ -1,4 +1,7 @@
-import { Routes } from '@angular/router';
+import { Routes, provideRouter } from '@angular/router';
+import { ApplicationConfig } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { appConfig } from './app.config';
 import { HomeComponent } from './components/home/home.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { ResultComponent } from './components/result/result.component';
@@ -19,11 +22,24 @@ import { SudokuComponent } from './components/sudoku/sudoku.component';
 import { DivisionComponent } from './components/division/division.component';
 import { AnswerUploadComponent } from './components/answer-upload/answer-upload.component';
 import { FMCComponent } from './components/fmc/fmc.component';
-
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
+import { ProgressComponent } from './progress/progress.component';
+import { AdminDashboardComponent } from './admin/admin-dashboard.component';
+import { authGuard } from './auth/auth.guard';
+import { AuthService } from './auth/auth.service';
+import { TestAdditionComponent } from './components/test-addition/test-addition.component';
+import { MyAccountComponent } from './components/my-account/my-account.component';
 
 export const routes: Routes = [
+  { path: 'login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) },
+  { path: 'register', loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent) },
   { path: '', component: HomeComponent },
-  { path: 'operation', component: OperationComponent },
+  {path: 'header', loadComponent: () => import('./components/header/header.component').then(m => m.HeaderComponent)},
+  {path: 'operation', loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
+  { path: 'operation/:type',  loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
+  //{ path: 'operation', redirectTo: 'operation/addition', pathMatch: 'full' },
+
   { path: 'level', component: LevelComponent },
   { path: 'quiz', component: QuizComponent },
   { path: 'result', component: ResultComponent },
@@ -34,10 +50,24 @@ export const routes: Routes = [
   {path: 'division', loadComponent: () => import('./components/division/division.component').then(m => m.DivisionComponent)},
   {path: 'fmc', loadComponent: () => import('./components/fmc/fmc.component').then(m => m.FMCComponent)},
   {path: 'left_sidebar', component: LeftSidebarComponent},
-  {path: 'header', component: HeaderComponent},
   {path: 'footer', component: FooterComponent},
   {path: 'lottie', component: LottieComponent},
   {path: 'sudoku', component: SudokuComponent},
   {path: 'right_sidebar', component: RightSidebarComponent},
   {path: 'upload-answers', component: AnswerUploadComponent },
+  { path: 'progress', loadComponent: () => import('./progress/progress.component').then(m => m.ProgressComponent), 
+    canActivate: [authGuard]
+   },
+   {
+    path: 'my-account/:id',
+    loadComponent: () => import('./components/my-account/my-account.component').then(m => m.MyAccountComponent)
+  },
+    {path: 'admin', loadComponent: () => import('./admin/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    canActivate: [authGuard]
+  },
+
+  {
+    path: 'test-addition',
+    loadComponent: () => import('./components/test-addition/test-addition.component').then(m => m.TestAdditionComponent),
+  },
 ];

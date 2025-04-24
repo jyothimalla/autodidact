@@ -6,19 +6,11 @@ import { routes } from './app/app.routes';
 import { ConfigService } from './app/services/config.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { appConfig } from './app/app.config';
 
-
-// ✅ Bootstrap using a wrapper to load config before launching app
-bootstrapApplication(AppComponent, {
-  providers: [
-    provideHttpClient(withFetch()),
-    provideRouter(routes),FormsModule,
-    
-    ConfigService
-  ]
-}).then(appRef => {
-  const injector = appRef.injector;
-  const configService = injector.get(ConfigService);
-
-  return configService.loadConfig();
-}).catch(err => console.error('Bootstrap failed:', err));
+const configService = new ConfigService();
+configService.loadConfig().then(() => {
+  // You can inject configService globally later if needed
+  bootstrapApplication(AppComponent, appConfig)
+    .catch(err => console.error('Bootstrap failed:', err));
+});

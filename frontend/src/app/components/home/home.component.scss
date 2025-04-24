@@ -1,66 +1,67 @@
-:host {
+.home-wrapper {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+
+  .video-container {
+    max-width: 800px;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+
+    button {
+      padding: 0.75rem 2rem;
+      font-size: 1.2rem;
+      border: none;
+      background-color: #1976d2;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #1565c0;
+      }
+    }
+  }
+}
+.home-container {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-
-  background-image: 
-    linear-gradient(rgba(25, 196, 215, 0.5), rgba(0, 0, 0, 0.5)), 
-    url('https://images.unsplash.com/photo-1607532941433-361fdc1a763e?auto=format&fit=crop&w=1650&q=80');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-family: 'Poppins', sans-serif;
+  flex: 1;
+  overflow: hidden;
+  padding: 1rem;
 }
 
-div {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.1);     /* Glassy look */
-  backdrop-filter: blur(12px);              /* ✨ Magic blur */
-  -webkit-backdrop-filter: blur(12px);      /* For Safari */
-  padding: 2rem 3rem;
-  border-radius: 20px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-  max-width: 400px;
-  width: 90%;
-  animation: fadeIn 1s ease-in-out;
+.intro-gif {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 2rem;
 }
 
-input {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  width: 100%;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-}
+.auth-buttons {
+  display: flex;
+  gap: 1.5rem;
 
-button {
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  background-color: #69d5e3;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-button:hover {
-  background-color: #077186;
-  transform: scale(1.05);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
+  button {
+    background-color: #007bff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  button:hover {
+    background-color: #0056b3;
   }
 }
+

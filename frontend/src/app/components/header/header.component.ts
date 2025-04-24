@@ -1,72 +1,93 @@
+import { Component, OnInit, Input } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
-
+import { FormsModule } from '@angular/forms';
+import { FooterComponent } from "../footer/footer.component";
+import { ConfigService } from '../../services/config.service';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-header',
-  templateUrl: './header.component.html',
-  imports: [CommonModule],
   standalone: true,
+  imports: [CommonModule, FormsModule, CommonModule, RouterModule],
+  templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent {
-  operations: string[] = ['Addition', 'Subtraction', 'Multiplication', 'Division', 'FMC', 'Sudoku'];
-  selectedOperation: string = '';
-  levels: number[] = [];
-  unlockedLevel = 0;
+export class HeaderComponent implements OnInit {
+  @Input() username = 'Guest'; // Bind this from parent
+  isLoggedIn = false;
+  user_id: number = 0;
+  awarded_title = '';
+  ninjaStars = 0;
+  attempts: any[] = [];
+  userData: any = null;
 
-  sudokuLevels = [
-    { label: 'Easy', value: 1 },
-    { label: 'Medium', value: 2 },
-    { label: 'Difficult', value: 3 },
-  ];
-
-  constructor(private router: Router, private quizService: QuizService) {}
-
-  selectOperation(operation: string) {
-    this.selectedOperation = operation;
-
-    const progressKey = `${operation.toLowerCase()}_progress`;
-    this.unlockedLevel = parseInt(localStorage.getItem(progressKey) || '1', 10);
-
-    localStorage.setItem('selectedOperation', operation.toLowerCase());
-
-    this.levels = operation.toLowerCase() === 'sudoku'
-      ? this.sudokuLevels.map(lvl => lvl.value)
-      : Array.from({ length: 10 }, (_, i) => i);
-  }
-
-  isLevelLocked(level: number): boolean {
-    return level > this.unlockedLevel;
-  }
-
-  selectLevel(level: number) {
-    if (this.isLevelLocked(level)) return;
-
-    const userName = localStorage.getItem('userName') || 'Guest';
-    const operation = this.selectedOperation.toLowerCase();
-
-    localStorage.setItem('operation', operation);
-    localStorage.setItem('level', level.toString());
-
-    if (operation === 'addition') {
-      this.router.navigate(['/addition']);
+  constructor(public router: Router, private route: ActivatedRoute, private config: ConfigService, private http: HttpClient ) {}
+  ngOnInit(): void {
+    const id = localStorage.getItem('user_id');
+    this.user_id = id ? parseInt(id, 10) : 0;
+    if (this.user_id > 0) {
+      this.loadUserProfile();
     } else {
-      this.quizService.startSession(userName, operation, level).subscribe({
-        next: () => this.router.navigate(['/quiz']),
-        error: (err) => console.error('❌ Failed to start session:', err)
-      });
+      this.username = 'Guest';
+      this.isLoggedIn = false;
     }
   }
-   
-  getLevelLabel(level: number): string {
-      if (this.selectedOperation.toLowerCase() === 'sudoku') {
-        const found = this.sudokuLevels.find(l => l.value === level);
-        return found ? found.label : `Level ${level}`;
+  
+  loadUserProfile(): void {
+    this.http.get<any>(`${this.config.apiBaseUrl}/user/profile/${this.user_id}`).subscribe({
+      next: (res) => {
+        this.username = res.username;
+        this.awarded_title = res.awarded_title || 'Ninja';
+        this.ninjaStars = res.ninja_stars;
+        this.attempts = res.progress || [];
+        this.isLoggedIn = this.username !== 'Guest';
+        console.log('✅ Header user profile loaded:', res);
+      },
+      error: (err) => {
+        console.error('❌ Failed to fetch header user profile:', err);
+        this.username = 'Guest';
+        this.isLoggedIn = false;
       }
-      return `Level ${level}`;
-    
+    });
   }
+  
+  ngDoCheck(): void {
+    this.username = this.route.snapshot.queryParams['username']  || localStorage.getItem('username') || 'Guest';
+    this.user_id = this.route.snapshot.queryParams['user_id'] || localStorage.getItem('user_id') || '0';
+
+    this.isLoggedIn = this.username !== 'Guest';
+  }
+  logout(): void {
+    localStorage.clear();
+    this.username = '';
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/']);
+      alert('Thank you! You have been logged out.');
+    });
+    this.isLoggedIn = false;
+    this.user_id = 0;;
+  }
+ 
+  userAccount(): void {
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+      this.router.navigate(['/user', userId]);
+    } else {
+      console.error('User ID not found in local storage.');
+    }
+  }
+  goToMyAccount(): void {
+    this.user_id = this.route.snapshot.queryParams['user_id'] || localStorage.getItem('user_id') || '0';
+
+    if (this.user_id) {
+      console.log('Navigating to /my-account/' + this.user_id);
+      this.router.navigate([`/my-account/${this.user_id}`]);
+    } else {
+      console.error('User ID not found in local storage.');
+    }
+  }
+  
 }

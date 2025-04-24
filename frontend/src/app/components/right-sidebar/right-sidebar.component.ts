@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./right-sidebar.component.scss']
 })
 export class RightSidebarComponent {
-  @Input() userName: string = '';
+  @Input() username: string = '';
   @Input() score: number = 0;
   @Input() currentQIndex: number = 0;
   @Input() totalQuestions: number = 0;

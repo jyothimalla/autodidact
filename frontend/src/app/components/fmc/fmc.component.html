@@ -48,8 +48,8 @@
 
   <!-- RIGHT SIDEBAR -->
   <div class="right-sidebar">
-    <app-right-sidebar
-      [userName]="userName"
+    <app-right-sidebar *ngIf="username"
+      [username]="username"
       [score]="score"
       [currentQIndex]="currentQIndex"
       [totalQuestions]="questions.length"

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <title>Test Questions</title>
+
+</head>
+
+<body>
+
+  <h2>📘 Test Addition Questions</h2>
+
+  <button onclick="loadQuestions()">Load Questions</button>
+
+  <ul id="questionList"></ul>
+
+
+
+  <script>
+
+    function loadQuestions() {
+
+      fetch('http://localhost:8000/addition/questions?level=0')
+
+        .then(res => res.json())
+
+        .then(data => {
+
+          const ul = document.getElementById('questionList');
+
+          ul.innerHTML = '';
+
+          data.forEach(q => {
+
+            const li = document.createElement('li');
+
+            li.innerHTML = `<strong>${q.question}</strong> = <em>${q.answer}</em><br><small>${q.explanation}</small>`;
+
+            ul.appendChild(li);
+
+          });
+
+        })
+
+        .catch(err => {
+
+          alert('❌ Failed to load questions');
+
+          console.error(err);
+
+        });
+
+    }
+
+  </script>
+
+</body>
+
+</html>

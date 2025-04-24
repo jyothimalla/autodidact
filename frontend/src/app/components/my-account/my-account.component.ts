@@ -1,0 +1,128 @@
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { ConfigService } from '../../services/config.service';
+import { environment } from '../../../environments/environment';
+import { AuthService } from '../../auth/auth.service';
+import { Router } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { HttpHeaders } from '@angular/common/http';
+
+@Component({
+  selector: 'app-my-account',
+  templateUrl: './my-account.component.html',
+  styleUrls: ['./my-account.component.scss'],
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule],
+})
+export class MyAccountComponent implements OnInit {
+  user_id: number = 0;
+  username: string = '';
+  awardedName: string = '';
+  ninjaStars: number = 0;
+  attempts: any[] = [];
+  isEditing: boolean = false;
+
+  // Fields for editing
+  editUsername: string = '';
+  editEmail: string = '';
+  editPassword: string = '';
+  editConfirmPassword: string = '';
+
+  constructor(private route: ActivatedRoute, private http: HttpClient,   private config: ConfigService , private router: Router) {}
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    this.user_id = idParam ? parseInt(idParam, 10) : 0;
+    this.loadUserProfile();
+    
+  }
+
+  loadUserProfile(): void {
+    console.log('🔍 Fetching user profile for ID:', this.user_id);
+    this.http.get<any>(`${this.config.apiBaseUrl}/user/profile/${this.user_id}`).subscribe({
+      next: (res) => {
+        this.username = res.username;
+        this.awardedName = res.awarded_title;
+        this.ninjaStars = res.ninja_stars;
+        this.attempts = res.progress || [];
+        console.log('✅ User profile loaded:', res);
+      },
+      error: (err) => {
+        console.error('❌ Failed to fetch user profile:', err);
+      }
+    });
+  }
+
+  getStarsForLevel(level: number): string {
+    const progress = this.attempts.find((a: any) => a.level === level);
+    return progress ? '★'.repeat(progress.dojo_points || 0) : '☆';
+  }
+
+  // 🔧 Trigger edit mode
+  editProfile(): void {
+    this.isEditing = true;
+  }
+
+  // ✅ Save edits to backend
+  saveChanges(): void {
+    const updatedData = {
+      username: this.editUsername,
+      email: this.editEmail,
+      password: this.editPassword,
+    };
+
+    this.http.put(`http://localhost:8000/user/update/${this.user_id}`, updatedData).subscribe({
+      next: () => {
+        alert('✅ Profile updated successfully!');
+        this.username = this.editUsername;
+        this.isEditing = false;
+      },
+      error: (err) => {
+        console.error('❌ Update failed:', err);
+        alert('Failed to update profile.');
+      }
+    });
+  }
+
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.editUsername = this.username;
+  }
+  // 🔒 Check if user is logged in
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('user_id');
+  }
+  deleteAccount(): void {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      this.http.delete(`http://localhost:8000/user/delete/${this.user_id}`).subscribe({
+        next: () => {
+          alert('✅ Account deleted successfully!');
+          localStorage.removeItem('user_id');
+          localStorage.removeItem('username');
+          window.location.href = '/';
+        },
+        error: (err) => {
+          console.error('❌ Failed to delete account:', err);
+          alert('Failed to delete account.');
+        }
+      });
+    }
+  }
+  // 🔑 Check if user is a guest
+  isGuest(): boolean {
+    return this.username === 'Guest';
+  }
+  goToOperations(): void {
+    this.router.navigate(['/operation'], {
+      queryParams: {
+        username: this.username,
+        user_id: this.user_id
+      }
+    });
+  }
+  
+}

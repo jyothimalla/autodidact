@@ -1,0 +1,64 @@
+<div class="account-container" *ngIf="username">
+    
+
+
+  <div class="account-wrapper" *ngIf="username">
+
+
+    <h2>
+      Welcome, {{ username }} 
+      <span class="title-badge">{{ awardedName || 'No Title Yet' }}</span>
+    </h2>
+        <button class="back-btn" (click)="goToOperations()">⬅️ Back to Operations</button>
+
+        <button class="edit-btn">✏️ Edit Profile</button>
+
+        <div *ngIf="isEditing" class="edit-form">
+        <label>Username:</label>
+        <input [(ngModel)]="editUsername" type="text" />
+    
+        <label>Email:</label>
+        <input [(ngModel)]="editEmail" type="email" />
+    
+        <label>New Password:</label>
+        <input [(ngModel)]="editPassword" type="password" />
+    
+        <button (click)="saveChanges()">💾 Save</button>
+        <button (click)="cancelEdit()">❌ Cancel</button>
+    </div>
+  
+  
+    <div class="stars-row">
+      <label>Your Ninja Stars:</label>
+      <span class="stars">
+        <ng-container *ngFor="let i of [].constructor(5)">
+          <span [class.filled]="i < ninjaStars">★</span>
+        </ng-container>
+      </span>
+    </div>
+  
+    <h3>Your Attempts</h3>
+  
+    <div *ngIf="attempts.length > 0; else noAttempts">
+      <div class="attempt-card" *ngFor="let attempt of attempts">
+        <div class="attempt-header">
+          <strong>{{ attempt.operation }}</strong> - Level {{ attempt.level }}
+          <span class="date">{{ attempt.date }}</span>
+        </div>
+  
+        <div class="progress-bar-container">
+          <div class="progress-bar" [style.width.%]="attempt.score * 10"></div>
+        </div>
+  
+        <p>Score: {{ attempt.score }}/10</p>
+      </div>
+    </div>
+  
+    <ng-template #noAttempts>
+      <p>You haven’t attempted any quizzes yet. Start now!</p>
+    </ng-template>
+
+    <button class="delete-btn" (click)="deleteAccount()">❌ Delete Account</button>
+
+  </div>
+  

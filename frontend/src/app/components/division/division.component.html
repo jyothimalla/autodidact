@@ -1,5 +1,6 @@
 <div class="quiz-wrapper" *ngIf="questions.length > 0">
-  <div class="left-sidebar"><app-left-sidebar></app-left-sidebar></div>
+  <div class="left-sidebar">
+    <app-left-sidebar *ngIf="username"></app-left-sidebar></div>
 
   <div class="quiz-main-card">
     <div class="quiz-header">
@@ -24,8 +25,8 @@
   </div>
 
   <div class="right-sidebar">
-    <app-right-sidebar
-      [userName]="userName"
+    <app-right-sidebar *ngIf="username"
+      [username]="username"
       [score]="score"
       [currentQIndex]="currentQIndex"
       [totalQuestions]="questions.length"

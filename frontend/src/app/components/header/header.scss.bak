@@ -1,0 +1,98 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #f3f3f3, #d6eaff);
+  padding: 12px 24px;
+  border-bottom: 2px solid #ccc;
+  font-family: 'Segoe UI', sans-serif;
+
+  .header-left h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #2c3e50;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    color: #444;
+
+    span {
+      font-weight: 500;
+    }
+
+    button {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #357ab8;
+      }
+    }
+  }
+}
+@media (max-width: 600px) {
+  .brand-name {
+    font-size: 1rem;
+  }
+
+  .logo {
+    width: 32px;
+    height: 32px;
+  }
+}
+.logo-wrapper:hover {
+  opacity: 0.9;
+}
+a.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.account-section {
+  position: absolute;
+  top: 1rem;
+  right: 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+
+  .logout-link {
+    cursor: pointer;
+    color: #d32f2f;
+    text-decoration: underline;
+    margin-left: 6px;
+  }
+}
+
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.5rem 1rem;
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c7ac7;
+}
+
+
+.username {
+  color: #2e7fcf;
+}

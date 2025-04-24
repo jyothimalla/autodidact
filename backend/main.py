@@ -4,7 +4,7 @@ from typing import List, Dict
 from pydantic import BaseModel
 import random
 from fastapi import FastAPI
-from routers import word_problem_routes
+from routers import word_problem_routes, user_routes, attempt_routes
 from routers import quiz_routes
 from routers import sudoku_routes
 from routers import addition_routes
@@ -14,20 +14,19 @@ from routers import division_routes
 from database import init_db
 from routers import submit_score 
 from sqlalchemy import text
-from database import init_db
 from routers import fmc_routes
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import progress_routes
 from sqladmin import Admin, ModelView
 from database import engine, Question, QuizSession, User, UserScore  # Import your models
-from database import Base, engine
-from routers import reasoning_routes
-
+from database import Base, engine, init_db
+from routers import reasoning_routes, auth_routes, progress_routes, reasoning_routes, attempt_routes
+from schemas import LevelAttempt as LevelAttemptSchema
+import os
 
 init_db()
-
-Base.metadata.create_all(bind=engine)
+if os.getenv("INIT_DB") == "true":
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -47,7 +46,7 @@ class QuestionAdmin(ModelView, model=Question):
     column_list = [Question.id, Question.question_text, Question.correct_answer]
 
 class UserAdmin(ModelView, model=User):
-    column_list = [User.id, User.name]
+    column_list = [User.id, User.username, User.email, User.ninja_stars, User.awarded_title]
 
 # Register views
 admin.add_view(QuestionAdmin)
@@ -57,8 +56,7 @@ admin.add_view(UserAdmin)
 # CORS setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Update with your frontend origin in prod
-
+    allow_origins=["http://localhost:4200"],  # 👈 frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,13 +72,11 @@ app.include_router(sudoku_routes.router)
 app.include_router(word_problem_routes.router)
 app.include_router(submit_score.router)
 app.include_router(fmc_routes.router)
-
 app.include_router(progress_routes.router)
 app.include_router(reasoning_routes.router)
-
-class UserAdmin(ModelView, model=User):
-    column_list = [User.id, User.name]
-    form_columns = [User.name]  # 👈 This ensures only 'name' shows in the form
+app.include_router(auth_routes.router)
+app.include_router(attempt_routes.router)
+app.include_router(user_routes.router)
 
 
 if __name__ == "__main__":

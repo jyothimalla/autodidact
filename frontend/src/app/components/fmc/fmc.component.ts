@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { QuizService } from '../../services/quiz.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
@@ -22,7 +22,8 @@ export class FMCComponent implements OnInit {
   feedbackMessage = '';
   score = 0;
   level = 0;
-  userName = '';
+  username = '';
+  user_id: number = 0;
   elapsedTime = '0:00';
   timer: any;
   secondsElapsed = 0;
@@ -31,34 +32,43 @@ export class FMCComponent implements OnInit {
   isEnterDisabled = false;
   lastUserAnswer = '';
   lastCorrectAnswer = '';
+  userAnswers: string[] = [];
 
-  constructor(private quizService: QuizService, private router: Router) {}
+  constructor(private quizService: QuizService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.level = parseInt(localStorage.getItem('level') || '0', 10);
-    this.userName = localStorage.getItem('userName') || 'Guest';
-    localStorage.setItem('operation', 'fmc');
-
-    this.quizService.getFMCQuestions(this.level).subscribe({
-      next: (res) => {
-        this.questions = res;
-        this.startTimer();
-      },
-      error: (err) => console.error('FMC fetch error:', err)
+    this.route.queryParams.subscribe(params => {
+      this.username = params['username'] || localStorage.getItem('username') || '';
+      this.user_id = parseInt(params['user_id'] || localStorage.getItem('user_id') || '0', 10);
+      this.level = parseInt(params['level'] || '0', 10);
+      this.currentOperation = params['operation'] || 'fmc';
+      this.currentQIndex = 0;
+      console.log('📡 Fetching questions for level:', this.level);
+  
+      this.quizService.getFMCQuestions(this.level).subscribe({
+        next: (questions) => {
+          this.questions = questions;
+  
+          console.log('✅ Questions received:', questions);
+  
+          this.userAnswers = new Array(questions.length).fill('');
+          this.startTimer();
+        },
+        error: (err) => console.error('❌ Error loading FMC questions:', err)
+      });     
     });
   }
-
   submitAnswer(): void {
     const currentQ = this.questions[this.currentQIndex];
     const correct = currentQ?.answer.trim();
-    const user = this.userAnswer.trim();
+    const userAnswer = this.userAnswer.trim();
   
-    if (!user) {
+    if (!userAnswer) {
       alert('⚠️ Please enter your answer before submitting!');
       return;
     }
   
-    if (user === correct) {
+    if (userAnswer === correct) {
       this.score++;
       this.feedbackMessage = '✅ Correct!';
     } else {

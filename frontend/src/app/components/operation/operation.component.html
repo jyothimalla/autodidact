@@ -1,26 +1,37 @@
 <div class="operation-wrapper">
-  <h2>Select an Operation</h2>
+  <h2 class="page-title">Select an Operation</h2>
 
+  <!-- Operation Buttons -->
   <div class="operation-buttons">
-    <button 
+    <button
       *ngFor="let op of operations"
       [ngClass]="op.toLowerCase()"
-      (click)="selectOperation(op)">
+      class="operation-button"
+      (click)="selectOperation(op.toLowerCase())"
+    >
       {{ op }}
     </button>
   </div>
 
-  <div class="levels-wrapper" *ngIf="selectedOperation">
-    <button
-      *ngFor="let level of levels"
-      [disabled]="isLevelLocked(level)"
-      (click)="selectLevel(level)"
-      [ngClass]="[
-        'level-button',
-        selectedOperation.toLowerCase() + '-level',
-        isLevelLocked(level) ? 'locked' : 'unlocked'
-      ]">
-      {{ getLevelLabel(level) }}
-    </button>
+  <!-- Levels only appear after operation is selected -->
+  <div *ngIf="selectedOperation" class="levels-section">
+    <h3 class="section-title">
+      Select Level for {{ selectedOperation | titlecase }}
+    </h3>
+
+    <div class="levels-grid">
+      <button
+        *ngFor="let level of levels"
+        [disabled]="isLevelLocked(level)"
+        (click)="selectLevel(level)"
+        [ngClass]="[
+          'level-button',
+          selectedOperation.toLowerCase() + '-level',
+          isLevelLocked(level) ? 'locked' : 'unlocked'
+        ]"
+      >
+        {{ getLevelLabel(level) }}
+      </button>
+    </div>
   </div>
 </div>

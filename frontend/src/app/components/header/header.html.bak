@@ -1,0 +1,63 @@
+<div class="operation-wrapper">
+
+  <div class="header-container">
+    <!-- <video autoplay muted loop playsinline class="background-video">
+      <source src="assets/Autodidact.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video> -->
+  
+    <div class="logo_wrapper">
+      <img src="assets/logo.png" alt="Logo" class="logo" />
+    
+    </div>
+    
+    <nav style="margin-bottom: 20px;">
+      <a routerLink="/" routerLinkActive="active">🏠 Home</a> <span style="padding-right: 15px;"> </span>
+      <a routerLink="/progress" routerLinkActive="active">📈 My Progress</a> <span style="padding-right: 15px; "> </span>
+      <a routerLink="/admin" routerLinkActive="active">🧑‍🏫 Admin Dashboard</a> <span style="padding-right: 15px;"></span>
+    </nav>
+
+    <!-- Right corner account display -->
+<div class="account-section" *ngIf="isLoggedIn; else loginLinks">
+  <span class="username"><a class="userAccount" (click)="userAccount()" style="margin-bottom: 5px;">👤 {{ username }} </a> </span><br>
+  <a class="logout-link" (click)="logout()">Logout</a>
+</div>
+
+<ng-template #loginLinks>
+  <a routerLink="/login">🔐 Login</a> |
+  <a routerLink="/register">📝 Register</a>
+</ng-template>
+
+
+    <!-- ✅ Only show operation buttons if not on Home -->
+<div class="operations" *ngIf="router.url !== '/' && isLoggedIn">
+  <h2>Select an Operation</h2>
+  <div class="operation-buttons">
+    <button *ngFor="let op of operations"
+            (click)="selectOperation(op)"
+            [ngStyle]="getOperationStyle(op)">
+      {{ op }}
+    </button>
+  </div>
+</div>
+
+
+
+  <div class="levels-wrapper">
+    <button
+    *ngFor="let level of levels"
+    [disabled]="isLevelLocked(level)"
+    (click)="selectLevel(level)"
+    [ngClass]="[
+      'level-button',
+      selectedOperation.toLowerCase() + '-level',
+      isLevelLocked(level) ? 'locked' : 'unlocked'
+    ]"
+  >
+    {{ getLevelLabel(level) }}
+  </button>
+
+</div>
+
+</div>
+    </div>

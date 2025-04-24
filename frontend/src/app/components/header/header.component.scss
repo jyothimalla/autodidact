@@ -1,76 +1,122 @@
-/* Operation background colors */
-.addition       { background-color: #ffe0e0; }
-.subtraction    { background-color: #fff4cc; }
-.multiplication { background-color: #d0f0d0; }
-.division       { background-color: #d6eaff; }
-.fmc            { background-color: #f3d6ff; }
-.sudoku         { background-color: #44e5eb; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #f3f3f3, #d6eaff);
+  padding: 12px 24px;
+  border-bottom: 2px solid #ccc;
+  font-family: 'Segoe UI', sans-serif;
 
-/* General button style */
-button {
-  border: none;
-  padding: 10px 16px;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  min-width: 100px;
-}
-
-.btn-nextlevel {
-  background-color: #21b519;
-  color: white;
-  margin-right: 10px;
-}
-
-/* Layout styling */
-.operation-wrapper {
-  text-align: center;
-  margin-top: 40px;
-
-  h2 {
+  .header-left h1 {
+    margin: 0;
     font-size: 24px;
-    margin-bottom: 20px;
+    color: #2c3e50;
   }
 
-  .operation-buttons {
+  .header-right {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    align-items: center;
     gap: 12px;
-  }
+    font-size: 16px;
+    color: #444;
 
-  .level-section {
-    margin-top: 30px;
+    span {
+      font-weight: 500;
+    }
+
+    button {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #357ab8;
+      }
+    }
   }
 }
+@media (max-width: 600px) {
+  .brand-name {
+    font-size: 1rem;
+  }
 
-/* Level buttons base style */
-.level-button {
-  padding: 10px 18px;
-  border-radius: 8px;
-  margin: 6px;
+  .logo {
+    width: 32px;
+    height: 32px;
+  }
+}
+.logo-wrapper:hover {
+  opacity: 0.9;
+}
+a.active {
   font-weight: bold;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  text-decoration: underline;
+}
+.account-section {
+  position: absolute;
+  top: 1rem;
+  right: 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+
+  .logout-link {
+    cursor: pointer;
+    color: #d32f2f;
+    text-decoration: underline;
+    margin-left: 6px;
+  }
 }
 
-/* Color by operation */
-.level-button.addition-level        { background-color: #ffd6d6; }
-.level-button.subtraction-level     { background-color: #ffeeaa; }
-.level-button.multiplication-level  { background-color: #b3e6b3; }
-.level-button.division-level        { background-color: #b8ddff; }
-.level-button.fmc-level             { background-color: #e6bfff; }
-.level-button.sudoku-level          { background-color: #2bd3d9; }
 
-/* Locked / Unlocked */
-.level-button.locked {
-  opacity: 0.5;
-  cursor: not-allowed;
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.5rem 1rem;
 }
 
-.level-button.unlocked:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+.logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
 }
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+
+.username {
+  color: #2c3e50;
+}
+
+.quiz-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Reserve space for left sidebar */
+.left-sidebar {
+  width: 200px;
+  height: 100%;
+}
+
+  /* Right sidebar styling */
+  .right-sidebar {
+    width: 220px;
+    background-color: #f7f7f7;
+    padding: 1rem;
+    border-radius: 12px;
+    height: 20%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }

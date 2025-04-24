@@ -1,0 +1,13 @@
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  .styled-table th, .styled-table td {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+  .styled-table thead {
+    background-color: #f2f2f2;
+  }

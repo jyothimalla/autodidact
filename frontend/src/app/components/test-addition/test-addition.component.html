@@ -1,0 +1,9 @@
+<h1 style="color: green">Test Component Loaded</h1>
+
+<button (click)="load()">Load Questions</button>
+
+<ul *ngIf="questions.length > 0">
+  <li *ngFor="let q of questions">
+    {{ q.question }} = {{ q.answer }}
+  </li>
+</ul>

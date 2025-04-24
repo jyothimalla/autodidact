@@ -301,4 +301,11 @@
       .quiz-title.sudoku {
         background-color: #44e5eb;
       }
+      .stars span {
+        font-size: 1.5rem;
+        color: lightgray;
+      }
+      .stars span.filled {
+        color: gold;
+      }
       

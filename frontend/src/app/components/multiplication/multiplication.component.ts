@@ -1,6 +1,6 @@
 
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuizService } from '../../services/quiz.service';
@@ -26,7 +26,8 @@ export class MultiplicationComponent implements OnInit {
   level = 0;
   currentOperation = 'multiplication';
   userAnswers: string[] = [];
-  userName = '';
+  username = '';
+  user_id: number = 0;
   elapsedTime = '0:00';
   private timer: any;
   private secondsElapsed = 0;
@@ -35,20 +36,28 @@ export class MultiplicationComponent implements OnInit {
   isCorrect = true;
   isReading = false;
 
-  constructor(private quizService: QuizService, private router: Router) {}
+  constructor(private quizService: QuizService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.level = parseInt(localStorage.getItem('level') || '0', 10);
-    this.userName = localStorage.getItem('userName') || 'Guest';
-    localStorage.setItem('operation', 'multiplication');
-
-    this.quizService.getDivisionQuestions(this.level).subscribe({
-      next: (data) => {
-        this.questions = data;
-        this.userAnswers = new Array(data.length).fill('');
-        this.startTimer();
-      },
-      error: (err) => console.error('❌ Error loading Multiplication questions:', err),
+    this.route.queryParams.subscribe(params => {
+      this.username = params['username'] || localStorage.getItem('username') || '';
+      this.user_id = parseInt(params['user_id'] || localStorage.getItem('user_id') || '0', 10);
+      this.level = parseInt(params['level'] || '0', 10);
+      this.currentOperation = params['operation'] || 'multiplication';
+      this.currentQIndex = 0;
+      console.log('📡 Fetching questions for level:', this.level);
+  
+      this.quizService.getMultiplicationQuestions(this.level).subscribe({
+        next: (questions) => {
+          this.questions = questions;
+  
+          console.log('✅ Questions received:', questions);
+  
+          this.userAnswers = new Array(questions.length).fill('');
+          this.startTimer();
+        },
+        error: (err) => console.error('❌ Error loading addition questions:', err)
+      });     
     });
   }
 
@@ -69,19 +78,23 @@ export class MultiplicationComponent implements OnInit {
   submitAnswer(): void {
     const currentQ = this.questions[this.currentQIndex];
     const correct = currentQ.answer.trim();
-    const user = this.answerInput.trim();
+    const userAnswer = this.answerInput.trim();
 
-    this.lastUserAnswer = user;
+    if (!userAnswer) {
+      alert('⚠️ Please enter your answer before submitting!');
+      return;
+    }
+    this.lastUserAnswer = userAnswer;
     this.lastCorrectAnswer = correct;
-    this.isCorrect = user === correct;
+    this.isCorrect = userAnswer === correct;
 
     this.feedbackMessage = this.isCorrect
       ? '✅ Correct!'
-      : `❌ Your answer "${user}" is incorrect.\n✅ Correct answer is "${correct}"`;
+      : `❌ Your answer "${userAnswer}" is incorrect.\n✅ Correct answer is "${correct}"`;
 
     if (this.isCorrect) this.score++;
 
-    this.userAnswers[this.currentQIndex] = user;
+    this.userAnswers[this.currentQIndex] = userAnswer;
     this.answerInput = '';
 
     setTimeout(() => {

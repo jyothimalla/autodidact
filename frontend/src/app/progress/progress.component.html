@@ -1,0 +1,59 @@
+<h2>Your Progress</h2>
+<canvas id="progressChart" width="400" height="200"></canvas>
+
+<table class="styled-table" *ngIf="progress.length > 0">
+  <thead>
+    <tr>
+      <th>Operation</th>
+      <th>Level Completed</th>
+      <th>Current Level</th>
+      <th>Attempts</th>
+      <th>Dojo Points</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of progress">
+      <td>{{ row.operation }}</td>
+      <td>{{ row.level_completed }}</td>
+      <td>{{ row.current_level }}</td>
+      <td>{{ row.total_attempts }}</td>
+      <td>{{ row.dojo_points }}</td>
+    </tr>
+  </tbody>
+</table>
+<div *ngIf="!progress.length">No progress yet.</div>
+
+<hr />
+
+<h2>Attempt History</h2>
+<label for="operationFilter">Filter by Operation:</label>
+<select id="operationFilter" [(ngModel)]="filterOperation" (change)="applyFilter()">
+  <option value="">All</option>
+  <option *ngFor="let op of operations" [value]="op">{{ op }}</option>
+</select>
+
+<button (click)="exportCSV()">Export CSV</button>
+
+<table class="styled-table" *ngIf="filteredAttempts.length > 0">
+  <thead>
+    <tr>
+      <th>Operation</th>
+      <th>Level</th>
+      <th>Attempt</th>
+      <th>Score</th>
+      <th>Passed?</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let a of filteredAttempts">
+      <td>{{ a.operation }}</td>
+      <td>{{ a.level }}</td>
+      <td>{{ a.attempt_number }}</td>
+      <td>{{ a.score }}/{{ a.total_questions }}</td>
+      <td>{{ a.is_passed ? '✅' : '❌' }}</td>
+      <td>{{ a.timestamp | date:'short' }}</td>
+    </tr>
+  </tbody>
+</table>
+<div *ngIf="!filteredAttempts.length">No attempts found for this filter.</div>

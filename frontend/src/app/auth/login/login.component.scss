@@ -1,0 +1,67 @@
+.auth-container {
+    max-width: 300px;
+    margin: 100px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #0002;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  
+    input, button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  
+    button {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+    }
+  }
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    width: 300px;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  mat-form-field {
+    margin-bottom: 16px;
+  }
+  
+  .dialog-actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  mat-error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+  
+  ::ng-deep .mat-dialog-container {
+    border-radius: 12px;
+    padding: 24px;
+    background-color: #f3f3f3;
+  }
+      

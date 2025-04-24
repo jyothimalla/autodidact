@@ -1,0 +1,115 @@
+operations: string[] = ['Addition', 'Subtraction', 'Multiplication', 'Division', 'FMC', 'Sudoku'];
+  selectedOperation: string = '';
+  levels: number[] = [];
+  unlockedLevel = 0;
+  isLoggedIn = true;
+  username = '';
+  level = 0;
+
+  sudokuLevels = [
+    { label: 'Easy', value: 1 },
+    { label: 'Medium', value: 2 },
+    { label: 'Difficult', value: 3 },
+  ];
+
+  constructor(public router: Router, private quizService: QuizService) {}
+
+  ngOnInit(): void {
+    this.username = localStorage.getItem('username') || '';
+    this.isLoggedIn = !!this.username;
+  }
+
+  selectOperation(operation: string) {
+    this.selectedOperation = operation;
+    const progressKey = `${operation.toLowerCase()}_progress`;
+    this.unlockedLevel = parseInt(localStorage.getItem(progressKey) || '0', 10);
+    localStorage.setItem('selectedOperation', operation.toLowerCase());
+
+    this.levels = operation.toLowerCase() === 'sudoku'
+      ? this.sudokuLevels.map(lvl => lvl.value)
+      : Array.from({ length: 10 }, (_, i) => i);
+  }
+
+  isLevelLocked(level: number): boolean {
+    return level > this.unlockedLevel;
+  }
+  getOperationStyle(op: string): { [key: string]: string } {
+    const colors: any = {
+      addition: '#ffe0e0',
+      subtraction: '#fff4cc',
+      multiplication: '#d0f0d0',
+      division: '#d6eaff',
+      fmc: '#f3d6ff',
+      sudoku: '#44e5eb'
+    };
+    return {
+      'background-color': colors[op.toLowerCase()] || '#eee',
+      'font-weight': 'bold',
+      'padding': '8px 16px',
+      'margin': '4px',
+      'border-radius': '8px',
+      'border': 'none',
+      'cursor': 'pointer'
+    };
+  }
+  
+
+  selectLevel(level: number) {
+    if (this.isLevelLocked(level)) return;
+    const username = localStorage.getItem('username') || 'Guest';
+    const operation = this.selectedOperation.toLowerCase();
+    localStorage.setItem('operation', operation);
+    localStorage.setItem('level', level.toString());
+
+    if (operation === 'addition') {
+      this.router.navigate(['/addition']);
+    }
+    else if (operation === 'subtraction') {
+      this.router.navigate(['/subtraction']);
+    }
+    else if (operation === 'multiplication') {
+      this.router.navigate(['/multiplication']);
+    }
+    else if (operation === 'division') {
+      this.router.navigate(['/division']);
+    } 
+    else if (operation === 'fmc') {
+      this.router.navigate(['/fmc']);
+    }
+    else if (operation === 'sudoku') {
+      this.router.navigate(['/sudoku']);
+    }
+    else {
+      this.quizService.startSession(operation, level).subscribe({
+        next: () => this.router.navigate(['/quiz']),
+        error: (err) => console.error('❌ Failed to start session:', err)
+      });
+    }
+  }
+
+  getLevelLabel(level: number): string {
+    if (this.selectedOperation.toLowerCase() === 'sudoku') {
+      const found = this.sudokuLevels.find(l => l.value === level);
+      return found ? found.label : `Level ${level}`;
+    }
+    return `Level ${level}`;
+  }
+
+  logout() {
+    localStorage.clear(); // clear stored username/user_id/etc.
+    this.isLoggedIn = false;
+    this.username = '';
+  
+    // Trigger re-render and redirect to login page
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/login']);
+    });
+  }
+ userAccount() {
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+      this.router.navigate(['/user', userId]);
+    } else {
+      console.error('User ID not found in local storage.');
+    }
+  }

@@ -6,12 +6,11 @@ import { QuizService } from '../../services/quiz.service';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
 import { HeaderComponent } from '../header/header.component';
-import { FooterComponent } from '../footer/footer.component';
 import player from 'lottie-web';
 import { AnimationOptions, LottieComponent } from 'ngx-lottie';
 import { AnimationItem } from 'lottie-web';
 import { LottieServerModule } from 'ngx-lottie/server';
-
+import { ActivatedRoute } from '@angular/router';
 
 export function playerFactory() {
   return player;
@@ -25,9 +24,7 @@ export function playerFactory() {
     CommonModule,
     FormsModule,
     RightSidebarComponent,
-    LeftSidebarComponent,
-    FooterComponent,
-  ],
+    LeftSidebarComponent,],
   templateUrl: './addition.component.html',
   styleUrls: ['./addition.component.scss']
 })
@@ -43,34 +40,44 @@ export class AdditionComponent implements OnInit {
   level = 0;
   currentOperation = 'addition';
   userAnswers: string[] = [];
-  userName = '';
+  username: string = '';
   elapsedTime = '0:00'; 
   private timer: any;
   private secondsElapsed = 0;
   animation!: AnimationItem;
   isEnterDisabled = false;
-
   lastUserAnswer = '';
   lastCorrectAnswer = '';
   isCorrect = true;
+  user_id: number = 0;
+  explanation  = '';
+  
+  constructor(private quizService: QuizService, private router: Router, private route: ActivatedRoute) {}
 
-  constructor(private quizService: QuizService, private router: Router) {}
-
-
+  
 
   ngOnInit(): void {
-    this.level = parseInt(localStorage.getItem('level') || '0', 10);
-    this.userName = localStorage.getItem('userName') || 'Guest';
-    localStorage.setItem('operation', 'addition');
+    this.route.queryParams.subscribe(params => {
+    this.username = params['username'] || localStorage.getItem('username') || '';
+    this.user_id = parseInt(params['user_id'] || localStorage.getItem('user_id') || '0', 10);
+    this.level = parseInt(params['level'] || '0', 10);
+    this.currentOperation = params['operation'] || 'addition';
+    this.currentQIndex = 0;
+    console.log('📡 Fetching questions for level:', this.level);
 
     this.quizService.getAdditionQuestions(this.level).subscribe({
-      next: (data) => {
-        this.questions = data;
-        this.userAnswers = new Array(data.length).fill('');
+      next: (questions) => {
+        this.questions = questions;
+
+        console.log('✅ Questions received:', questions);
+
+        this.userAnswers = new Array(questions.length).fill('');
         this.startTimer();
       },
       error: (err) => console.error('❌ Error loading addition questions:', err)
-    });
+    }); });
+
+    
   }
 
   startTimer(): void {
@@ -83,16 +90,11 @@ export class AdditionComponent implements OnInit {
   }
 
   @HostListener('document:keydown.enter', ['$event'])
-  
   handleEnter(event: KeyboardEvent) {
   if (!this.isEnterDisabled) {
     this.isEnterDisabled = true;  // Prevent rapid fire
     this.submitAnswer();
-
-    // Reset after short delay
-    setTimeout(() => {
-      this.isEnterDisabled = false;
-    }, 11500);  // Adjust timing if needed
+    setTimeout(() => { this.isEnterDisabled = false;}, 1500); 
   }
 }
 
@@ -100,35 +102,30 @@ export class AdditionComponent implements OnInit {
   submitAnswer(): void {
     const currentQ = this.questions[this.currentQIndex];
     const correct = currentQ.answer.trim();
-    const user = this.answerInput.trim();
+    const userAnswer = this.answerInput.trim();
 
-    this.lastUserAnswer = user;
-    this.lastCorrectAnswer = correct;
-    this.isCorrect = user === correct;
-    if (!user) {
+    if (!userAnswer) {
       alert('⚠️ Please enter your answer before submitting!');
       return;
     }
-    if (this.isCorrect) {
-      this.feedbackMessage = '✅ Correct!';
+    this.lastUserAnswer = userAnswer;
+    this.lastCorrectAnswer = correct;
+    this.isCorrect = userAnswer === correct;
+    this.feedbackMessage = this.isCorrect ? '✅ Correct!' : `❌ Incorrect! The correct answer is ${correct}`;
+    if (this.isCorrect) 
       this.score++;
-    } else {
-      this.feedbackMessage = `❌ Incorrect!`;
-    }
 
-    this.userAnswers[this.currentQIndex] = user;
+    this.userAnswers[this.currentQIndex] = userAnswer;
     this.answerInput = '';
     
     setTimeout(() => {
       this.feedbackMessage = '';
+      if (this.currentQIndex < this.questions.length - 1) {
+        this.currentQIndex++;
+      } else {
+        this.completeQuiz();
+      }
     }, 1500);
-
-    if (this.currentQIndex < this.questions.length - 1) {
-      this.currentQIndex++;
-    } else {
-      this.completeQuiz();
-    }
-    
   }
   
 
@@ -151,14 +148,8 @@ export class AdditionComponent implements OnInit {
   restartQuiz(): void {
     this.router.navigate(['/operation']);
   }
-  
-  // Lottie Animation
 
-handleLottie(anim: AnimationItem) {
-  this.animation = anim;
-}
 isReading = false;
-
 readQuestionAloud(): void {
   const question = this.questions[this.currentQIndex]?.question;
   if (question && 'speechSynthesis' in window) {
@@ -171,4 +162,25 @@ readQuestionAloud(): void {
   }
 }
   
+ngOnDestroy(): void {
+  if (this.timer) clearInterval(this.timer);
+}
+goHome(): void {
+  clearInterval(this.timer);
+  localStorage.removeItem('userName');
+  localStorage.removeItem('operation');
+  localStorage.removeItem('level');
+  localStorage.removeItem('score');
+  this.router.navigate(['/']);
+}
+
+goBack(): void {
+  if (this.currentQIndex > 0) {
+    this.currentQIndex--;
+    this.answerInput = this.userAnswers[this.currentQIndex] || '';
+  }
+  this.feedbackMessage = '';
+  this.explanation = '';
+  this.router.navigate(['/operation']);
+}
 }

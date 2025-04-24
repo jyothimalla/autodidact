@@ -2,31 +2,52 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LoginComponent } from '../../auth/login/login.component';
+import { RegisterComponent } from '../../auth/register/register.component';
+import { MatDialog } from '@angular/material/dialog';
+
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoginComponent, RegisterComponent],
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  userName: string = '';
+  username: string = '';
+  showLogin = false;
+  showRegister = false;
+  musicOn: boolean = false; // Initialize musicOn to false
+  musicSrc: string = 'assets/audio/music.mp3'; // Path to your audio file
+  
+  constructor(private router: Router , private dialog: MatDialog) {}
 
-  constructor(
-    private router: Router
-  ) {}
+  openLogin(): void {
+    this.dialog.open(LoginComponent, { width: '400px' });
+  }
+
+  openRegister(): void {
+    this.dialog.open(RegisterComponent, { width: '400px' });
+  }
+  
+
+  closeModals() {
+    this.showLogin = false;
+    this.showRegister = false;
+  }
+
 
   errorMessage = '';
 
   startQuiz() {
-    if (!this.userName.trim()) {
+    if (!this.username.trim()) {
       this.errorMessage = 'Please enter your name to start the Quiz!';
       return;
     }
 
     this.errorMessage = ''; // clear old errors
 
-    localStorage.setItem('userName', this.userName);
+    localStorage.setItem('username', this.username);
     this.router.navigate(['/operation']);
 
   }

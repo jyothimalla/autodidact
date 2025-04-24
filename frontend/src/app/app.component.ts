@@ -1,12 +1,34 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { FooterComponent } from './components/footer/footer.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import {routes } from './app.routes';
+import { provideRouter, withHashLocation } from '@angular/router';
+import { appConfig } from './app.config';
+import { provideHttpClient } from '@angular/common/http';
+import { ConfigService } from './services/config.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: '<router-outlet></router-outlet>',
-  styleUrl: './app.component.scss'
+  standalone: true,
+  imports: [RouterModule, FormsModule, HeaderComponent, CommonModule, FooterComponent, MatSlideToggleModule ], 
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
+
 export class AppComponent {
+  username = localStorage.getItem('username') || 'Guest'; // <-- reads from localStorage
+
+  constructor(public router: Router,   private route: ActivatedRoute,  private config: ConfigService,   private http: HttpClient) 
+  { console.log('AppComponent initialized 🚀');
+    
+  } 
   title = 'Autididact - Kids Self Learning Platform';
+  
+  
 }

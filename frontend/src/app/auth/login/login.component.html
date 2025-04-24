@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Login</h2>
+
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" style="padding: 16px;">
+  <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
+    <mat-label>Username</mat-label>
+    <input matInput type="username" formControlName="username" required />
+    <mat-error *ngIf="loginForm.controls['username'].invalid && loginForm.controls['username'].touched">
+      Existing Username is required
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
+    <mat-label>Password</mat-label>
+    <input matInput type="password" formControlName="password" required />
+    <mat-error *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched">
+      Password is required
+    </mat-error>
+  </mat-form-field>
+  <mat-error *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</mat-error>
+
+  <div class="dialog-actions" style="margin-top: 16px; display: flex; justify-content: space-between;">
+    <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid">Login</button>
+    <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
+  </div>
+</form>

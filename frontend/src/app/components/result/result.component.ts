@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { PLATFORM_ID } from '@angular/core';
 import { QuizService } from '../../services/quiz.service';
 import { FooterComponent } from "../footer/footer.component";
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'app-result',
@@ -15,7 +17,7 @@ import { FooterComponent } from "../footer/footer.component";
 export class ResultComponent implements OnInit {
   platformId = inject(PLATFORM_ID);
 
-  userName: string = '';
+  username: string = '';
   score: number = 0;
   total: number = 0;
   userAnswers: string[] = [];
@@ -23,15 +25,20 @@ export class ResultComponent implements OnInit {
   explanation: string = '';
   operation: string = '';
   level: number = 0;
+  user_id: number = 0;
 
   get attemptedCount(): number {
     return this.userAnswers.filter(ans => ans && ans.trim() !== '').length;
   }
 
-  constructor(private router: Router, private quizService: QuizService) {}
+  constructor(private router: Router, private quizService: QuizService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    const name = localStorage.getItem('userName');
+    this.username = this.route.snapshot.queryParams['username'] || localStorage.getItem('username') || '';
+    this.user_id = parseInt(localStorage.getItem('user_id') || '0', 10);
+    console.log('Storing user_id:', this.user_id, 'username:', this.username);
+    console.log('🧠 Username:', this.username);
+    
     const storedScore = localStorage.getItem('score');
     const storedAnswers = localStorage.getItem('answers');
     const storedQuestions = localStorage.getItem('questions');
@@ -41,12 +48,12 @@ export class ResultComponent implements OnInit {
     
     this.operation = operation;
     this.level = level;
-    if (!name || !storedScore || !storedAnswers || !storedQuestions) {
+    if (!this.username || !storedScore || !storedAnswers || !storedQuestions) {
     this.router.navigate(['/']);
     return;
     }
     try {
-    this.userName = name;
+    this.username = this.username;
     this.score = parseInt(storedScore);
     this.userAnswers = JSON.parse(storedAnswers);
     this.questions = JSON.parse(storedQuestions);
@@ -127,10 +134,10 @@ export class ResultComponent implements OnInit {
     const nextLevel = this.level + 1;
     localStorage.setItem('level', nextLevel.toString());
     localStorage.setItem('operation', this.operation);
-    const userName = localStorage.getItem('userName') || 'Guest';
+    const username = localStorage.getItem('username') || 'Guest';
 
     // ✅ Call backend to start session for next level
-    this.quizService.startSession(userName, this.operation, nextLevel).subscribe({
+    this.quizService.startSession(this.operation, nextLevel).subscribe({
       next: (res) => {
         console.log('Session started for next level:', res);
         this.router.navigate(['/operation']);

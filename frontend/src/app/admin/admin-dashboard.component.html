@@ -1,0 +1,42 @@
+<h2>Admin Dashboard - All Quiz Attempts</h2>
+
+<label>
+  Filter by User:
+  <input [(ngModel)]="filterUser" (input)="applyFilter()" placeholder="Enter username" />
+</label>
+
+<label>
+  Filter by Operation:
+  <select [(ngModel)]="filterOp" (change)="applyFilter()">
+    <option value="">All</option>
+    <option *ngFor="let op of operations">{{ op }}</option>
+
+  </select>
+</label>
+
+<table class="styled-table" *ngIf="filtered.length">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Operation</th>
+      <th>Level</th>
+      <th>Attempt</th>
+      <th>Score</th>
+      <th>Passed?</th>
+      <th>Timestamp</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let a of filtered">
+      <td>{{ a.user_name }}</td>
+      <td>{{ a.operation }}</td>
+      <td>{{ a.level }}</td>
+      <td>{{ a.attempt_number }}</td>
+      <td>{{ a.score }}/{{ a.total_questions }}</td>
+      <td>{{ a.is_passed ? '✅' : '❌' }}</td>
+      <td>{{ a.timestamp | date:'short' }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!filtered.length">No matching attempts found.</div>

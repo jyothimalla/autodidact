@@ -1,14 +1,18 @@
-<div>
-    <h1>Welcome to the Maths Challenge!</h1>
-    
-    <input type="text" [(ngModel)]="userName" placeholder="Enter your name" />
-    <br />
-  
-    <button (click)="startQuiz()">Start Quiz</button>
-  
-    <!-- ✅ Error Message -->
-    <div *ngIf="errorMessage" style="color: red; margin-top: 10px;">
-      {{ errorMessage }}
-    </div>
+<div class="home-wrapper">
+  <div class="home-container">
+    <img src="assets/Autodidact.gif" alt="Welcome" class="intro-gif" />
   </div>
+  <!--<mat-slide-toggle [(ngModel)]="musicOn">Enable Music</mat-slide-toggle>
+  <p>Music is {{ musicOn ? 'ON 🎵' : 'OFF 🔇' }}</p>-->
+
+  <div class="button-group">
+    <button mat-button (click)="openLogin()">🔐 Login</button>
+    <button mat-button (click)="openRegister()">📝 Register</button>
+  </div>
+
+  <!-- Login Modal -->
+  <app-login *ngIf="showLogin" (close)="closeModals()"></app-login>
   
+  <!-- Register Modal -->
+  <app-register *ngIf="showRegister" (close)="closeModals()"></app-register>
+</div>

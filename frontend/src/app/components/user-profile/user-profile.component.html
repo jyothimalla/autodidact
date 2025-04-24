@@ -1,0 +1,31 @@
+<div class="profile-wrapper" *ngIf="!isLoading && userProfile">
+    <h2>👤 {{ userProfile.username }}'s Profile</h2>
+  
+    <p><strong>Ninja Title:</strong> {{ userProfile.title }}</p>
+    <p><strong>⭐ Ninja Stars:</strong> {{ userProfile.ninja_stars }}</p>
+  
+    <h3>📚 Attempted Operations</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Operation</th>
+          <th>Highest Level</th>
+          <th>Attempts</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let progress of userProfile.progress">
+          <td>{{ progress.operation }}</td>
+          <td>{{ progress.level }}</td>
+          <td>{{ progress.attempts }}</td>
+          <td>{{ progress.best_score }}/10</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div *ngIf="isLoading">
+    <p>⏳ Loading profile...</p>
+  </div>
+  

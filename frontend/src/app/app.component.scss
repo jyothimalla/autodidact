@@ -1,0 +1,43 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* 🔒 Prevent scrolling */
+  }
+  
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  app-root {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  main{
+    min-height: 10px; // leave space for footer
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  footer {
+    background-color: #fff;
+    padding: 10px 20px;
+    font-size: 14px;
+    text-align: center;
+    overflow: hidden;
+  }
+  
+  main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* 🔒 Prevent scrolling */
+  }

@@ -1,31 +1,22 @@
-<div class="operation-wrapper">
-    <h2>Select an Operation</h2>
-    <div class="operation-buttons">
-      <!-- Operation Buttons -->
-    <button 
-    *ngFor="let op of operations"
-    [ngClass]="op.toLowerCase()"
-    (click)="selectOperation(op)"
-    >
-    {{ op }}
-    </button>
-    </div>
-  <div class="levels-wrapper">
-    <button
-    *ngFor="let level of levels"
-    [disabled]="isLevelLocked(level)"
-    (click)="selectLevel(level)"
-    [ngClass]="[
-      'level-button',
-      selectedOperation.toLowerCase() + '-level',
-      isLevelLocked(level) ? 'locked' : 'unlocked'
-    ]"
-  >
-    {{ getLevelLabel(level) }}
-  </button>
+<!DOCTYPE html>
 
-  
-</div>
-    
+<header>
+  <div class="header-left">
+    <div class="logo_wrapper">
+      <img src="assets/logo.png" alt="Logo" class="logo" />
+    </div>
+    <h1 style="color: rgb(19, 129, 213); font-size:65%;">Kids Self Learning Application</h1>
   </div>
-  
+
+  <!-- 🛠 Move this block OUTSIDE of header-left -->
+  <div class="header-right" *ngIf="this.username">
+    <span>👋 Welcome, {{ this.username }} ( {{this.awarded_title}})</span>
+    <button (click)="goToMyAccount()">My Account</button>
+    <button (click)="logout()">Logout</button>
+  </div>
+</header>
+<div class="quiz-wrapper" >
+
+
+
+</div>

@@ -74,3 +74,36 @@ button {
   transform: scale(1.05);
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
+.welcome-text {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+.level-button {
+  margin: 5px;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.unlocked {
+  background-color: #c8f7c5;
+}
+
+
+.levels-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 1rem;
+}
