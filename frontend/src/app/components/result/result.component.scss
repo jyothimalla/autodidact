@@ -158,3 +158,38 @@ footer {
   .footer-link a:hover {
     text-decoration: underline;
   }
+  .congrats-popup {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff3cd;
+    border: 2px solid #ffeeba;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    z-index: 1000;
+    animation: popUp 0.5s ease-out;
+  }
+  
+  @keyframes popUp {
+    0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
+  }
+  
+  .congrats-popup h2 {
+    color: #856404;
+  }
+  
+  .congrats-popup button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  

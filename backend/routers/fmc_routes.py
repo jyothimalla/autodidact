@@ -10,6 +10,8 @@ from database import UserScore
 from database import Base
 from database import FMCQuestionBank
 from schemas import FMCQuestionCreate, FMCQuestionRead
+from datetime import datetime
+
 
 router = APIRouter()
 
@@ -17,6 +19,13 @@ class FMCQuestion(BaseModel):
     question: str
     answer: str
     explanation: str
+
+class FMCQuestionSaveModel(BaseModel):
+    user_id: int
+    level: int
+    score: int
+    questions: List[FMCQuestion]
+    timestamp: Optional[datetime] = None 
 
 names = ["Ava", "Lima", "Zoe", "Noah", "Emma", "Ethan", "Olivia", "Liam", "Sophia", "Mason", "Isabella", "Lucas", "Mia",
           "Aiden", "Charlotte", "Jackson", "Amelia", "Caden", "Harper", "Grayson", "Evelyn", "Elijah", "Abigail", "Oliver", "Ella", "James", "Scarlett", "Benjamin", "Avery", "Alexander",
@@ -440,3 +449,38 @@ def get_admin_questions(level: Optional[int] = None, qtype: Optional[str] = None
 @router.get("/fmc/admin/export", response_model=List[FMCQuestionRead])
 def export_all_fmc_questions(db: Session = Depends(get_db)):
     return db.query(FMCQuestionBank).all()
+
+@router.get("/fmc/questions")
+def get_fmc_questions(level: int = 0, db: Session = Depends(get_db)):
+    questions = generate_fmc_questions(level)  # You may have your own generator
+    for q in questions:
+        db_question = FMCQuestion(
+            level=level,
+            question_text=q.question,
+            answer=q.answer,
+            explanation=q.explanation
+        )
+        db.add(db_question)
+    db.commit()
+    return questions
+
+# Admin: Save questions to database
+@router.post("/fmc/save-questions")
+def save_fmc_questions(data: FMCQuestionSaveModel, db: Session = Depends(get_db)):
+    from models import FMCQuestionAttempt  # Assuming model is defined in models.py
+
+    attempt = FMCQuestionAttempt(
+        user_id=data.user_id,
+        level=data.level,
+        score=data.score,
+        questions=json.dumps([q.dict() for q in data.questions]),
+        timestamp=data.timestamp or datetime.utcnow()
+    )
+    db.add(attempt)
+    db.commit()
+    return {"message": "FMC Questions saved successfully."}
+
+@router.get("/fmc/questions/{level}")
+def get_fmc_questions_by_level(level: int, db: Session = Depends(get_db)):
+    questions = db.query(FMCQuestionBank).filter(FMCQuestionBank.level == level).all()
+    return questions

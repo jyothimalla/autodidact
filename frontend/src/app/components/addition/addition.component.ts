@@ -51,7 +51,8 @@ export class AdditionComponent implements OnInit {
   isCorrect = true;
   user_id: number = 0;
   explanation  = '';
-  
+  savingInProgress = false;
+
   constructor(private quizService: QuizService, private router: Router, private route: ActivatedRoute) {}
 
   
@@ -125,25 +126,53 @@ export class AdditionComponent implements OnInit {
       } else {
         this.completeQuiz();
       }
-    }, 1500);
+    }, 2500);
   }
   
 
   completeQuiz(): void {
     this.quizCompleted = true;
-
+    this.savingInProgress = true; // 🔵 Start showing spinner
+  
     localStorage.setItem('score', this.score.toString());
     localStorage.setItem('answers', JSON.stringify(this.userAnswers));
     localStorage.setItem('questions', JSON.stringify(this.questions));
-
+  
     const progressKey = `${this.currentOperation}_progress`;
     const unlockedLevel = parseInt(localStorage.getItem(progressKey) || '0', 10);
     if (this.score === this.questions.length && this.level >= unlockedLevel) {
       localStorage.setItem(progressKey, (this.level + 1).toString());
     }
-
-    setTimeout(() => this.router.navigate(['/result']), 1000);
+  
+    this.quizService.submitChallengeAttempt({
+      user_id: this.user_id,
+      operation: this.currentOperation,
+      level: this.level,
+      score: this.score,
+      total_questions: this.questions.length
+    }).subscribe({
+      next: (response) => {
+        console.log('✅ Attempt saved successfully!', response);
+  
+        setTimeout(() => {
+          this.savingInProgress = false; // 🟢 Stop spinner after small wait
+          this.router.navigate(['/result'], {
+            queryParams: {
+              username: this.username,
+              user_id: this.user_id,
+              operation: this.currentOperation,
+              level: this.level
+            }
+          });
+        }, 1500); // ⏳ Wait 1.5 seconds to show spinner properly
+      },
+      error: (error) => {
+        console.error('❌ Error saving attempt:', error);
+        this.savingInProgress = false; // 🔴 Hide spinner on error too
+      }
+    });
   }
+  
 
   restartQuiz(): void {
     this.router.navigate(['/operation']);
@@ -174,13 +203,13 @@ goHome(): void {
   this.router.navigate(['/']);
 }
 
-goBack(): void {
-  if (this.currentQIndex > 0) {
-    this.currentQIndex--;
-    this.answerInput = this.userAnswers[this.currentQIndex] || '';
+  goBack(): void {
+    if (this.currentQIndex > 0) {
+      this.currentQIndex--;
+      this.answerInput = this.userAnswers[this.currentQIndex] || '';
+    }
+    this.feedbackMessage = '';
+    this.explanation = '';
+    this.router.navigate(['/operation']);
   }
-  this.feedbackMessage = '';
-  this.explanation = '';
-  this.router.navigate(['/operation']);
-}
 }

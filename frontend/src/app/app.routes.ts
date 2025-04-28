@@ -30,6 +30,8 @@ import { authGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { TestAdditionComponent } from './components/test-addition/test-addition.component';
 import { MyAccountComponent } from './components/my-account/my-account.component';
+import { LearnComponent } from './components/learn/learn.component';
+
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) },
@@ -58,6 +60,11 @@ export const routes: Routes = [
   { path: 'progress', loadComponent: () => import('./progress/progress.component').then(m => m.ProgressComponent), 
     canActivate: [authGuard]
    },
+   {
+    path: 'learn/addition',
+    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)
+  },
+  
    {
     path: 'my-account/:id',
     loadComponent: () => import('./components/my-account/my-account.component').then(m => m.MyAccountComponent)

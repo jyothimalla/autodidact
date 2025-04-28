@@ -1,0 +1,76 @@
+.learn-wrapper {
+    text-align: center;
+    padding: 20px;
+  
+    h2 {
+      margin-bottom: 1rem;
+      font-size: 24px;
+      color: #444;
+    }
+  
+    .learn-video {
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+  
+    .learn-caption {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #666;
+    }
+  }
+  .quiz-wrapper {
+    display: flex;
+    flex-direction: row;
+    min-height: 1vh;
+  }
+  
+  .left-sidebar, .right-sidebar {
+    width: 20%;
+    background-color: #f0f0f0;
+  }
+  
+  .learn-wrapper {
+    flex: 1;
+    text-align: center;
+    padding: 2rem;
+    background-color: #fffbe9;
+  }
+  
+  .learn-video {
+    margin-top: 20px;
+    border: 3px solid #88c0d0;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  
+  .learn-caption {
+    font-size: 1.1rem;
+    color: #444;
+    margin-top: 1rem;
+  }
+  
+  .button-group {
+    margin-top: 20px;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  
+    .try-again {
+      background-color: #f7b733;
+      color: white;
+      transition: background-color 0.3s;
+    }
+  
+    .try-again:hover {
+      background-color: #f57c00;
+    }
+  }

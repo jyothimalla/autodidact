@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
-import { FooterComponent } from '../footer/footer.component';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -12,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './fmc.component.html',
   styleUrls: ['./fmc.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, LeftSidebarComponent, RightSidebarComponent, FooterComponent],
+  imports: [CommonModule, FormsModule, LeftSidebarComponent, RightSidebarComponent],
   providers: [QuizService]
 })
 export class FMCComponent implements OnInit {
@@ -33,6 +32,12 @@ export class FMCComponent implements OnInit {
   lastUserAnswer = '';
   lastCorrectAnswer = '';
   userAnswers: string[] = [];
+  isAnimationPlaying = false;
+  explanation = '';
+  animation: any;
+  answerInput = '';
+  isCorrect = true;
+  quizCompleted = false;
 
   constructor(private quizService: QuizService, private router: Router, private route: ActivatedRoute) {}
 
@@ -88,6 +93,7 @@ export class FMCComponent implements OnInit {
   }
   
   completeQuiz(): void {
+    this.quizCompleted = true;
     clearInterval(this.timer);
     this.isFinished = true;
     localStorage.setItem('score', this.score.toString());
@@ -120,11 +126,47 @@ export class FMCComponent implements OnInit {
     this.isFinished = true;
     localStorage.setItem('score', this.score.toString());
   }
+  restartQuiz(): void {
+    this.router.navigate(['/operation']);
+  }
 
   tryAgain(): void {
     this.router.navigate(['/operation']);
   }
   reviewAnswers(): void {
     this.router.navigate(['/result'], { queryParams: { score: this.score, elapsedTime: this.elapsedTime } });
+  }
+  isReading = false;
+  readQuestionAloud(): void {
+    const question = this.questions[this.currentQIndex]?.question;
+    if (question && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(question);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+
+      this.animation?.play(); // Play animation
+      utterance.onend = () => this.animation?.stop(); // Stop after speaking
+    }
+  }
+  ngOnDestroy(): void {
+    if (this.timer) clearInterval(this.timer);
+  }
+  goHome(): void {
+    clearInterval(this.timer);
+    localStorage.removeItem('userName');
+    localStorage.removeItem('operation');
+    localStorage.removeItem('level');
+    localStorage.removeItem('score');
+    this.router.navigate(['/']);
+  }
+  
+  goBack(): void {
+    if (this.currentQIndex > 0) {
+      this.currentQIndex--;
+      this.answerInput = this.userAnswers[this.currentQIndex] || '';
+    }
+    this.feedbackMessage = '';
+    this.explanation = '';
+    this.router.navigate(['/operation']);
   }
 }

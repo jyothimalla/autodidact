@@ -1,0 +1,64 @@
+<div class="quiz-wrapper" *ngIf="questions.length > 0; else loading">
+    <!-- LEFT SIDEBAR -->
+    <app-left-sidebar class="left-sidebar"></app-left-sidebar>
+  
+    <!-- MAIN CONTENT -->
+    <div class="quiz-main-card">
+    <!-- <button (click)="goHome()">🏠 Go to Home</button>-->
+      <div class="quiz-header">
+        <h2 class="quiz-title addition">
+          {{ currentOperation | titlecase }} –
+          {{
+            currentOperation === 'sudoku'
+              ? (level === 0 ? 'Easy' : level === 1 ? 'Medium' : 'Difficult')
+              : 'Level ' + level
+          }}
+        </h2>
+      </div>
+  
+      <div *ngIf="questions[currentQIndex]" class="question-row">
+        <div class="character-container" (click)="readQuestionAloud()">
+          <img src="assets/images/bird1.png" alt="Bird Reader" [class.animate]="isReading" />
+        </div>
+        <div class="question-container">
+          <p>
+            {{ questions[currentQIndex].question.split('=')[0] }} =
+            <input
+              type="text"
+              [(ngModel)]="answerInput"
+              class="answer-input"
+              (keyup.enter)="submitAnswer()"
+              placeholder="?" />
+          </p>
+        </div>
+      </div>
+  
+      <div class="feedback" *ngIf="feedbackMessage">
+        <p>{{ feedbackMessage }}</p>
+      </div>
+  
+      <div class="button-group">
+        <button *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
+        <button (click)="goBack()">🔙 Go Back</button>
+  
+        <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
+      </div>
+    </div>
+  
+    <!-- RIGHT SIDEBAR -->
+     <div class="right-sidebar ">
+    <app-right-sidebar *ngIf="username"
+      class="sidebar right"
+      [username]="username"
+      [score]="score"
+      [currentQIndex]="currentQIndex"
+      [totalQuestions]="questions.length"
+      [elapsedTime]="elapsedTime">
+    </app-right-sidebar>
+  </div>
+  </div>
+    <!-- LOADING TEMPLATE -->
+  <ng-template #loading>
+    <p>⏳ Loading questions...</p>
+  </ng-template>
+  

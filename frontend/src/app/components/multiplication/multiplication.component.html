@@ -1,10 +1,14 @@
 
 <div class="quiz-wrapper" *ngIf="questions.length > 0">
   <!-- LEFT SIDEBAR -->
-  <div class="left-sidebar">
-    <app-left-sidebar></app-left-sidebar>
-  </div>
+    <app-left-sidebar class="left-sidebar"></app-left-sidebar>
 
+    <div *ngIf="savingInProgress" class="saving-overlay">
+      <div class="spinner"></div>
+      <p>Saving your results... Please wait ⏳</p>
+    </div>
+
+    
   <!-- MAIN QUIZ CONTENT -->
   <div class="quiz-main-card">
     <div class="quiz-header">
@@ -51,8 +55,10 @@
 
     <!-- Buttons -->
     <div class="button-group">
-      <button style="background-color:#73AD21" *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
-      <button *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()" class="try-again">🔁 Try Again</button>
+      <button *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
+      <button (click)="goBack()">🔙 Go Back</button>
+
+      <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
     </div>
   </div>
 
@@ -68,14 +74,10 @@
       [elapsedTime]="elapsedTime">
     </app-right-sidebar>
   </div>
+  
 </div>
 
 <!-- Fallback -->
 <div *ngIf="questions.length === 0">
   <p>Loading questions...</p>
-</div>
-
-<!-- Footer -->
-<div class="footer" style="margin: auto; padding: 10px; width: 100%;">
-  <app-footer></app-footer>
 </div>

@@ -1,0 +1,52 @@
+<div class="operation-wrapper">
+    <h2 class="page-title">Select an Operation</h2>
+  
+    <!-- Operation Buttons -->
+    <div class="operation-buttons">
+      <button
+        *ngFor="let op of operations"
+        [ngClass]="op.toLowerCase()"
+        class="operation-button"
+        (click)="selectOperation(op.toLowerCase())"
+      >
+        {{ op }}
+      </button>
+    </div>
+  
+    <!-- Levels Grid -->
+    <div *ngIf="selectedOperation" class="levels-section">
+      <h3 class="section-title">
+        Select Level for {{ selectedOperation | titlecase }}
+      </h3>
+  
+      <div class="levels-grid">
+        <button
+          *ngFor="let level of levels"
+          [disabled]="isLevelLocked(level)"
+          (click)="onLevelClick(level)"
+          [ngClass]="[
+            'level-button',
+            selectedOperation.toLowerCase() + '-level',
+            isLevelLocked(level) ? 'locked' : 'unlocked'
+          ]"
+        >
+          {{ getLevelLabel(level) }}
+        </button>
+      </div>
+  
+      <!-- Show actions only for selected and unlocked level -->
+      <div class="level-card" *ngIf="selectedLevel !== null && !isLevelLocked(selectedLevel)">
+        <div class="level-info">
+          <h4>Choose one of the following Options: Learn, Practice and Attempt{{ getLevelLabel(selectedLevel) }}</h4>
+        </div>
+  
+        <div class="level-actions">
+          <button class="levels-section" (click)="startLearning(selectedLevel)">📖 Learn</button>
+  
+          <button class="levels-button selectedOperation.toLowerCase() + '-level'" (click)="startPractice(selectedLevel)">🛠️ Try Out</button>
+          <button class="levels-section" (click)="selectLevel(selectedLevel)">📝 🚀 Challenge </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

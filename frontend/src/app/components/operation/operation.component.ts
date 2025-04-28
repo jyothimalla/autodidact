@@ -18,6 +18,14 @@ export class OperationComponent implements OnInit {
   unlockedLevel = 0;
   username: string = '';
   user_id: number = 0;
+  subLevels: number[] = [];
+  selectedSubLevel: number | null = null;
+  activeLevel: number | null = null;
+  selectedLevel: number | null = null;
+  isSudoku: boolean = false;
+  actionLabel: string | null = null;
+  selectedSublevelType: 'learn' | 'practice' | 'attempt' | null = null;
+
 
   sudokuLevels = [
     { label: 'Easy', value: 0 },
@@ -62,7 +70,6 @@ export class OperationComponent implements OnInit {
     selectOperation(operation: string) {
     
       this.selectedOperation = operation;
-      console.log('🧠 Operation clicked:', operation);
 
       const progressKey = `${operation.toLowerCase()}_progress`;
       this.unlockedLevel = parseInt(localStorage.getItem(progressKey) || '0', 10);
@@ -74,7 +81,9 @@ export class OperationComponent implements OnInit {
         ? this.sudokuLevels.map(lvl => lvl.value)
         : Array.from({ length:10 }, (_, i) => i);  // Try limiting to 3 levels for now
     
-      console.log('📋 Available levels:', this.levels);
+        console.log('🧠 Operation clicked:', operation);
+
+        console.log('📋 Available levels:', this.levels);
     }
     
 
@@ -82,41 +91,118 @@ export class OperationComponent implements OnInit {
   return this.username === 'Guest' ? level !== 0 : level > this.unlockedLevel;
   }
 
-selectLevel(level: number) {
+  selectLevel(level: number) {
 
-  if (this.isLevelLocked(level)) {
-    console.warn(`🚫 Level ${level} is locked!`);
-    return;
-  }
-  console.log('🧪 Selected level:', level);
+    if (this.isLevelLocked(level)) {
+      console.warn(`🚫 Level ${level} is locked!`);
+      return;
+    }
+    console.log('🧪 Selected level:', level);
 
-  const operation = this.selectedOperation.toLowerCase();
-  localStorage.setItem('operation', operation);
-  localStorage.setItem('level', level.toString());
+    const operation = this.selectedOperation.toLowerCase();
+    localStorage.setItem('operation', operation);
+    localStorage.setItem('level', level.toString());
 
-  const directRoutes = ['addition', 'subtraction', 'multiplication', 'division', 'fmc', 'sudoku'];
+    const directRoutes = ['addition', 'subtraction', 'multiplication', 'division', 'fmc', 'sudoku'];
 
-  if (directRoutes.includes(operation)) {
-    console.log('🔄 Navigating to direct route:', operation);
-    this.navigateToOperation(operation, level);
-  }
-   else {
-    this.quizService.startSession(operation, level).subscribe({
-      next: () => {
-        console.log('✅ Session started, navigating to /quiz');
-        this.router.navigate(['/quiz']);
-      },
-      error: (err) => {
-        console.error('❌ Failed to start session:', err);
-        alert('Could not start quiz session. Please try again.');
-      }
-    });
-  }
+    if (directRoutes.includes(operation)) {
+      console.log('🔄 Navigating to direct route:', operation);
+      this.selectedLevel = level;
+      this.activeLevel = level;
+      this.subLevels = Array.from({ length: 10 }, (_, i) => i);
+      console.log('🔄 Sublevels:', this.subLevels);
+      console.log('✅ Level selected. Choose a sublevel next.');
+    }
+    else {
+      this.quizService.startSession(operation, level).subscribe({
+        next: () => {
+          console.log('✅ Session started, navigating to /quiz');
+          this.router.navigate(['/quiz']);
+        },
+        error: (err) => {
+          console.error('❌ Failed to start session:', err);
+          alert('Could not start quiz session. Please try again.');
+        }
+      });
+    }
 }
-navigateToOperation(operation: string, level: number) {
-  this.router.navigate([`/${operation}`], {
+
+
+selectSubLevel(type: 'learn' | 'practice' | 'attempt') {
+  this.selectedSublevelType = type;
+  this.actionLabel = type === 'learn' ? 'Learn'
+                   : type === 'practice' ? 'Practice'
+                   : 'Attempt';
+
+  if (this.selectedLevel === null && this.activeLevel !== null) {
+  this.selectedLevel = this.activeLevel;
+  }
+  const subLevel = this.selectedSubLevel !== null ? this.selectedSubLevel : 0;
+  console.log('🧩 Sublevel selected:', subLevel);
+  const operation = this.selectedOperation.toLowerCase();
+  const level = this.selectedLevel;
+
+  const routeMap: Record<number, string> = {
+    1: `/learn/${operation}`,   // Learn
+    2: `/practice`,             // Try Out
+    3: `/${operation}`          // Challenge
+  };
+
+  const route = routeMap[subLevel];
+  console.log('🔄 Navigating to route:', route);
+  console.log('🔄 Sublevel:', subLevel);
+
+  this.router.navigate([route], {
     queryParams: {
       level,
+      username: this.username,
+      user_id: this.user_id,
+      sublevel: subLevel
+    }
+  });
+}
+
+navigateToOperation(): void {
+  const operation = this.selectedOperation.toLowerCase();
+  this.router.navigate([`/${operation}`], {
+    queryParams: {
+      sublevel: this.subLevels,
+      username: this.username,
+      user_id: this.user_id
+    }
+  });
+}
+navigateToLearn(): void {
+  const operation = this.selectedOperation.toLowerCase();
+  if (this.activeLevel === null) return;
+  this.router.navigate([`/learn/${operation}`], {
+    queryParams: {
+      level: this.activeLevel,
+      username: this.username,
+      user_id: this.user_id
+    }
+  });
+}
+
+navigateToPractice(): void {
+  const operation = this.selectedOperation.toLowerCase();
+  if (this.activeLevel === null) return;
+  this.router.navigate([`/practice`], {
+    queryParams: {
+      level: this.activeLevel,
+      operation,
+      username: this.username,
+      user_id: this.user_id
+    }
+  });
+}
+
+navigateToChallenge(): void {
+  const operation = this.selectedOperation.toLowerCase();
+  if (this.activeLevel === null) return;
+  this.router.navigate([`/${operation}`], {
+    queryParams: {
+      level: this.activeLevel,
       username: this.username,
       user_id: this.user_id
     }
@@ -131,4 +217,90 @@ navigateToOperation(operation: string, level: number) {
     }
     return `Level ${level}`;
   }
+
+  startPractice(level: number): void {
+    const operation = this.selectedOperation.toLowerCase();
+    this.selectedLevel = level;
+    this.actionLabel = 'Practice';
+    this.selectedSublevelType = 'practice';
+    this.router.navigate(['/practice'], {
+      queryParams: {
+        level,
+        operation,
+        username: this.username,
+        user_id: this.user_id
+      }
+    });
+  }
+
+  onLevelClick(level: number): void {
+    if (!this.isLevelLocked(level)) {
+      this.selectedLevel = level;
+    } else {
+      console.warn(`🚫 Level ${level} is locked.`);
+    }
+  }
+  startLearning(level: number): void {
+    const operation = this.selectedOperation.toLowerCase();
+    this.selectedLevel = level;
+    this.actionLabel = 'Learn';
+    this.selectedSublevelType = 'learn';
+    console.log(`📘 Starting learning for ${operation}, Level ${level}`);
+  
+    this.router.navigate([`/learn/${operation}`], {
+      queryParams: {
+        level: level,
+        username: this.username,
+        user_id: this.user_id
+      }
+    });
+  }
+  startAttempt(level: number) {
+    this.selectedLevel = level;
+    this.actionLabel = 'Attempt';
+    this.selectedSublevelType = 'attempt';
+  }
+
+learnLevel(level: number) {
+  this.activeLevel = level;
+  this.actionLabel = 'Learn';
+  // Optionally: route to video or learning page
+}
+
+confirmAction(): void {
+  const operation = this.selectedOperation.toLowerCase();
+  const level = this.selectedLevel;
+
+  const routeMap: Record<string, string> = {
+    'Learn': `/learn/${operation}`,
+    'Practice': '/practice',
+    'Attempt': `/${operation}`
+  };
+
+  const selectedRoute = routeMap[this.actionLabel || ''] || '/operation';
+
+  const queryParams: any = {
+    level,
+    username: this.username,
+    user_id: this.user_id
+  };
+
+  if (this.actionLabel === 'Practice') {
+    queryParams.operation = operation;  // Only Practice needs 'operation' separately
+  }
+
+  this.router.navigate([selectedRoute], { queryParams });
+  this.resetConfirmation();
+}
+
+cancelAction(): void {
+  this.resetConfirmation();
+}
+
+resetConfirmation(): void {
+  this.actionLabel = null;
+  this.selectedSublevelType = null;
+}
+
+
 }

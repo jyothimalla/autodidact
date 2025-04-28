@@ -3,7 +3,11 @@
 
   
   <app-left-sidebar class="left-sidebar"></app-left-sidebar>
-
+  <div *ngIf="savingInProgress" class="saving-overlay">
+    <div class="spinner"></div>
+    <p>Saving your results... Please wait ⏳</p>
+  </div>
+  
   <!-- MAIN CONTENT -->
   <div class="quiz-main-card">
   <!-- <button (click)="goHome()">🏠 Go to Home</button>-->

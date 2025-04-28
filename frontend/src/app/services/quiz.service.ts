@@ -5,6 +5,12 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { ConfigService } from '../services/config.service'; 
 
+interface SubmitChallengeResponse {
+  message: string;
+  level_attempt_id: number;
+  attempt_number: number;
+  is_passed: boolean;
+}
 
 @Injectable({ providedIn: 'root' })
 
@@ -75,4 +81,15 @@ export class QuizService {
     const user_id = localStorage.getItem('user_id');
     return this.http.get<any>(`${this.baseUrl}/progress/${user_id}?operation=${operation}`);
   }
+
+  submitChallengeAttempt(data: {
+    user_id: number,
+    operation: string,
+    level: number,
+    score: number,
+    total_questions: number
+  }) {
+    return this.http.post<SubmitChallengeResponse>(`${this.baseUrl}/level-attempt/`, data);
+  }
+  
 }

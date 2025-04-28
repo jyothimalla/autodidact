@@ -1,0 +1,36 @@
+<div class="quiz-wrapper">
+  <!-- LEFT SIDEBAR -->
+  <app-left-sidebar class="left-sidebar"></app-left-sidebar>
+
+  <!-- MAIN CONTENT -->
+  <div class="learn-wrapper">
+    <h2>📘 Let's Learn: {{ operation | titlecase }} - Level {{ level }}</h2>
+
+    <video
+      class="learn-video"
+      width="400"
+      height="300"
+      controls
+      preload="metadata"
+      (ended)="onVideoEnd()"
+    >
+      <source [src]="videoSrc" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <p class="learn-caption">
+      Watch this video to understand concepts in {{ operation }} with fun animations!
+    </p>
+
+    <div class="button-group">
+      <button (click)="goBack()">🔙 Go Back</button>
+      <button class="try-again" *ngIf="videoFinished" (click)="tryPractice()">🛠️ Try Out</button>
+      <button class="try-again" *ngIf="videoFinished" (click)="takeChallenge()">🚀 Take Challenge</button>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="right-sidebar">
+  
+  </div>
+</div>

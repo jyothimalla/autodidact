@@ -6,12 +6,18 @@ import { FormsModule } from '@angular/forms';
 import { QuizService } from '../../services/quiz.service';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
-import { FooterComponent } from '../footer/footer.component';
+import confetti from 'canvas-confetti';
 
+interface SubmitChallengeResponse {
+  message: string;
+  level_attempt_id: number;
+  attempt_number: number;
+  is_passed: boolean;
+}
 
 @Component({
   selector: 'app-multiplication',
-  imports: [CommonModule, FormsModule, RightSidebarComponent, LeftSidebarComponent, FooterComponent],
+  imports: [CommonModule, FormsModule, RightSidebarComponent, LeftSidebarComponent],
   standalone: true,
   templateUrl: './multiplication.component.html',
   styleUrl: './multiplication.component.scss'
@@ -35,6 +41,12 @@ export class MultiplicationComponent implements OnInit {
   lastCorrectAnswer = '';
   isCorrect = true;
   isReading = false;
+  savingInProgress = false;
+  explanation = '';
+  showSpinner = false;
+  showAnswer = false;
+  showAnswerText = '';
+
 
   constructor(private quizService: QuizService, private router: Router, private route: ActivatedRoute) {}
 
@@ -74,55 +86,127 @@ export class MultiplicationComponent implements OnInit {
   handleEnter(event: KeyboardEvent) {
     this.submitAnswer();
   }
+  
 
   submitAnswer(): void {
     const currentQ = this.questions[this.currentQIndex];
     const correct = currentQ.answer.trim();
     const userAnswer = this.answerInput.trim();
-
+  
     if (!userAnswer) {
       alert('⚠️ Please enter your answer before submitting!');
       return;
     }
+  
     this.lastUserAnswer = userAnswer;
     this.lastCorrectAnswer = correct;
     this.isCorrect = userAnswer === correct;
-
+  
     this.feedbackMessage = this.isCorrect
       ? '✅ Correct!'
-      : `❌ Your answer "${userAnswer}" is incorrect.\n✅ Correct answer is "${correct}"`;
-
-    if (this.isCorrect) this.score++;
-
+      : `❌ Incorrect! Correct is "${correct}"`;
+  
+    if (this.isCorrect) {
+      this.score++;
+    }
+  
     this.userAnswers[this.currentQIndex] = userAnswer;
     this.answerInput = '';
-
-    setTimeout(() => {
-      this.feedbackMessage = '';
-    }, 1800);
-
-    if (this.currentQIndex < this.questions.length - 1) {
-      this.currentQIndex++;
-    } else {
-      this.completeQuiz();
-    }
+  
+    // ✅ Move to next question after very short delay
+    
+      if (this.currentQIndex < this.questions.length - 1) {
+        this.currentQIndex++;   // move to next
+      } else {
+        this.completeQuiz();    // quiz complete
+      }
+      setTimeout(() => {
+        this.feedbackMessage = ''; // clear message
+    
+    }, 800); // Just 0.8 seconds delay to show feedback
   }
+  
+  
 
   completeQuiz(): void {
     this.quizCompleted = true;
+    this.savingInProgress = true; // Show spinner
+  
     localStorage.setItem('score', this.score.toString());
     localStorage.setItem('answers', JSON.stringify(this.userAnswers));
     localStorage.setItem('questions', JSON.stringify(this.questions));
-
+  
     const progressKey = `${this.currentOperation}_progress`;
-    const unlocked = parseInt(localStorage.getItem(progressKey) || '0', 10);
-    if (this.score === this.questions.length && this.level >= unlocked) {
+    const unlockedLevel = parseInt(localStorage.getItem(progressKey) || '0', 10);
+    if (this.score === this.questions.length && this.level >= unlockedLevel) {
       localStorage.setItem(progressKey, (this.level + 1).toString());
     }
+  
+    this.quizService.submitChallengeAttempt({
+      user_id: this.user_id,
+      operation: this.currentOperation,
+      level: this.level,
+      score: this.score,
+      total_questions: this.questions.length
+    }).subscribe({
+      next: (response: SubmitChallengeResponse) => {
+        
+        console.log('Level Attempt ID:', response.level_attempt_id);
+        console.log('Attempt Number:', response.attempt_number);
+        console.log('Is Passed:', response.is_passed);
+        const attemptNumber = response.attempt_number; // ✅ Pick attempt_number
 
-    setTimeout(() => this.router.navigate(['/result']), 1000);
+        // 🎉 Play Confetti and Claps first
+        if (this.score === this.questions.length) {
+          this.launchConfetti();
+          this.playClapSound();
+        }
+  
+        setTimeout(() => {
+          this.savingInProgress = false;
+          this.router.navigate(['/result'], {
+            queryParams: {
+              username: this.username,
+              user_id: this.user_id,
+              operation: this.currentOperation,
+              level: this.level,
+              attempt_number: attemptNumber 
+            }
+          });
+        }, 2500); 
+      },
+      error: (error) => {
+        console.error('❌ Error saving attempt:', error);
+        this.savingInProgress = false;
+      }
+    });
+  }
+  
+  
+  launchConfetti() {
+    const duration = 3 * 1000; // 3 seconds
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+  
+    const interval: any = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+  
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+  
+      const particleCount = 50 * (timeLeft / duration);
+  
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+    }, 250);
   }
 
+  playClapSound() {
+    const audio = new Audio();
+    audio.src = 'assets/sounds/clap.mp3';  // Make sure you have a clap.mp3 inside assets/sounds
+    audio.load();
+    audio.play();
+  }
   restartQuiz(): void {
     this.router.navigate(['/operation']);
   }
@@ -134,5 +218,14 @@ export class MultiplicationComponent implements OnInit {
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     }
+  }
+  goBack(): void {
+    if (this.currentQIndex > 0) {
+      this.currentQIndex--;
+      this.answerInput = this.userAnswers[this.currentQIndex] || '';
+    }
+    this.feedbackMessage = '';
+    this.explanation = '';
+    this.router.navigate(['/operation']);
   }
 }

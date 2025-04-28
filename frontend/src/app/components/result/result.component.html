@@ -6,67 +6,74 @@
     <div class="score-box">
       <h3 style="color:blue">Your Score</h3>
       <p style="color:blue">{{ score }} / {{ total }}</p>
+
+      <!-- Only show Next Level/Go Home if full score -->
       <div *ngIf="score === total" class="btn-nextlvel">
         <button style="background-color:rgb(129, 224, 46); color:white; margin-right: 10px" (click)="goToNextLevel()">➡️ Next Level</button>
         <button style="background-color:chocolate; color: white;" (click)="goToOperations()">🏠 Go to Different Module</button>
       </div>
     </div>
 
-    <div *ngIf="score < total">
+    <!-- Show retry button if score < total -->
+    <div *ngIf="score < total" class="retry-section">
       <button style="background-color:rgb(71, 132, 218); color: white;" (click)="retrySameLevel()">🔁 Try Again</button>
     </div>
 
-    <p style="color:blue" *ngIf="score === 10" class="success-msg">
-      🎉 You completed Level {{ level }}! Next Level is now unlocked.
+    <!-- Success Message -->
+    <p style="color:green" *ngIf="score === 10" class="success-msg">
+      🎉 You completed Level {{ level }}! New Level unlocked.
     </p>
 
+    <!-- Retry Message -->
     <p *ngIf="score < 10" class="retry-msg">
       You scored {{ score }}/{{ total }}. Try again to unlock the next level.
     </p>
 
+    <!-- Quiz Review Section -->
     <div class="chat-thread">
-      
-      
       <div class="chat-message" *ngFor="let q of questions; let i = index">
-        
-        
-        <div class="chat-message">
-          <div class="message-question">
-            <span class="q-index">Q{{ i + 1 }}:</span> {{ q.question }}
-          </div>
-        
-          <!-- Your Answer -->
-          <div class="message-user">
-            <span [class.correct]="userAnswers[i] === q.correctValue"
-                  [class.incorrect]="userAnswers[i] !== q.correctValue">
-              Your Answer: {{ userAnswers[i] }}
-            </span>
-          </div>
-        
-          <!-- Correct Answer -->
-          <div *ngIf="userAnswers[i] !== q.correctValue" class="message-correct">
-            ✅ Correct Answer: <span class="correct-msg">{{ q.correctValue }}</span>
-          </div>
-        
-          <!-- Explanation -->
-          
+        <div class="message-question">
+          <span class="q-index">Q{{ i + 1 }}:</span> {{ q.question }}
         </div>
+
+        <!-- Your Answer -->
+        <div class="message-user">
+          <span [class.correct]="userAnswers[i] === q.correctValue"
+                [class.incorrect]="userAnswers[i] !== q.correctValue">
+            Your Answer: {{ userAnswers[i] }}
+          </span>
+        </div>
+
+        <!-- Correct Answer -->
+        <div *ngIf="userAnswers[i] !== q.correctValue" class="message-correct">
+          ✅ Correct Answer: <span class="correct-msg">{{ q.correctValue }}</span>
+        </div>
+
+        <!-- Explanation -->
         <div *ngIf="q.explanation" class="message-explanation">
-            💡 <strong>Explanation:</strong> {{ q.explanation }}
-          </div>
-       
+          💡 <strong>Explanation:</strong> {{ q.explanation }}
+        </div>
       </div>
     </div>
 
+    <!-- Action Buttons -->
     <div class="result-buttons">
       <button (click)="reviewQuiz()">🔁 Review Quiz</button>
       <button *ngIf="score < 10" (click)="retrySameLevel()">❌ Try Again</button>
       <button *ngIf="score === 10" (click)="goToNextLevel()">✅ Go to Next Level</button>
     </div>
+
   </div>
- 
 </div>
+
+<!-- 🎉 Congratulations Popup if level unlocked -->
+<div *ngIf="levelUnlocked" class="congrats-popup">
+  <h2>🎉 Congratulations! 🎉</h2>
+  <p>You unlocked Level {{ level + 1 }}!</p>
+  <button (click)="goToNextLevel()" style="background-color: #28a745; color: white; padding: 10px 20px; margin-top: 10px; border-radius: 8px;">🚀 Go to Next Level</button>
+</div>
+
+<!-- Footer -->
 <div class="footer">
-  
-<app-footer></app-footer>
+  <app-footer></app-footer>
 </div>

@@ -8,50 +8,23 @@
     text-align: center;
   }
   
-  .question-container {
-    font-size: 1.2rem;
-    background: #f3e9ff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-    width: 100%;
-  }
-  
-  .answer-input {
-    border: 2px solid #b98eff;
-    border-radius: 5px;
-    padding: 5px 10px;
-    margin-left: 10px;
-    font-size: 1rem;
-    width: 100px;
-  }
-  
-  .submit-btn {
-    background-color: #ba6dff;
-    color: white;
-    padding: 6px 16px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  .submit-btn:hover {
-    background-color: #9d5ad6;
-  }
-  
-  .feedback p {
-    font-size: 1.2rem;
-    color: #d63384;
-    font-weight: bold;
+  .quiz-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 2rem;
+    font-family: 'Poppins', sans-serif;
   }
   
   /* Reserve space for left sidebar */
   .left-sidebar {
     width: 200px;
     height: 100%;
+    left: 20px;
+    background-color: #f7f7f7;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
   
   /* Centered main quiz box */
@@ -61,7 +34,7 @@
     background-color: #ffffff;
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 4px 20px #f3d6ff; ;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
   
   /* Right sidebar styling */
@@ -91,9 +64,10 @@
   }
   
   .button-group button {
-    padding: 0.6rem 1.2rem;
+    padding: 0.5rem 0.8rem;
     border: none;
-    background-color: #2196f3;
+    width: 20%;
+    background-color: #77e80d;
     color: white;
     border-radius: 6px;
     font-weight: bold;
@@ -107,8 +81,9 @@
   }
   
   .button-group button:hover:not(:disabled) {
-    background-color: #1976d2;
+    background-color: #27ac2d;
   }  
+  
   .volume-btn {
     background-color: transparent;
     border: none;
@@ -138,120 +113,6 @@
     animation: bounce 0.6s ease-in-out infinite;
   }
   
-  @keyframes bounce {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-10px); }
-  }
-  .lottie-anim {
-    display: flex;
-    justify-content: flex-end;
-    padding-bottom: 1rem;
-  }
-  
-  .quiz-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 2rem;
-    margin: 2rem auto;
-    font-family: 'Poppins', sans-serif;
-    flex-wrap: wrap;
-  }
-
-  .quiz-title {
-    background: #ffe0e0;
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-  }
-  .character-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .question-text {
-    font-size: 1.0rem;
-    font-weight: 500;
-  }
-  
-  .answer-input {
-    border: 2px solid #2196f3;
-    border-radius: 5px;
-    padding: 4px 8px;
-    width: 60px;
-    font-size: 1.2rem;
-    margin-left: 8px;
-  }
-  
-  .feedback {
-    margin-top: 1rem;
-    padding: 1rem;
-    border-radius: 8px;
-    font-size: 1.1rem;
-  }
-  
-  .correct {
-    color: green;
-  }
-  
-  .incorrect {
-    color: red;
-  }
-  
-  .correct-answer {
-    margin-top: 0.5rem;
-    color: green;
-    font-weight: 500;
-  }
-  
-  .submit-btn {
-    background-color: #73ad21;
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .loading-text {
-    text-align: center;
-    margin-top: 2rem;
-    font-size: 1.2rem;
-    color: #777;
-  }
-    
-  .rough-work-title {
-    font-weight: bold;
-    font-size: 1rem;
-    margin-top: 2rem;
-    margin-bottom: 0.5rem;
-    color: #333;
-  }
-  
-  .grid-rough-area {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-bottom: 1.5rem;
-  
-    .grid-row {
-      display: flex;
-      gap: 4px;
-  
-      .grid-cell {
-        width: 28px;
-        height: 28px;
-        border: 1px solid #ccc;
-        background-color: #fff;
-      }
-    }
-  }
   
   .whiteboard-rough-area {
     margin-top: 1rem;
@@ -267,3 +128,25 @@
     }
   }
   
+  .back-btn {
+    background-color: #d38049;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    margin-top: 1rem;
+    text-align: center;
+    width: 20%;
+    right: 0px;
+    &:hover {
+      background-color: #df5804;
+    }
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  
+  }
