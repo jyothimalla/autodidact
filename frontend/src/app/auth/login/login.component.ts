@@ -49,8 +49,8 @@ export class LoginComponent {
       password: ['', Validators.required]
     });
     // ✅ Set baseUrl at runtime inside constructor
-    if (window.APP_CONFIG?.apiUrl) {
-      this.baseUrl = `${window.APP_CONFIG.apiUrl}/auth/login`;
+    if (window.APP_CONFIG?.apiBaseUrl) {
+      this.baseUrl = `${window.APP_CONFIG.apiBaseUrl}/auth/login`;
     } else {
       console.warn('⚠️ APP_CONFIG.apiUrl is not defined');
       this.baseUrl = `${environment.apiBaseUrl}/auth/login`; // fallback to environment

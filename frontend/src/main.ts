@@ -13,17 +13,12 @@ if (environment.production) {
 }
 
 fetch('/assets/config.json')
-  .then(response => response.json())
+  .then(res => res.json())
   .then(config => {
-    const configService = new ConfigService({} as any); // we’ll override HttpClient later
-    (configService as any).config = config;
-
-    bootstrapApplication(AppComponent, {
-      providers: [
-        provideHttpClient(),
-        provideRouter(routes),
-        provideAnimations(),
-        { provide: ConfigService, useValue: configService }
-      ]
-    });
+    window.APP_CONFIG = config;
+    return import('./app/app.component');
+  })
+  .then(({ AppComponent }) => {
+    bootstrapApplication(AppComponent)
+      .catch(err => console.error(err));
   });
