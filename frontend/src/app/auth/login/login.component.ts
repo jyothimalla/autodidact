@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { appConfig } from '../../app.config';
 
 declare global {
   interface Window {
@@ -35,6 +36,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
   baseUrl: string = '';
+  
 
   constructor(
     private fb: FormBuilder,

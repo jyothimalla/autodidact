@@ -47,15 +47,16 @@
     >
       {{ label }}
     </button>-->
-    <button class="sublevel-btn learn-btn"
+    <button class="sublevel-btn learn-btn" *ngIf="selectedOperation && activeLevel !== undefined" 
+
       [ngClass]="{ 'selected-learn': selectedSublevelType === 'learn' }"
       (click)="selectSubLevel('learn')"> 📖 Learn </button>
 
-    <button class="sublevel-btn practice-btn"
+    <button class="sublevel-btn practice-btn" *ngIf="selectedOperation && activeLevel !== undefined" 
       [ngClass]="{ 'selected-practice': selectedSublevelType === 'practice' }"
       (click)="selectSubLevel('practice')">  🛠️ Try Out </button>
 
-    <button class="sublevel-btn attempt-btn"
+    <button class="sublevel-btn attempt-btn" *ngIf="selectedOperation && activeLevel !== undefined" 
       [ngClass]="{ 'selected-attempt': selectedSublevelType === 'attempt' }"
       (click)="selectSubLevel('attempt')">  🚀 Challenge </button>
    <!--    <div *ngIf="true" style="background: #fefbd8; padding: 10px; margin: 10px 0;">

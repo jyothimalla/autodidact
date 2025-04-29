@@ -64,6 +64,15 @@ export const routes: Routes = [
     path: 'learn/addition',
     loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)
   },
+  { path: 'learn/subtraction',
+    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)},
+  { path: 'learn/multiplication',
+    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)},
+  { path: 'learn/division',
+    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)},
+  { path: 'learn/fmc',
+    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)
+  },
     {path: 'practice/addition', loadComponent: () => import('./components/practice/practice.component').then(m => m.PracticeComponent)},
    {
     path: 'my-account/:id',

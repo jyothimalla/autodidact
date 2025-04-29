@@ -1,52 +1,84 @@
 <div class="operation-wrapper">
-    <h2 class="page-title">Select an Operation</h2>
-  
-    <!-- Operation Buttons -->
-    <div class="operation-buttons">
+  <h2>Select an Operation</h2>
+
+  <!-- OPERATION BUTTONS -->
+  <div class="operation-buttons">
+    <button
+      *ngFor="let op of operations"
+      [ngClass]="op.toLowerCase()"
+      (click)="selectOperation(op.toLowerCase())">
+      {{ op }}
+    </button>
+  </div>
+
+  <!-- LEVEL SELECTION -->
+  <div *ngIf="selectedOperation !== '' && levels.length > 0" class="levels-wrapper">
+    <h2>Select Level for {{ selectedOperation }}</h2>
+
+    <div class="levels-grid">
       <button
-        *ngFor="let op of operations"
-        [ngClass]="op.toLowerCase()"
-        class="operation-button"
-        (click)="selectOperation(op.toLowerCase())"
-      >
-        {{ op }}
+        *ngFor="let level of levels"
+        [disabled]="isLevelLocked(level)"
+        (click)="onLevelClick(level)"
+        [ngClass]="[
+          'level-button',
+          selectedOperation.toLowerCase() + '-level',
+          isLevelLocked(level) ? 'locked' : 'unlocked',
+          activeLevel === level ? 'active' : ''
+        ]">
+        {{ getLevelLabel(level) }}
       </button>
     </div>
-  
-    <!-- Levels Grid -->
-    <div *ngIf="selectedOperation" class="levels-section">
-      <h3 class="section-title">
-        Select Level for {{ selectedOperation | titlecase }}
-      </h3>
-  
-      <div class="levels-grid">
-        <button
-          *ngFor="let level of levels"
-          [disabled]="isLevelLocked(level)"
-          (click)="onLevelClick(level)"
-          [ngClass]="[
-            'level-button',
-            selectedOperation.toLowerCase() + '-level',
-            isLevelLocked(level) ? 'locked' : 'unlocked'
-          ]"
-        >
-          {{ getLevelLabel(level) }}
-        </button>
-      </div>
-  
-      <!-- Show actions only for selected and unlocked level -->
-      <div class="level-card" *ngIf="selectedLevel !== null && !isLevelLocked(selectedLevel)">
-        <div class="level-info">
-          <h4>Choose one of the following Options: Learn, Practice and Attempt{{ getLevelLabel(selectedLevel) }}</h4>
-        </div>
-  
-        <div class="level-actions">
-          <button class="levels-section" (click)="startLearning(selectedLevel)">📖 Learn</button>
-  
-          <button class="levels-button selectedOperation.toLowerCase() + '-level'" (click)="startPractice(selectedLevel)">🛠️ Try Out</button>
-          <button class="levels-section" (click)="selectLevel(selectedLevel)">📝 🚀 Challenge </button>
-        </div>
-      </div>
-    </div>
   </div>
+
+  <!-- Sublevel buttons shown after a level is selected -->
+<div class="sublevel-actions" *ngIf="selectedLevel !== null">
   
+  <p>Please select a mode:</p>
+
+  <div class="sublevel-buttons">
+    <!--<button
+      *ngFor="let label of ['📖 Learn', '🛠️ Try Out', '🚀 Challenge']; let i = index"
+      [ngClass]="{
+        'sublevel-btn': true,
+        'selected-sublevel': selectedSubLevel === i
+      }"
+      (click)="selectSubLevel(i)"
+    >
+      {{ label }}
+    </button>-->
+    <button class="sublevel-btn learn-btn"
+      [ngClass]="{ 'selected-learn': selectedSublevelType === 'learn' }"
+      (click)="startLearning(level)"> 📖 Learn </button>
+
+    <button class="sublevel-btn practice-btn"
+      [ngClass]="{ 'selected-practice': selectedSublevelType === 'practice' }"
+      (click)="startLearning(level)">  🛠️ Try Out </button>
+
+    <button class="sublevel-btn attempt-btn"
+      [ngClass]="{ 'selected-attempt': selectedSublevelType === 'attempt' }"
+      (click)="startLearning(level)">  🚀 Challenge </button>
+   <!--    <div *ngIf="true" style="background: #fefbd8; padding: 10px; margin: 10px 0;">
+        <p><strong>Debug Info</strong></p>
+        <p>Selected Level: {{ selectedLevel }}</p>
+        <p>Action Label: {{ actionLabel }}</p>
+      </div> -->
+        
+  </div>
+</div>
+
+<div *ngIf="actionLabel && selectedLevel !== null" class="confirmation-box">
+  <h3>
+    You have chosen to <strong style="color: rgb(205, 92, 92);">{{ actionLabel }}</strong> - Level
+    <strong>{{ selectedLevel }}</strong> in
+    <strong style="color: rgb(205, 92, 92);">{{ selectedOperation | titlecase }}</strong> Module.
+  </h3>
+  <p>Would you like to continue?</p>
+
+  <div class="confirmation-buttons">
+    <button class="confirm-btn" (click)="confirmAction()">✅ Yes</button>
+    <button class="cancel-btn" (click)="cancelAction()">❌ No</button>
+  </div>
+</div>
+
+</div>

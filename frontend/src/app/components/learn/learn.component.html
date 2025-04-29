@@ -8,25 +8,20 @@
     <p class="learn-caption">
       Watch this video to understand concepts in {{ operation }} with fun animations!
     </p>
-    <video
-      class="learn-video"
-      width="400"
-      height="300"
-      controls
-      preload="metadata"
-      (ended)="onVideoEnd()"
-    >
-    <source [src]="'assets/videos/' + operation + '_level' + level + '.mp4'" type="video/mp4">
+    
+        <div (ended)="onVideoEnd()" video="video_container" *ngIf="youtubeUrl">
+          <iframe width="560" height="315"
+          [src]="this.youtubeUrl"
+          frameborder="0"
+          allowfullscreen>
+          </iframe>
 
-      <source [src]="videoSrc" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
+        </div>
 
     <p class="learn-caption">
-      Watch this video to understand concepts in {{ operation }} with fun animations!
-    </p>
+    Read     </p>
 
-    <img [src]="'assets/images/' + operation + '_level' + level + '.png'" alt="Working Example" />
+    <img [src]="'assets/images/' + operation + '_level' + level + '.png'" alt="Working Example" style="width: 550px; height: 500px;" />
 
     <div *ngIf="example">
       <h3>Example:</h3>
