@@ -9,6 +9,10 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, HTTPException, Depends
 from passlib.hash import bcrypt
 from fastapi import FastAPI
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 app = FastAPI()
@@ -142,3 +146,17 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(user)
     db.commit()
     return {"message": "User deleted successfully"}
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+@router.post("auth/login")
+def login(data: dict, db: Session = Depends(get_db)):
+    username = data.get("username")
+    password = data.get("password")
+
+    user = db.query(User).filter(User.username == username).first()
+    if not user or not verify_password(password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return {"message": "Login successful", "user_id": user.id}

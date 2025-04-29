@@ -1,3 +1,46 @@
+<!-- Updated result.component.html -->
+
+<div class="result-wrapper">
+  <div class="result-card">
+    <h2>🎉 Quiz Completed!</h2>
+    <p class="summary">Well done, {{ username }}!</p>
+
+    <div class="score-box">
+      <h3 style="color:blue">Your Score</h3>
+      <p style="color:blue">{{ score }} / {{ total }}</p>
+    </div>
+
+    <div *ngIf="score === total" class="success-msg">
+      <p>🏆 Congratulations! You've completed Level {{ level }} successfully and unlocked the next one!</p>
+    </div>
+
+    <div *ngIf="score < total" class="try-again-msg">
+      <p>🔁 You scored {{ score }} out of {{ total }}. Don't worry, you can try again and master it!</p>
+    </div>
+
+    <div class="actions">
+      <button (click)="goHome()">🏠 Go Home</button>
+      <button (click)="restartQuiz()">🔁 Retry Level</button>
+    </div>
+
+    <!-- List questions and answers -->
+    <div class="review-section">
+      <h3>📝 Review Your Quiz</h3>
+      <div *ngFor="let q of questions; let i = index" class="review-question">
+        <p><strong>Q{{ i + 1 }}:</strong> {{ q.question.split('=')[0] }} = <span [class.correct-answer]="userAnswers[i] === q.answer" [class.incorrect-answer]="userAnswers[i] !== q.answer">{{ userAnswers[i] || 'No answer' }}</span></p>
+        <div *ngIf="userAnswers[i] !== q.answer">
+          <small>✅ Correct Answer: {{ q.answer }}</small>
+        </div>
+        <div *ngIf="q.explanation">
+          <small>💡 {{ q.explanation }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <div class="result-wrapper">
   <div class="result-card">
     <h2>🎉 Quiz Completed!</h2>
@@ -58,11 +101,12 @@
 
     <!-- Action Buttons -->
     <div class="result-buttons">
-      <button (click)="reviewQuiz()">🔁 Review Quiz</button>
-      <button *ngIf="score < 10" (click)="retrySameLevel()">❌ Try Again</button>
-      <button *ngIf="score === 10" (click)="goToNextLevel()">✅ Go to Next Level</button>
+      <button (click)="reviewQuiz()">🔍 Review Quiz</button>
+      <button *ngIf="score < total" (click)="retrySameLevel()">🔁 Try Again</button>
+      <button *ngIf="score === total" (click)="goToNextLevel()">✅ Go to Next Level</button>
+    
     </div>
-
+    
   </div>
 </div>
 

@@ -97,7 +97,7 @@
 }
 
 .character-container img {
-  width: 60px;
+  width: 125px;
   height: auto;
   cursor: pointer;
   filter: grayscale(50%);
@@ -176,4 +176,9 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-    
+  
+input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}

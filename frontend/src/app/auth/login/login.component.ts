@@ -11,6 +11,13 @@ import { EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+declare global {
+  interface Window {
+    APP_CONFIG: any;
+  }
+}
 
 @Component({
   selector: 'app-login',
@@ -22,11 +29,12 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
+
+
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
-  baseUrl: string = 'http://localhost:8000/auth/login';
-
+  baseUrl: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -38,6 +46,13 @@ export class LoginComponent {
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+    // ✅ Set baseUrl at runtime inside constructor
+    if (window.APP_CONFIG?.apiUrl) {
+      this.baseUrl = `${window.APP_CONFIG.apiUrl}/auth/login`;
+    } else {
+      console.warn('⚠️ APP_CONFIG.apiUrl is not defined');
+      this.baseUrl = `${environment.apiBaseUrl}/auth/login`; // fallback to environment
+    }
   }
 
   onSubmit(): void {

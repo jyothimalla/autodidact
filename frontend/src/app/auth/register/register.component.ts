@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -22,10 +23,12 @@ import { MatInputModule } from '@angular/material/input';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
+
 export class RegisterComponent {
   registerForm: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
+  baseUrl: string = '${environment.apiUrl}/auth/register';
 
   constructor(
     private fb: FormBuilder,
@@ -45,7 +48,7 @@ export class RegisterComponent {
     if (this.registerForm.invalid) return;
     const { username, email, password, confirm_password } = this.registerForm.value;
 
-    this.http.post<any>('http://localhost:8000/auth/register', {
+    this.http.post<any>(this.baseUrl, {
       username,
       email,
       password,

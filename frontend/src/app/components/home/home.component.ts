@@ -18,7 +18,7 @@ export class HomeComponent {
   showLogin = false;
   showRegister = false;
   musicOn: boolean = false; // Initialize musicOn to false
-  musicSrc: string = 'assets/audio/music.mp3'; // Path to your audio file
+  musicSrc: string = 'assets/sounds/music1.mp3'; // Path to your audio file
   
   constructor(private router: Router , private dialog: MatDialog) {}
 

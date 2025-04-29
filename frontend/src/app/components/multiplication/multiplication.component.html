@@ -1,16 +1,18 @@
-
 <div class="quiz-wrapper" *ngIf="questions.length > 0">
   <!-- LEFT SIDEBAR -->
-    <app-left-sidebar class="left-sidebar"></app-left-sidebar>
+  <app-left-sidebar></app-left-sidebar>
 
-    <div *ngIf="savingInProgress" class="saving-overlay">
-      <div class="spinner"></div>
-      <p>Saving your results... Please wait ⏳</p>
-    </div>
+  <!-- Saving Spinner -->
+  <div *ngIf="savingInProgress" class="saving-overlay">
+    <div class="spinner"></div>
+    <p>Saving your results... Please wait ⏳</p>
+  </div>
 
-    
   <!-- MAIN QUIZ CONTENT -->
   <div class="quiz-main-card">
+    <button (click)="launchConfetti()">🎉 Test Confetti</button>
+
+    <!-- Quiz Header -->
     <div class="quiz-header">
       <h2 class="quiz-title multiplication">
         {{ currentOperation | titlecase }} – 
@@ -22,47 +24,48 @@
       </h2>
     </div>
 
-    <!-- Question -->
+    <!-- Question Row -->
     <div class="question-row">
+      
+      <!-- Bird Character for Reading -->
       <div class="character-container" (click)="readQuestionAloud()">
         <img
-          src="assets/images/bird1.png"
+          src="assets/images/bird1.gif"
           alt="Bird Reader"
-          [class.animate]="isReading"
-        />
+          [class.animate]="isReading" />
       </div>
 
+      <!-- Question and Answer Input -->
       <div class="question-container">
         <p>
-          <!-- <button class="volume-btn" (click)="readQuestionAloud()" aria-label="Read question aloud">🔊</button> -->
           {{ questions[currentQIndex].question.split('=')[0] }} =
           <input
             type="text"
             [(ngModel)]="answerInput"
             class="answer-input"
-            placeholder=""
-            (keyup.enter)="submitAnswer()" />
+            (keyup.enter)="submitAnswer()"
+            autocomplete="off"
+            [disabled]="quizCompleted"
+            placeholder="?" />
         </p>
-        
       </div>
     </div>
 
-
-   <!-- Feedback -->
+    <!-- Feedback Message -->
     <div class="feedback" *ngIf="feedbackMessage">
       <p style="white-space: pre-line;">{{ feedbackMessage }}</p>
     </div>
 
     <!-- Buttons -->
     <div class="button-group">
-      <button *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
+      <button *ngIf="!quizCompleted" (click)="submitAnswer()">✅ Submit Answer</button>
+      
       <button (click)="goBack()">🔙 Go Back</button>
+      <button (click)="printQuestions()" class="print-button">🖨️ Print</button>
 
-      <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
+      <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Retry Quiz</button>
     </div>
   </div>
-
-
 
   <!-- RIGHT SIDEBAR -->
   <div class="right-sidebar">
@@ -74,10 +77,9 @@
       [elapsedTime]="elapsedTime">
     </app-right-sidebar>
   </div>
-  
 </div>
 
-<!-- Fallback -->
-<div *ngIf="questions.length === 0">
-  <p>Loading questions...</p>
+<!-- Fallback if no questions -->
+<div *ngIf="questions.length === 0" class="loading">
+  <p>Loading questions... Please wait 🙏</p>
 </div>

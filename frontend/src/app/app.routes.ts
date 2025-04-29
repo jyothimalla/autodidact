@@ -31,7 +31,7 @@ import { AuthService } from './auth/auth.service';
 import { TestAdditionComponent } from './components/test-addition/test-addition.component';
 import { MyAccountComponent } from './components/my-account/my-account.component';
 import { LearnComponent } from './components/learn/learn.component';
-
+import { PracticeComponent } from './components/practice/practice.component';
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) },
@@ -64,7 +64,7 @@ export const routes: Routes = [
     path: 'learn/addition',
     loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)
   },
-  
+    {path: 'practice/addition', loadComponent: () => import('./components/practice/practice.component').then(m => m.PracticeComponent)},
    {
     path: 'my-account/:id',
     loadComponent: () => import('./components/my-account/my-account.component').then(m => m.MyAccountComponent)

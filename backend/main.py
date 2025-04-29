@@ -83,7 +83,12 @@ admin.add_view(LevelAttemptAdmin)
 # CORS setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # Angular frontend
+    allow_origins=[
+        "http://localhost:4200",           # local Angular dev
+        "https://autodidact.uk",           # live Angular site
+        "https://www.autodidact.uk"        # optional www version
+        
+        ],  # Angular frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -47,7 +47,7 @@ def root():
     return {"message": "FastAPI backend is running!"}
 
 
-@router.post("/quiz/submit-result")
+@router.post("/submit-result")
 def submit_result(result: QuizResult):
     quiz_results.append({
         "username": result.username,
@@ -59,7 +59,7 @@ def submit_result(result: QuizResult):
     return {"status": "ok"}
 
 
-@router.get("/quiz/leaderboard")
+@router.get("/leaderboard")
 def get_leaderboard():
     return sorted(quiz_results, key=lambda r: r["score"], reverse=True)
 
@@ -69,7 +69,7 @@ class AnswerSubmission(BaseModel):
     question_index: int
     selected_answer: str
 
-@router.post("/quiz/submit-answer")
+@router.post("/submit-answer")
 def submit_answer(data: AnswerSubmission):
     # Save to DB or in-memory store
     print(f"User {data.name} selected {data.selected_answer} for Q{data.question_index}")
@@ -136,6 +136,7 @@ def submit_challenge(user_id: int, operation: str, level: int, score: int, total
         "is_passed": is_passed
     }
 
+
 @router.post("/level-attempt/")
 def save_level_attempt(
     
@@ -148,7 +149,10 @@ def save_level_attempt(
 ):
     logger.info("Saving attempt for user_id=1, level=2, etc...")
 
+    print(f"🔍 Fetching user with ID = {user_id}")
     user = db.query(User).filter(User.id == user_id).first()
+    print(f"✅ User found: {user.username if user else 'None'}")
+
     if not user:
         return {"error": "User not found"}
 
@@ -171,6 +175,7 @@ def save_level_attempt(
     db.add(level_attempt)
     db.commit()
     db.refresh(level_attempt)
+    update_ninja_stars_and_title(user_id, db)
 
     return {
         "message": "Level attempt saved successfully!",
@@ -178,3 +183,43 @@ def save_level_attempt(
         "attempt_number": attempt_number,
         "is_passed": is_passed
     }
+
+# for updating the ninja stars and title
+def update_ninja_stars_and_title(user_id: int, db: Session):
+    attempts = db.query(LevelAttempt).filter(LevelAttempt.user_id == user_id).all()
+
+    level_weights = {i: (i + 1) * 0.1 for i in range(10)}  # 0.1 to 1.0
+    total_weight = 0
+    weighted_score = 0
+
+    for a in attempts:
+        if a.is_passed:
+            weight = level_weights.get(a.level, 0)
+            total_weight += weight
+            performance = a.score / a.total_questions
+            weighted_score += performance * weight
+
+    if total_weight == 0:
+        average_score = 0
+    else:
+        average_score = weighted_score / total_weight
+
+    # Convert average score to stars (out of 5)
+    ninja_stars = round(average_score * 5)
+
+    # Award title
+    if ninja_stars >= 5:
+        title = "Math Ninja 🥇"
+    elif ninja_stars >= 3:
+        title = "Confident Solver 🥈"
+    elif ninja_stars >= 1:
+        title = "Basic Learner 🥉"
+    else:
+        title = "Getting Started"
+
+    # Update user table
+    user = db.query(User).filter_by(id=user_id).first()
+    if user:
+        user.ninja_stars = ninja_stars
+        user.awarded_title = title
+        db.commit()

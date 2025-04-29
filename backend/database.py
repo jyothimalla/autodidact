@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ✅ MySQL database URL
-DATABASE_URL = "mysql+pymysql://autodidact_user:password@localhost/autodidact_db"
+DATABASE_URL = "mysql+pymysql://autodidact_user:Root%401234@localhost/autodidact_db"
 
 # Database connection setup
 engine = create_engine(DATABASE_URL, echo=True)

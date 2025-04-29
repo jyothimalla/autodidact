@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
+import { QuizService } from '../../services/quiz.service';
+import { ExampleService } from '../../services/example.service';
+
 
 @Component({
   selector: 'app-learn',
@@ -16,8 +19,19 @@ export class LearnComponent implements OnInit {
   user_id: number = 0;
   operation: string = 'addition';
   videoFinished: boolean = false;
+  showExample: boolean = false;
+  example: { question: string, answer: number } | null = null;  // ✅ properly declare example
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  exampleHtml: string = `
+    <p><strong>Example:</strong> 700 + 500 =</p>
+    <p>Arrange:</p>
+    <pre>700\n+500</pre>
+    <p>Add zeros, then add 7 + 5 = 12</p>
+  `;
+  constructor(private route: ActivatedRoute, private router: Router,
+              private quizService: QuizService,
+              private exampleService: ExampleService,
+  ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -26,6 +40,9 @@ export class LearnComponent implements OnInit {
       this.user_id = parseInt(params['user_id'] || '0', 10);
       this.operation = params['operation'] || 'addition';
       console.log(`🎓 Loaded Learn Video for ${this.operation} Level ${this.level}`);
+
+      // Generate the working example
+      this.example = this.exampleService.getExample(this.operation, this.level);
     });
   }
 

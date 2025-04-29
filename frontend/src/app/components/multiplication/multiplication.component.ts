@@ -1,5 +1,4 @@
-
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +6,8 @@ import { QuizService } from '../../services/quiz.service';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
 import confetti from 'canvas-confetti';
+import { AnimationItem } from 'lottie-web';
+
 
 interface SubmitChallengeResponse {
   message: string;
@@ -17,12 +18,12 @@ interface SubmitChallengeResponse {
 
 @Component({
   selector: 'app-multiplication',
-  imports: [CommonModule, FormsModule, RightSidebarComponent, LeftSidebarComponent],
   standalone: true,
+  imports: [CommonModule, FormsModule, RightSidebarComponent, LeftSidebarComponent],
   templateUrl: './multiplication.component.html',
   styleUrl: './multiplication.component.scss'
 })
-export class MultiplicationComponent implements OnInit {
+export class MultiplicationComponent implements OnInit, OnDestroy {
   questions: any[] = [];
   currentQIndex = 0;
   answerInput = '';
@@ -40,13 +41,13 @@ export class MultiplicationComponent implements OnInit {
   lastUserAnswer = '';
   lastCorrectAnswer = '';
   isCorrect = true;
-  isReading = false;
   savingInProgress = false;
   explanation = '';
-  showSpinner = false;
-  showAnswer = false;
-  showAnswerText = '';
+  animation: AnimationItem | undefined;
+  isReading = false;
 
+  showSpinner = false;
+  isEnterDisabled = false;
 
   constructor(private quizService: QuizService, private router: Router, private route: ActivatedRoute) {}
 
@@ -57,19 +58,15 @@ export class MultiplicationComponent implements OnInit {
       this.level = parseInt(params['level'] || '0', 10);
       this.currentOperation = params['operation'] || 'multiplication';
       this.currentQIndex = 0;
-      console.log('📡 Fetching questions for level:', this.level);
-  
+
       this.quizService.getMultiplicationQuestions(this.level).subscribe({
         next: (questions) => {
           this.questions = questions;
-  
-          console.log('✅ Questions received:', questions);
-  
           this.userAnswers = new Array(questions.length).fill('');
           this.startTimer();
         },
-        error: (err) => console.error('❌ Error loading addition questions:', err)
-      });     
+        error: (err) => console.error('❌ Error loading multiplication questions:', err)
+      });
     });
   }
 
@@ -86,62 +83,58 @@ export class MultiplicationComponent implements OnInit {
   handleEnter(event: KeyboardEvent) {
     this.submitAnswer();
   }
-  
 
   submitAnswer(): void {
+    if (this.quizCompleted) return;
+
     const currentQ = this.questions[this.currentQIndex];
     const correct = currentQ.answer.trim();
     const userAnswer = this.answerInput.trim();
-  
+
     if (!userAnswer) {
-      alert('⚠️ Please enter your answer before submitting!');
+      alert('⚠️ Please enter your answer!');
       return;
     }
-  
-    this.lastUserAnswer = userAnswer;
-    this.lastCorrectAnswer = correct;
+
     this.isCorrect = userAnswer === correct;
-  
-    this.feedbackMessage = this.isCorrect
-      ? '✅ Correct!'
-      : `❌ Incorrect! Correct is "${correct}"`;
-  
-    if (this.isCorrect) {
-      this.score++;
-    }
-  
+    this.feedbackMessage = this.isCorrect ? '✅ Correct!' : `❌ Incorrect! Correct answer: "${correct}"`;
+
+    if (this.isCorrect) this.score++;
+
     this.userAnswers[this.currentQIndex] = userAnswer;
     this.answerInput = '';
-  
-    // ✅ Move to next question after very short delay
-    
-      if (this.currentQIndex < this.questions.length - 1) {
-        this.currentQIndex++;   // move to next
-      } else {
-        this.completeQuiz();    // quiz complete
-      }
-      setTimeout(() => {
-        this.feedbackMessage = ''; // clear message
-    
-    }, 800); // Just 0.8 seconds delay to show feedback
-  }
-  
-  
 
-  completeQuiz(): void {
+    if (this.currentQIndex < this.questions.length - 1) {
+      this.currentQIndex++;
+    } else {
+      this.finishQuiz();
+    }
+
+    setTimeout(() => { this.feedbackMessage = ''; }, 800);
+  }
+
+  finishQuiz(): void {
     this.quizCompleted = true;
-    this.savingInProgress = true; // Show spinner
-  
+    clearInterval(this.timer);
+    this.savingInProgress = true;
+
+    // Save quiz results locally
     localStorage.setItem('score', this.score.toString());
     localStorage.setItem('answers', JSON.stringify(this.userAnswers));
     localStorage.setItem('questions', JSON.stringify(this.questions));
-  
+
+    // Save progress
     const progressKey = `${this.currentOperation}_progress`;
     const unlockedLevel = parseInt(localStorage.getItem(progressKey) || '0', 10);
     if (this.score === this.questions.length && this.level >= unlockedLevel) {
       localStorage.setItem(progressKey, (this.level + 1).toString());
+      this.feedbackMessage = '🎉 Challenge Completed!';
+      this.launchConfetti();
+      this.playClapSound();
+
     }
-  
+
+    // Save to backend
     this.quizService.submitChallengeAttempt({
       user_id: this.user_id,
       operation: this.currentOperation,
@@ -150,65 +143,55 @@ export class MultiplicationComponent implements OnInit {
       total_questions: this.questions.length
     }).subscribe({
       next: (response: SubmitChallengeResponse) => {
-        
-        console.log('Level Attempt ID:', response.level_attempt_id);
-        console.log('Attempt Number:', response.attempt_number);
-        console.log('Is Passed:', response.is_passed);
-        const attemptNumber = response.attempt_number; // ✅ Pick attempt_number
+        console.log('✅ Attempt saved!', response);
 
-        // 🎉 Play Confetti and Claps first
-        if (this.score === this.questions.length) {
+        if (response.is_passed) {
+          this.savingInProgress = true;
           this.launchConfetti();
           this.playClapSound();
         }
-  
+
         setTimeout(() => {
           this.savingInProgress = false;
+          // 🎉 ✅ Show Congratulations Alert!
+        alert(`🎉 Congratulations ${this.username}! You completed Level ${this.level}!\n\n⭐ You are now promoted to Level ${this.level + 1}.`);
+
           this.router.navigate(['/result'], {
             queryParams: {
               username: this.username,
               user_id: this.user_id,
               operation: this.currentOperation,
               level: this.level,
-              attempt_number: attemptNumber 
+              attempt_number: response.attempt_number
             }
           });
-        }, 2500); 
+        }, 2500);
       },
       error: (error) => {
-        console.error('❌ Error saving attempt:', error);
+        console.error('❌ Failed to save attempt:', error);
         this.savingInProgress = false;
       }
     });
   }
-  
-  
+
   launchConfetti() {
-    const duration = 3 * 1000; // 3 seconds
+    const duration = 3 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-  
-    const interval: any = setInterval(function() {
+
+    const interval: any = setInterval(() => {
       const timeLeft = animationEnd - Date.now();
-  
       if (timeLeft <= 0) {
         return clearInterval(interval);
       }
-  
       const particleCount = 50 * (timeLeft / duration);
-  
       confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
     }, 250);
   }
 
   playClapSound() {
-    const audio = new Audio();
-    audio.src = 'assets/sounds/clap.mp3';  // Make sure you have a clap.mp3 inside assets/sounds
-    audio.load();
+    const audio = new Audio('assets/sounds/claps.mp3');
     audio.play();
-  }
-  restartQuiz(): void {
-    this.router.navigate(['/operation']);
   }
 
   readQuestionAloud(): void {
@@ -217,8 +200,25 @@ export class MultiplicationComponent implements OnInit {
       const utterance = new SpeechSynthesisUtterance(question);
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
+
+      this.animation?.play();
+      utterance.onend = () => this.animation?.stop();
     }
   }
+
+  restartQuiz(): void {
+    this.router.navigate(['/operation']);
+  }
+
+  ngOnDestroy(): void {
+    if (this.timer) clearInterval(this.timer);
+  }
+  goHome(): void {
+    clearInterval(this.timer);
+    localStorage.clear();
+    this.router.navigate(['/']);
+  }
+
   goBack(): void {
     if (this.currentQIndex > 0) {
       this.currentQIndex--;
@@ -227,5 +227,40 @@ export class MultiplicationComponent implements OnInit {
     this.feedbackMessage = '';
     this.explanation = '';
     this.router.navigate(['/operation']);
+  }
+  goToLearn(): void {
+    this.router.navigate([`/learn/${this.currentOperation}`], {
+      queryParams: {
+        level: this.level,
+        username: this.username,
+        user_id: this.user_id
+      }
+    });
+  }
+  printQuestions(): void {
+    const printableContent = this.questions.map((q, index) => `
+      <div style="margin-bottom: 20px;">
+        <div><strong>Q${index + 1}:</strong> ${q.question}
+        <div style="border: 1px solid #000; width: 40px; height: 30px; margin-top: 8px;"></div>
+      </div></div>
+    `).join('');
+  
+    const printWindow = window.open('', '', 'height=800,width=800');
+  
+    if (printWindow) {
+      printWindow.document.write('<html><head><title>Quiz Questions</title></head><body>');
+      printWindow.document.write('<h1 style="text-align:center;">Quiz Paper</h1>');
+      printWindow.document.write(printableContent);
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+      printWindow.print();
+    }
+  }
+  
+  goToNextLevel(): void {
+    const nextLevel = this.level + 1;
+    const currentOperation = localStorage.getItem('operation'); // or pass it in as input
+    localStorage.setItem('level', nextLevel.toString());
+    this.router.navigate([`/operation/${currentOperation}/${nextLevel}`]);
   }
 }

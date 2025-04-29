@@ -35,7 +35,7 @@ export class ResultComponent implements OnInit {
   performanceColor: string = '';
   attemptNumber: number = 1;
 
-  
+
   get attemptedCount(): number {
     return this.userAnswers.filter(ans => ans && ans.trim() !== '').length;
   }
@@ -173,9 +173,15 @@ export class ResultComponent implements OnInit {
     this.router.navigate(['/operation']);
   }
  
-  reviewQuiz() {
-    
-      this.router.navigate(['/review']);} 
+  reviewQuiz(): void {
+    const progressKey = `${this.operation}_progress`;
+    const currentUnlocked = parseInt(localStorage.getItem(progressKey) || '0', 10);
+    if (this.level < currentUnlocked) {
+      this.router.navigate([`/operation/${this.operation}/${this.level}`]);
+    } else {
+      this.router.navigate([`/operation/${this.operation}/${this.level}`]);
+    }
+  }
   
   goToNextLevel() {
     const nextLevel = this.level + 1;

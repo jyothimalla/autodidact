@@ -7,27 +7,29 @@ import { environment
   providedIn: 'root',
 })
 export class ConfigService {
-  private config: any;
+  private config: { apiBaseUrl?: string } = {};
 
-  apiBaseUrl = environment.apiBaseUrl;  // 🛡️ VPS IP
-  // apiBaseUrl = 'http://localhost:8000'; // FastAPI backend
-  async loadConfig(): Promise<void> {
-    const hostname = window.location.hostname;
-    const isProd = !hostname.includes('localhost');
-  
-    const configPath = isProd
-      ? '/assets/config.prod.json'
-      : '/assets/config.dev.json';
-
-  const response = await fetch(configPath);
-  if (!response.ok) {
-    throw new Error(`Failed to load ${configPath}`);
+  constructor(private http: HttpClient) {}
+  /**
+   * Loads the configuration from config.json.
+   * @returns A promise that resolves when the configuration is loaded.
+   */
+  loadConfig(): Promise<void> {
+    return this.http.get<any>('/assets/config.json')
+      .toPromise()
+      .then(data => {
+        this.config = data;
+      })
+      .catch(error => {
+        console.error('❌ Failed to load config.json:', error);
+      });
   }
 
-  this.config = await response.json();
-}
-
-  get apiUrl(): string {
-    return this.config?.apiUrl ?? '';
+  get apiBaseUrl(): string {
+    if (!this.config || !this.config.apiBaseUrl) {
+      throw new Error('❌ Config not loaded yet or apiBaseUrl missing');
+    }
+    return this.config.apiBaseUrl;
   }
+
 }

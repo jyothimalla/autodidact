@@ -143,15 +143,15 @@ selectSubLevel(type: 'learn' | 'practice' | 'attempt') {
   const level = this.selectedLevel;
 
   const routeMap: Record<number, string> = {
-    1: `/learn/${operation}`,   // Learn
-    2: `/practice`,             // Try Out
+    1: `/learn/${operation}`,     // Learn
+    2: `/practice/${operation}`, // Try Out
     3: `/${operation}`          // Challenge
   };
 
   const route = routeMap[subLevel];
   console.log('🔄 Navigating to route:', route);
   console.log('🔄 Sublevel:', subLevel);
-
+  
   this.router.navigate([route], {
     queryParams: {
       level,
@@ -187,7 +187,7 @@ navigateToLearn(): void {
 navigateToPractice(): void {
   const operation = this.selectedOperation.toLowerCase();
   if (this.activeLevel === null) return;
-  this.router.navigate([`/practice`], {
+  this.router.navigate([`/practice/${operation}`], {
     queryParams: {
       level: this.activeLevel,
       operation,
@@ -223,7 +223,7 @@ navigateToChallenge(): void {
     this.selectedLevel = level;
     this.actionLabel = 'Practice';
     this.selectedSublevelType = 'practice';
-    this.router.navigate(['/practice'], {
+    this.router.navigate([`/practice/${operation}`], {
       queryParams: {
         level,
         operation,

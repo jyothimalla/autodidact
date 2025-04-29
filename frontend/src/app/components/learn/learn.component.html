@@ -5,7 +5,9 @@
   <!-- MAIN CONTENT -->
   <div class="learn-wrapper">
     <h2>📘 Let's Learn: {{ operation | titlecase }} - Level {{ level }}</h2>
-
+    <p class="learn-caption">
+      Watch this video to understand concepts in {{ operation }} with fun animations!
+    </p>
     <video
       class="learn-video"
       width="400"
@@ -14,6 +16,8 @@
       preload="metadata"
       (ended)="onVideoEnd()"
     >
+    <source [src]="'assets/videos/' + operation + '_level' + level + '.mp4'" type="video/mp4">
+
       <source [src]="videoSrc" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
@@ -21,6 +25,14 @@
     <p class="learn-caption">
       Watch this video to understand concepts in {{ operation }} with fun animations!
     </p>
+
+    <img [src]="'assets/images/' + operation + '_level' + level + '.png'" alt="Working Example" />
+
+    <div *ngIf="example">
+      <h3>Example:</h3>
+      <p>{{ example.question }}</p>
+      <p>Answer: {{ example.answer }}</p>
+    </div>
 
     <div class="button-group">
       <button (click)="goBack()">🔙 Go Back</button>

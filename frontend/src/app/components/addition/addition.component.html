@@ -2,15 +2,27 @@
   <!-- LEFT SIDEBAR -->
 
   
-  <app-left-sidebar class="left-sidebar"></app-left-sidebar>
-  <div *ngIf="savingInProgress" class="saving-overlay">
+  <app-left-sidebar></app-left-sidebar>
+
+   <!-- Saving Spinner -->
+   <div *ngIf="savingInProgress" class="saving-overlay">
     <div class="spinner"></div>
     <p>Saving your results... Please wait ⏳</p>
   </div>
+  <div class="example-section" *ngIf="showExample">
+    <h3>📘 Learn with an Example</h3>
+    <div [innerHTML]="exampleHtml"></div>
+    <button (click)="showExample = false">Start Quiz</button>
+  </div>
+  
   
   <!-- MAIN CONTENT -->
   <div class="quiz-main-card">
   <!-- <button (click)="goHome()">🏠 Go to Home</button>-->
+  <div *ngIf="savingInProgress" class="saving-overlay">
+    <div class="spinner"></div>
+    <p>Saving your results... Please wait ⏳</p>
+  </div>
     <div class="quiz-header">
       <h2 class="quiz-title addition">
         {{ currentOperation | titlecase }} –
@@ -24,7 +36,7 @@
 
     <div *ngIf="questions[currentQIndex]" class="question-row">
       <div class="character-container" (click)="readQuestionAloud()">
-        <img src="assets/images/bird1.png" alt="Bird Reader" [class.animate]="isReading" />
+        <img src="assets/images/bird1.gif" alt="Bird Reader" [class.animate]="isReading" />
       </div>
       <div class="question-container">
         <p>
@@ -34,6 +46,8 @@
             [(ngModel)]="answerInput"
             class="answer-input"
             (keyup.enter)="submitAnswer()"
+            [disabled]="quizCompleted"
+            autocomplete="off"
             placeholder="?" />
         </p>
       </div>
@@ -46,6 +60,7 @@
     <div class="button-group">
       <button *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
       <button (click)="goBack()">🔙 Go Back</button>
+      <button (click)="printQuestions()" class="print-button">🖨️ Print</button>
 
       <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
     </div>

@@ -371,39 +371,37 @@ def get_fmc_questions(level: int = 0):
             print(f"Error in generating FMC question: {e}")
     return questions
 
-@router.get("/fmc/all")
-def get_all_generated(db: Session = Depends(get_db)):
-    return db.query(GeneratedProblem).order_by(GeneratedProblem.id.desc()).limit(10).all()
+@router.get("/fmc/questions", response_model=List[FMCQuestion])
+def generate_dynamic_fmc_questions(level: int = 0):
+    """Generate 10 fresh FMC problems dynamically without saving."""
+    return [generate_fmc_problem(level) for _ in range(10)]
 
-@router.get("/fmc/history")
-def get_user_history(user_name: str, db: Session = Depends(get_db)):
+@router.post("/fmc/save-questions")
+def save_user_attempt(data: FMCQuestionSaveModel, db: Session = Depends(get_db)):
+    """Save a user's solved questions and their score."""
+    attempt = GeneratedProblem(
+        user_id=data.user_id,
+        level=data.level,
+        score=data.score,
+        questions=json.dumps([q.dict() for q in data.questions]),
+        timestamp=data.timestamp or datetime.utcnow()
+    )
+    db.add(attempt)
+    db.commit()
+    return {"message": "User FMC Attempt saved successfully."}
+
+@router.get("/fmc/history/{user_name}")
+def get_user_fmc_history(user_name: str, db: Session = Depends(get_db)):
+    """Fetch a user's previous solved FMC history."""
     return db.query(GeneratedProblem).filter_by(user_name=user_name).order_by(GeneratedProblem.created_at.desc()).all()
 
-@router.post("/fmc/evaluate")
-def evaluate_fmc_submission(user_name: str, level: int, answers: List[str], db: Session = Depends(get_db)):
-    questions = [generate_fmc_problem(level) for _ in range(10)]
-    correct = sum(1 for a, q in zip(answers, questions) if a.strip().lower() == q.answer.strip().lower())
-    
-    db_score = UserScore(
-        user_name=user_name,
-        operation="fmc",
-        level=level,
-        score=correct,
-        total_questions=10,
-        is_completed=(correct == 10)
-    )
-    db.add(db_score)
-    db.commit()
-
-    if correct < 6:
-        topic_list = ", ".join(level_topics[level])
-        return {"score": correct, "message": f"Please review: {topic_list} before retrying this level."}
-    else:
-        return {"score": correct, "message": "Well done! You can move to the next level."}
-
+# ---------------------------
+# Admin FMC Routes
+# ---------------------------
 
 @router.post("/fmc/admin/add")
-def add_fmc_questions(questions: List[FMCQuestion], level: int, question_type: str, db: Session = Depends(get_db)):
+def add_curated_questions(questions: List[FMCQuestionCreate], level: int, question_type: str, db: Session = Depends(get_db)):
+    """Admin can add manually curated FMC questions."""
     for q in questions:
         db_question = FMCQuestionBank(
             level=level,
@@ -414,73 +412,45 @@ def add_fmc_questions(questions: List[FMCQuestion], level: int, question_type: s
         )
         db.add(db_question)
     db.commit()
-    return {"message": f"{len(questions)} questions added to database for level {level}."}
+    return {"message": f"{len(questions)} curated questions added successfully!"}
 
-@router.get("/fmc/admin/questions", response_model=List[FMCQuestion])
-def get_admin_questions(level: int = 0, db: Session = Depends(get_db)):
-    return db.query(FMCQuestionBank).filter_by(level=level).all()
-
-@router.get("/fmc/admin/export")
-def export_questions(level: int = 0, db: Session = Depends(get_db)):
-    questions = db.query(FMCQuestionBank).filter_by(level=level).all()
-    return [q.__dict__ for q in questions if hasattr(q, "__dict__")]
-
-
-# Admin: Add curated questions
-@router.post("/fmc/admin/add", response_model=FMCQuestionRead)
-def add_fmc_question(q: FMCQuestionCreate, db: Session = Depends(get_db)):
-    db_q = FMCQuestionBank(**q.dict())
-    db.add(db_q)
-    db.commit()
-    db.refresh(db_q)
-    return db_q
-
-# Admin: View all or filter by level/type
 @router.get("/fmc/admin/questions", response_model=List[FMCQuestionRead])
-def get_admin_questions(level: Optional[int] = None, qtype: Optional[str] = None, db: Session = Depends(get_db)):
+def get_all_curated_questions(level: Optional[int] = None, question_type: Optional[str] = None, db: Session = Depends(get_db)):
+    """Fetch curated FMC questions by level and/or type."""
     query = db.query(FMCQuestionBank)
     if level is not None:
         query = query.filter(FMCQuestionBank.level == level)
-    if qtype:
-        query = query.filter(FMCQuestionBank.question_type == qtype)
+    if question_type:
+        query = query.filter(FMCQuestionBank.question_type == question_type)
     return query.all()
 
-# Admin: Export for download
 @router.get("/fmc/admin/export", response_model=List[FMCQuestionRead])
-def export_all_fmc_questions(db: Session = Depends(get_db)):
+def export_all_curated_questions(db: Session = Depends(get_db)):
+    """Export all curated FMC questions."""
     return db.query(FMCQuestionBank).all()
 
-@router.get("/fmc/questions")
-def get_fmc_questions(level: int = 0, db: Session = Depends(get_db)):
-    questions = generate_fmc_questions(level)  # You may have your own generator
-    for q in questions:
-        db_question = FMCQuestion(
-            level=level,
-            question_text=q.question,
-            answer=q.answer,
-            explanation=q.explanation
-        )
-        db.add(db_question)
-    db.commit()
-    return questions
+# ---------------------------
+# Evaluation Route
+# ---------------------------
 
-# Admin: Save questions to database
-@router.post("/fmc/save-questions")
-def save_fmc_questions(data: FMCQuestionSaveModel, db: Session = Depends(get_db)):
-    from models import FMCQuestionAttempt  # Assuming model is defined in models.py
+@router.post("/fmc/evaluate")
+def evaluate_fmc_submission(user_name: str, level: int, answers: List[str], db: Session = Depends(get_db)):
+    """Evaluate submitted FMC answers."""
+    generated_questions = [generate_fmc_problem(level) for _ in range(10)]
+    correct_count = sum(1 for submitted, generated in zip(answers, generated_questions) if submitted.strip().lower() == generated.answer.strip().lower())
 
-    attempt = FMCQuestionAttempt(
-        user_id=data.user_id,
-        level=data.level,
-        score=data.score,
-        questions=json.dumps([q.dict() for q in data.questions]),
-        timestamp=data.timestamp or datetime.utcnow()
+    # Save score to UserScore table
+    score_record = UserScore(
+        user_name=user_name,
+        operation="fmc",
+        level=level,
+        score=correct_count,
+        total_questions=10,
+        is_completed=(correct_count == 10)
     )
-    db.add(attempt)
+    db.add(score_record)
     db.commit()
-    return {"message": "FMC Questions saved successfully."}
 
-@router.get("/fmc/questions/{level}")
-def get_fmc_questions_by_level(level: int, db: Session = Depends(get_db)):
-    questions = db.query(FMCQuestionBank).filter(FMCQuestionBank.level == level).all()
-    return questions
+    if correct_count < 6:
+        return {"score": correct_count, "message": f"Please review the topics before retrying."}
+    return {"score": correct_count, "message": "Excellent! You may proceed to the next level."}

@@ -22,6 +22,7 @@ import { HttpClient } from '@angular/common/http';
 })
 
 export class AppComponent {
+  provider = [provideRouter(routes, withHashLocation()), provideHttpClient(), ConfigService];
   username = localStorage.getItem('username') || 'Guest'; // <-- reads from localStorage
 
   constructor(public router: Router,   private route: ActivatedRoute,  private config: ConfigService,   private http: HttpClient) 
