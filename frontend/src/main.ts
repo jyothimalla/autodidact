@@ -16,9 +16,13 @@ fetch('/assets/config.json')
   .then(res => res.json())
   .then(config => {
     window.APP_CONFIG = config;
-    return import('./app/app.component');
-  })
-  .then(({ AppComponent }) => {
-    bootstrapApplication(AppComponent)
-      .catch(err => console.error(err));
+
+    bootstrapApplication(AppComponent, {
+      providers: [
+        provideRouter(routes),
+        provideHttpClient(),
+        provideAnimations(),
+        { provide: ConfigService, useValue: new ConfigService(config) }
+      ]
+    }).catch(err => console.error(err));
   });

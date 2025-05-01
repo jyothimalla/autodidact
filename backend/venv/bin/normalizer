@@ -1,4 +1,4 @@
-#!/Users/jyothi/projects/autodidact/backend/venv/bin/python3.13
+#!/Users/kumarm/GitHubRepos/autodidact/backend/venv/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -1,7 +1,15 @@
+import os
+import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqladmin import Admin, ModelView
 from database import engine, Base, init_db, Question, QuizSession, User, UserScore, LevelAttempt
+from fastapi.responses import JSONResponse
+
+
+# Initialize DB
+init_db()
+
 from routers import (
     word_problem_routes,
     user_routes,
@@ -18,13 +26,6 @@ from routers import (
     auth_routes,
     progress_routes,
 )
-import os
-import logging
-from fastapi.responses import JSONResponse
-
-
-# Initialize DB
-init_db()
 
 # Create FastAPI app
 app = FastAPI()

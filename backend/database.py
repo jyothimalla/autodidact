@@ -3,6 +3,20 @@ from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, B
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Session
 from datetime import datetime
 from dotenv import load_dotenv
+import time
+from sqlalchemy.exc import OperationalError
+
+def init_db(retries=10, delay=3):
+    for attempt in range(retries):
+        try:
+            Base.metadata.create_all(bind=engine)
+            print("✅ Database initialized and tables created.")
+            break
+        except OperationalError as e:
+            print(f"❌ Attempt {attempt + 1} failed: {e}")
+            time.sleep(delay)
+    else:
+        print("🚨 Failed to connect to database after several attempts.")
 
 # ======================
 # Environment Variables
@@ -10,7 +24,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ✅ MySQL database URL
-DATABASE_URL = "mysql+pymysql://autodidact_user:Root%401234@localhost/autodidact_db"
+DATABASE_URL = "mysql+pymysql://autodidact_user:Root%401234@db/autodidact_db"
 
 # Database connection setup
 engine = create_engine(DATABASE_URL, echo=True)
