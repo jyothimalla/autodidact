@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Docker
+*.env
+db_data/
+
+# Logs and system
+*.log
+*.sqlite
+.DS_Store
+
