@@ -38,7 +38,7 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "baseHref": "./"
+            "baseHref": "/"
           },
           "configurations": {
             "production": {
