@@ -128,39 +128,58 @@ export class OperationComponent implements OnInit {
 }
 
 
-selectSubLevel(type: 'learn' | 'practice' | 'attempt') {
+selectSubLevel(type: 'learn' | 'practice' | 'attempt' | null): void {
   this.selectedSublevelType = type;
-  this.actionLabel = type === 'learn' ? 'Learn'
-                   : type === 'practice' ? 'Practice'
-                   : 'Attempt';
-
-  if (this.selectedLevel === null && this.activeLevel !== null) {
-  this.selectedLevel = this.activeLevel;
+  
+  if (type === 'learn' || type === 'practice' || type === 'attempt') {
+    this.actionLabel = {
+      learn: 'Learn',
+      practice: 'Practice',
+      attempt: 'Attempt'
+    }[type];
+  } else {
+    this.actionLabel = null;
   }
-  const subLevel = this.selectedSubLevel !== null ? this.selectedSubLevel : 0;
-  console.log('🧩 Sublevel selected:', subLevel);
-  const operation = this.selectedOperation.toLowerCase();
-  const level = this.selectedLevel;
+  
 
-  const routeMap: Record<number, string> = {
-    1: `/learn/${operation}`,     // Learn
-    2: `/practice/${operation}`, // Try Out
-    3: `/${operation}`          // Challenge
+  // Fallback if sublevel not explicitly selected
+  const subLevel = this.selectedSubLevel ?? 0;
+  const operation = this.selectedOperation?.toLowerCase();
+  const level = this.selectedLevel ?? this.activeLevel;
+
+  if (!operation || level === null || !this.actionLabel) {
+    console.warn('🚫 Cannot navigate: missing operation or level', { operation, level, subLevel });
+    this.router.navigate(['/operation']);
+    return;
+  }
+
+  // Determine the correct route
+  const routeMap: Record<string, string> = {
+    Learn: `/learn/${operation}`,
+    Practice: `/practice/${operation}`,
+    Attempt: `/${operation}`
   };
 
-  const route = routeMap[subLevel];
-  console.log('🔄 Navigating to route:', route);
-  console.log('🔄 Sublevel:', subLevel);
-  
-  this.router.navigate([route], {
+  const targetRoute = routeMap[this.actionLabel];
+
+  if (!targetRoute) {
+    console.warn('⚠️ Invalid navigation target:', this.actionLabel);
+    this.router.navigate(['/operation']);
+    return;
+  }
+
+  console.log(`🔄 Navigating to: ${targetRoute} (Level: ${level})`);
+
+  this.router.navigate([targetRoute], {
     queryParams: {
       level,
+      sublevel: subLevel,
       username: this.username,
-      user_id: this.user_id,
-      sublevel: subLevel
+      user_id: this.user_id
     }
   });
 }
+
 
 navigateToOperation(): void {
   const operation = this.selectedOperation.toLowerCase();

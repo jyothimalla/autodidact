@@ -24,7 +24,7 @@ def init_db(retries=10, delay=3):
 load_dotenv()
 
 # ✅ MySQL database URL
-DATABASE_URL = "mysql+pymysql://autodidact_user:Root%401234@db/autodidact_db"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Database connection setup
 engine = create_engine(DATABASE_URL, echo=True)

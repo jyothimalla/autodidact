@@ -9,7 +9,12 @@
     <button mat-button (click)="openLogin()">🔐 Login</button>
     <button mat-button (click)="openRegister()">📝 Register</button>
   </div>
+  <div class="button-group">
 
+  <button class="guest-button" style="background-color: rgb(230, 221, 62); color: #1e1ed1;" (click)="continueAsGuest()">
+    👤 Continue as Guest
+  </button>
+  </div>
   <!-- Login Modal -->
   <app-login *ngIf="showLogin" (close)="closeModals()"></app-login>
   

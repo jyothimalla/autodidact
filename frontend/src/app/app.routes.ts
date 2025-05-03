@@ -38,10 +38,7 @@ export const routes: Routes = [
   { path: 'register', loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent) },
   { path: '', component: HomeComponent },
   {path: 'header', loadComponent: () => import('./components/header/header.component').then(m => m.HeaderComponent)},
-  {path: 'operation', loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
-  { path: 'operation/:type',  loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
-  //{ path: 'operation', redirectTo: 'operation/addition', pathMatch: 'full' },
-
+  
   { path: 'level', component: LevelComponent },
   { path: 'quiz', component: QuizComponent },
   { path: 'result', component: ResultComponent },
@@ -58,24 +55,17 @@ export const routes: Routes = [
   {path: 'right_sidebar', component: RightSidebarComponent},
   {path: 'upload-answers', component: AnswerUploadComponent },
   { path: 'progress', loadComponent: () => import('./progress/progress.component').then(m => m.ProgressComponent), 
-    canActivate: [authGuard]
-   },
-   {
-    path: 'learn/addition',
-    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)
-  },
-  { path: 'learn/subtraction',
-    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)},
-  { path: 'learn/multiplication',
-    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)},
-  { path: 'learn/division',
-    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)},
-  { path: 'learn/fmc',
-    loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)
-  },
-    {path: 'practice/addition', loadComponent: () => import('./components/practice/practice.component').then(m => m.PracticeComponent)},
-   {
-    path: 'my-account/:id',
+    canActivate: [authGuard]},
+  {path: 'operation', loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
+  { path: 'operation/:type',  loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
+  { path: 'operation/:type/:level', loadComponent: () => import('./components/quiz/quiz.component').then(m => m.QuizComponent) },
+  { path: 'learn/:operation', loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)},
+  { path: 'learn/:type', loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent) },
+  { path: 'practice/:type', loadComponent: () => import('./components/practice/practice.component').then(m => m.PracticeComponent) },
+  { path: 'challenge/:type', loadComponent: () => import('./components/quiz/quiz.component').then(m => m.QuizComponent) },
+
+  {path: 'practice/:operation', loadComponent: () => import('./components/practice/practice.component').then(m => m.PracticeComponent)},
+   {path: 'my-account/:id',
     loadComponent: () => import('./components/my-account/my-account.component').then(m => m.MyAccountComponent)
   },
     {path: 'admin', loadComponent: () => import('./admin/admin-dashboard.component').then(m => m.AdminDashboardComponent),

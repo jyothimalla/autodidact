@@ -29,11 +29,20 @@
       <p>Answer: {{ example.answer }}</p>
     </div>
 
-    <div class="button-group">
-      <button (click)="goBack()">🔙 Go Back</button>
-      <button class="try-again" *ngIf="videoFinished" (click)="tryPractice()">🛠️ Try Out</button>
-      <button class="try-again" *ngIf="videoFinished" (click)="takeChallenge()">🚀 Take Challenge</button>
+    <div class="practice-done-box">
+      <div class="hover-options">
+        <div class="hover-item" (click)="goToPractice()">
+          <img src="assets/images/yellowPuzzle.png" alt="Learn" class="puzzle-icon" />
+          <span class="hover-text">Not sure Yet? Want to practice few?</span>
+        </div>
+    
+        <div class="hover-item" (click)="takeChallenge()">
+          <img src="assets/images/redPuzzle.png" alt="Challenge" class="puzzle-icon" />
+          <span class="hover-text">Ready? Try the challenge now!</span>
+        </div>
+      </div>
     </div>
+    
   </div>
 
   <!-- RIGHT SIDEBAR -->

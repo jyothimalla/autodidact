@@ -13,6 +13,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { appConfig } from '../../app.config';
+import { routes } from '../../app.routes';
+import { ActivatedRoute } from '@angular/router';
+import { ConfigService } from '../../services/config.service';
 
 declare global {
   interface Window {
@@ -42,15 +45,22 @@ export class LoginComponent {
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router,
+    private route: ActivatedRoute,
+    private config: ConfigService,
+
     public dialogRef: MatDialogRef<LoginComponent>
-  ) {
+  ) 
+  {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+    
+
     // ✅ Set baseUrl at runtime inside constructor
     if (window.APP_CONFIG?.apiBaseUrl) {
-      this.baseUrl = `${window.APP_CONFIG.apiBaseUrl}/auth/login`;
+      this.baseUrl = `${this.config.apiBaseUrl}/auth/login`;
+      
     } else {
       console.warn('⚠️ APP_CONFIG.apiUrl is not defined');
       this.baseUrl = `${environment.apiBaseUrl}/auth/login`; // fallback to environment
@@ -61,6 +71,8 @@ export class LoginComponent {
     if (this.loginForm.invalid) return;
 
     const { username, password } = this.loginForm.value;
+    console.log('🔍 Loaded baseUrl:', this.baseUrl);
+    console.log('📦 APP_CONFIG:', window.APP_CONFIG);
     
     this.http.post<any> (this.baseUrl, {
       username, password

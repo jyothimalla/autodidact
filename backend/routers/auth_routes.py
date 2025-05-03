@@ -10,6 +10,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from passlib.hash import bcrypt
 from fastapi import FastAPI
 from passlib.context import CryptContext
+from security.jwt_utils import get_current_user_from_token
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -103,13 +105,13 @@ def logout_user():
     return {"message": "Logout successful"}
 
 
-@router.get("/profile")
+@router.get("/profile/{user_id}")
 def get_profile(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return {
-        "username": user.username,
+        "username": user.username,  
         "email": user.email
     }
 
@@ -150,13 +152,17 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-@router.post("auth/login")
-def login(data: dict, db: Session = Depends(get_db)):
-    username = data.get("username")
-    password = data.get("password")
 
-    user = db.query(User).filter(User.username == username).first()
-    if not user or not verify_password(password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+@router.get("/ping")
+def ping():
+    return {"status": "ok", "message": "Auth API is up"}
 
-    return {"message": "Login successful", "user_id": user.id}
+@router.get("/me")
+def get_me(current_user: User = Depends(get_current_user_from_token)):
+    return {
+        "user_id": current_user.id,
+        "username": current_user.username,
+        "awarded_title": current_user.awarded_title,
+        "ninja_stars": current_user.ninja_stars,
+        "progress": current_user.progress
+    }

@@ -2,27 +2,35 @@ import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors , HttpClient} from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { ConfigService } from './app/services/config.service';
 import { routes } from './app/app.routes';
 import { provideRouter } from '@angular/router';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { inject } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { APP_INITIALIZER } from '@angular/core';
+
 
 if (environment.production) {
   enableProdMode();
 }
 
-fetch('/assets/config.json')
-  .then(res => res.json())
-  .then(config => {
-    window.APP_CONFIG = config;
+export function loadAppConfig(configService: ConfigService): () => Promise<void> {
+  return () => configService.loadConfig();
+}
 
-    bootstrapApplication(AppComponent, {
-      providers: [
-        provideRouter(routes),
-        provideHttpClient(),
-        provideAnimations(),
-        { provide: ConfigService, useValue: new ConfigService(config) }
-      ]
-    }).catch(err => console.error(err));
-  });
+bootstrapApplication(AppComponent, {
+  providers: [ provideRouter(routes),
+
+    provideHttpClient(),
+    ConfigService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: loadAppConfig,
+      deps: [ConfigService],
+      multi: true
+    }
+  ]
+});

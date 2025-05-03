@@ -51,5 +51,9 @@ export class HomeComponent {
     this.router.navigate(['/operation']);
 
   }
-
+  continueAsGuest(): void {
+    localStorage.setItem('username', 'Guest');
+    localStorage.setItem('user_id', '0');
+    this.router.navigate(['/operation']);
+  }
 }

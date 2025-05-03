@@ -25,10 +25,13 @@ export class AppComponent {
   provider = [provideRouter(routes, withHashLocation()), provideHttpClient(), ConfigService];
   username = localStorage.getItem('username') || 'Guest'; // <-- reads from localStorage
 
-  constructor(public router: Router,   private route: ActivatedRoute,  private config: ConfigService,   private http: HttpClient) 
+  constructor(public router: Router,   
+              private config: ConfigService,  
+              private http: HttpClient) 
   { console.log('AppComponent initialized 🚀');
     
   } 
+  
   title = 'Autididact - Kids Self Learning Platform';
   
   

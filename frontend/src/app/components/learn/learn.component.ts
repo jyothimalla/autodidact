@@ -19,7 +19,7 @@ export class LearnComponent implements OnInit {
   level: number = 0;
   username: string = '';
   user_id: number = 0;
-  operation: string = 'addition';
+  operation: string = '';
   videoFinished: boolean = false;
   showExample: boolean = false;
   example: { question: string, answer: number } | null = null;  // ✅ properly declare example
@@ -46,8 +46,8 @@ export class LearnComponent implements OnInit {
 
       this.route.paramMap.subscribe(params => {
         this.selectedOperation = params.get('type') || '';
-        const operation = this.selectedOperation.toLowerCase();
-        console.log('selected operation:', this.selectedOperation)
+        this.operation = this.route.snapshot.params['operation'] || 'addition';
+        console.log('selected operation:', this.operation)
       });
 
       console.log(`🎓 Loaded Learn Video for ${this.operation} Level ${this.level}`);
@@ -55,17 +55,15 @@ export class LearnComponent implements OnInit {
       const videoUrl = this.youtubeVideoMap[this.operation]?.[this.level];
       console.log('Video id:', videoUrl)
       if (videoUrl) {
-        this.youtubeUrl = `https://www.youtube.com/watch?v=${videoUrl}`;
-        console.log('VIdeo link:', this.youtubeUrl )
+        this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.youtube.com/embed/${videoUrl}`
+        );
+        console.log('🎥 Video link:', this.youtubeUrl);
       } else {
-        console.error('Video URL not found for the given operation and level');
+        console.error('⚠️ Video URL not found for operation:', this.operation, 'level:', this.level);
       }
-      // Set the video ID for the YouTube video
-
-      this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${videoUrl}`
-      );
-      // Generate the working example
+  
+      // Set example
       this.example = this.exampleService.getExample(this.operation, this.level);
     });
   }
@@ -84,16 +82,24 @@ export class LearnComponent implements OnInit {
   }
 
   tryPractice(): void {
-    this.router.navigate(['/practice'], {
+    this.router.navigate([`/practice/${this.operation}`], {
       queryParams: {
         level: this.level,
-        operation: this.operation,
         username: this.username,
         user_id: this.user_id
       }
     });
   }
-
+  
+  goToPractice(): void {
+    this.router.navigate([`/practice/$this.operation}`], {
+      queryParams: {
+        level: this.level,
+        username: this.username,
+        user_id: this.user_id
+      }
+    });
+  }
   takeChallenge(): void {
     this.router.navigate([`/${this.operation}`], {
       queryParams: {
@@ -146,7 +152,7 @@ export class LearnComponent implements OnInit {
     // ...
   },
   multiplication: {
-    0: 'eWk6Xw-kjjo',
+    0: 'EI2qZC1vUGk',
     1: 'kwh4SD1ToFc',
     2: 'kwh4SD1ToFc',
     3: 'kwh4SD1ToFc',

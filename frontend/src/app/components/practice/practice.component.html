@@ -1,1 +1,104 @@
-<p>practice works!</p>
+<div class="quiz-wrapper" *ngIf="questions.length > 0; else loading">
+    <!-- LEFT SIDEBAR -->
+  
+    
+    <app-left-sidebar></app-left-sidebar>
+  
+     <!-- Saving Spinner -->
+     <div *ngIf="savingInProgress" class="saving-overlay">
+      <div class="spinner"></div>
+      <p>Saving your results... Please wait ⏳</p>
+    </div>
+    
+    
+    <!-- MAIN CONTENT -->
+    <div class="quiz-main-card">
+        <div class="button-group-practice">
+        <button (click)="printQuestions()" class="print-button" style="margin-right: 380px;">🖨️ Print Questions</button>
+        <button class="print-button" (click)="goBack()" style="margin-left: 10px;">🔙 Go Back</button>
+        </div>
+    <!-- <button (click)="goHome()">🏠 Go to Home</button>-->
+   
+      <div class="quiz-header">
+        <h2 class="quiz-title addition">
+         You are practicing  {{ this.operation | titlecase }} –
+          {{
+            this.operation === 'sudoku'
+              ? (level === 0 ? 'Easy' : level === 1 ? 'Medium' : 'Difficult')
+              : 'Level ' + level
+          }}
+        </h2>
+      </div>
+  
+      <div *ngIf="questions[currentQIndex]" class="question-row">
+        <div class="character-container" (click)="readQuestionAloud()">
+          <img src="assets/images/bird1.gif" alt="Bird Reader" [class.animate]="isReading" />
+        </div>
+        <div class="question-container">
+          <p>
+            {{ questions[currentQIndex].question.split('=')[0] }} =
+            <input
+              type="text"
+              [(ngModel)]="answerInput"
+              class="answer-input"
+              (keyup.enter)="submitAnswer()"
+              [disabled]="quizCompleted"
+              autocomplete="off"
+              placeholder="?" />
+          </p>
+        </div>
+       
+
+        
+            <button *ngIf="!quizCompleted" (click)="submitAnswer()" class="submit-btn">Submit</button>
+            <!--<button (click)="takeChallenge()" class="print-button">Take a Challenge</button>-->
+            <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
+      </div>
+  
+      <div class="feedback" *ngIf="feedbackMessage">
+        <p>{{ feedbackMessage }}</p>
+      </div>
+  
+      <div class="practice-done-box">
+        <div class="hover-options">
+          
+          <div class="hover-item" (click)="goToLearn()">
+            <img src="assets/images/greenPuzzle.png" class="puzzle-icon" />
+            <div class="hover-text">Not sure? Want to learn with example?</div>
+            <div class="example-box">
+              <p><strong>Example:</strong> 300 + 500 = 800</p>
+              <p>Arrange as:</p>
+              <pre>300\n+500</pre>
+            </div>
+          </div>
+      
+          <div class="hover-item" (click)="takeChallenge()">
+            <img src="assets/images/redPuzzle.png" class="puzzle-icon" />
+            <div class="hover-text">Ready? Try the challenge now!</div>
+            <div class="example-box">
+              <p>Challenge yourself with 5 random questions from this level.</p>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+      
+      
+  </div>
+    <!-- RIGHT SIDEBAR -->
+     <div class="right-sidebar ">
+    <app-right-sidebar *ngIf="username"
+      class="sidebar right"
+      [username]="username"
+      [score]="score"
+      [currentQIndex]="currentQIndex"
+      [totalQuestions]="questions.length"
+      [elapsedTime]="elapsedTime">
+    </app-right-sidebar>
+  </div>
+  </div>
+    <!-- LOADING TEMPLATE -->
+  <ng-template #loading>
+    <p>⏳ Loading questions...</p>
+  </ng-template>
+  

@@ -1,5 +1,5 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideRouter, Routes } from '@angular/router';
+import { ActivatedRoute, provideRouter, Routes } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HomeComponent } from './components/home/home.component';
 import { QuizComponent } from './components/quiz/quiz.component';
@@ -21,10 +21,11 @@ console.log('📦 Routes loaded from app.routes.ts:', routes);
 
 
 export const appConfig: ApplicationConfig = {
+
   providers: [
     provideRouter(routes),
     provideHttpClient(),
-    importProvidersFrom(FormsModule),             // ✅ Fix ngModel
-    importProvidersFrom(MatSlideToggleModule),    // ✅ Fix slide toggle
+    importProvidersFrom(FormsModule),             
+    importProvidersFrom(MatSlideToggleModule), 
   ]
 };
