@@ -23,8 +23,14 @@ def init_db(retries=10, delay=3):
 # ======================
 load_dotenv()
 
+#DB_USER = os.getenv("DB_USER")
+#DB_PASSWORD = os.getenv("DB_PASSWORD")
+#DB_HOST = os.getenv("DB_HOST")
+#DB_NAME = os.getenv("DB_NAME")
+
 # ✅ MySQL database URL
-DATABASE_URL = "mysql+pymysql://autodidact_user:Root%401234@db/autodidact_db"
+# DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Database connection setup
 engine = create_engine(DATABASE_URL, echo=True)

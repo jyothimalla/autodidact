@@ -10,8 +10,8 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports:
-      - "3306:3306"
+#    ports:
+#      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
@@ -30,8 +30,12 @@ services:
     env_file:
       - .env
     environment:
-      #DATABASE_URL: mysql+pymysql://autodidact_user:Root@1234@db/autodidact_db
-      DATABASE_URL: ${DATABASE_URL}
+      # DATABASE_URL: mysql+pymysql://autodidact_user:Root@1234@db/autodidact_db
+      # DATABASE_URL: ${DATABASE_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
     ports:
       - "8000:8000"
     restart: unless-stopped

@@ -1,3 +1,4 @@
-''' DATABASE_URL=postgresql://autodidact_user:OYBt6lZP8dnllu4EP3yhRHZ4JAdQD38I@dpg-cvqfpj3ipnbc73crtsm0-a.oregon-postgres.render.com/autodidact_db?sslmode=require '''
-
-DATABASE_URL = "mysql+pymysql://autodidact_user:Root%401234@db/autodidact_db"
+DB_USER=autodidact_user
+DB_PASSWORD=Root%401234
+DB_HOST=51.38.234.237
+DB_NAME=autodidact_db
