@@ -54,15 +54,42 @@ export class DivisionComponent implements OnInit, OnDestroy {
       this.level = parseInt(params['level'] || '0', 10);
       this.currentOperation = params['operation'] || 'division';
       this.currentQIndex = 0;
+       // ✅ Start session before loading questions
+       this.startSession();
+       // loading Questions
+       console.log('📡 Fetching questions for level:', this.level);
+       this.fetchQuestions();
+      
+    });
+  }
 
-      this.quizService.getDivisionQuestions(this.level).subscribe({
-        next: (questions) => {
-          this.questions = questions;
-          this.userAnswers = new Array(questions.length).fill('');
-          this.startTimer();
-        },
-        error: (err) => console.error('❌ Error loading division questions:', err)
-      });
+  fetchQuestions(): void {
+
+    this.quizService.getDivisionQuestions(this.level).subscribe({
+      next: (questions) => {
+        this.questions = questions;
+        this.userAnswers = new Array(questions.length).fill('');
+        localStorage.setItem('startTime', Date.now().toString());
+
+        this.startTimer();
+      },
+      error: (err) => console.error('❌ Error loading division questions:', err)
+    });
+  }
+  startSession(): void {
+    if (!this.username || !this.user_id) {
+      alert("⚠️ You must be logged in to start the quiz.");
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.username = this.username.trim();
+    this.quizService.startSession(this.username, this.currentOperation, this.level).subscribe({
+      next: (res) => {
+        console.log('✅ Session started:', res.session_id);
+      },
+      error: (err) => {
+        console.error('❌ Failed to start session:', err);
+      }
     });
   }
 

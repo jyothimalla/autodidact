@@ -1,0 +1,11 @@
+<h2>🛠 Inactive Users</h2>
+<ul *ngIf="inactiveUsers.length > 0; else noUsers">
+  <li *ngFor="let user of inactiveUsers">
+    <strong>{{ user.username }}</strong> (ID: {{ user.id }})
+    <button (click)="reactivateUser(user.id)">♻️ Reactivate</button>
+  </li>
+</ul>
+
+<ng-template #noUsers>
+  <p>No inactive users found.</p>
+</ng-template>

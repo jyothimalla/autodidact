@@ -1,32 +1,45 @@
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(to right, #f3f3f3, #d6eaff);
-  padding: 12px 24px;
+  background: linear-gradient(to right, #e9ebed, #7fb6f0);
   border-bottom: 2px solid #ccc;
-  font-family: 'Segoe UI', sans-serif;
+  padding: 12px 0;
 
-  .header-left h1 {
-    margin: 0;
-    font-size: 24px;
-    color: #2c3e50;
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .logo {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+    }
+
+    .brand-name {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: white;
+    }
   }
 
   .header-right {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 16px;
-    color: #444;
-
-    span {
-      font-weight: 500;
-    }
+    font-size: 1rem;
+    color: white;
 
     button {
-      background-color: #4a90e2;
-      color: white;
+      background-color: #ffffff;
+      color: #4a90e2;
       border: none;
       border-radius: 6px;
       padding: 6px 12px;
@@ -35,88 +48,70 @@ header {
       transition: background-color 0.3s ease;
 
       &:hover {
-        background-color: #357ab8;
+        background-color: #e3f2fd;
       }
     }
   }
 }
-@media (max-width: 600px) {
-  .brand-name {
-    font-size: 1rem;
-  }
 
-  .logo {
-    width: 32px;
-    height: 32px;
-  }
-}
-.logo-wrapper:hover {
-  opacity: 0.9;
-}
-a.active {
-  font-weight: bold;
-  text-decoration: underline;
-}
-.account-section {
-  position: absolute;
-  top: 1rem;
-  right: 2rem;
-  font-size: 1rem;
-  font-weight: bold;
+@media (max-width: 768px) {
+  header {
+    .header-container {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.5rem;
+    }
 
-  .logout-link {
-    cursor: pointer;
-    color: #d32f2f;
-    text-decoration: underline;
-    margin-left: 6px;
+    .header-right {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .brand-name {
+      font-size: 1.2rem;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+    }
   }
 }
-
-
-.logo-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0.5rem 1rem;
-}
-
-.logo {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-}
-
-.brand-name {
-  font-size: 1.5rem;
+.header-right button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
   font-weight: 600;
-  color: #2c3e50;
-}
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 
-
-.username {
-  color: #2c3e50;
-}
-
-.quiz-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 2rem;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Reserve space for left sidebar */
-.left-sidebar {
-  width: 200px;
-  height: 100%;
-}
-
-  /* Right sidebar styling */
-  .right-sidebar {
-    width: 220px;
-    background-color: #f7f7f7;
-    padding: 1rem;
-    border-radius: 12px;
-    height: 20%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  &:hover {
+    background-color: #357ab8;
   }
+}
+.username {
+  font-weight: 500;
+  color: white;
+}
+.nav-menu {
+  display: flex;
+  gap: 1.5rem;
+
+  button {
+    background: white;
+    color: #4a96e8;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background-color: #e0f0ff;
+    }
+  }
+}

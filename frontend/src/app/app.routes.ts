@@ -20,18 +20,24 @@ import { SubtractionComponent } from './components/subtraction/subtraction.compo
 import { MultiplicationComponent } from './components/multiplication/multiplication.component';
 import { SudokuComponent } from './components/sudoku/sudoku.component';
 import { DivisionComponent } from './components/division/division.component';
-import { AnswerUploadComponent } from './components/answer-upload/answer-upload.component';
 import { FMCComponent } from './components/fmc/fmc.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { ProgressComponent } from './progress/progress.component';
-import { AdminDashboardComponent } from './admin/admin-dashboard.component';
+import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 import { authGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { TestAdditionComponent } from './components/test-addition/test-addition.component';
 import { MyAccountComponent } from './components/my-account/my-account.component';
 import { LearnComponent } from './components/learn/learn.component';
 import { PracticeComponent } from './components/practice/practice.component';
+import { AnalyticsComponent } from './components/analytics/analytics.component';
+import { TimeQuestionsComponent } from './components/time-questions/time-questions.component';
+import { UploadAnswersComponent } from './components/analytics/upload-answers/upload-answers.component';
+import { AdminRecoverComponent } from './admin/admin-recover/admin-recover.component';
+import { PaperDownloadComponent } from './components/paper-download/paper-download.component';
+import { QuizService } from './services/quiz.service';
+import { UserLogComponent } from './admin/user-log.component';
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) },
@@ -48,12 +54,13 @@ export const routes: Routes = [
   {path: 'multiplication', loadComponent: () => import('./components/multiplication/multiplication.component').then(m => m.MultiplicationComponent)},
   {path: 'division', loadComponent: () => import('./components/division/division.component').then(m => m.DivisionComponent)},
   {path: 'fmc', loadComponent: () => import('./components/fmc/fmc.component').then(m => m.FMCComponent)},
+  {path: 'time-questions', loadComponent: () => import('./components/time-questions/time-questions.component').then(m => m.TimeQuestionsComponent)},
   {path: 'left_sidebar', component: LeftSidebarComponent},
   {path: 'footer', component: FooterComponent},
   {path: 'lottie', component: LottieComponent},
   {path: 'sudoku', component: SudokuComponent},
   {path: 'right_sidebar', component: RightSidebarComponent},
-  {path: 'upload-answers', component: AnswerUploadComponent },
+  {path: 'upload-answers', component: UploadAnswersComponent},
   { path: 'progress', loadComponent: () => import('./progress/progress.component').then(m => m.ProgressComponent), 
     canActivate: [authGuard]},
   {path: 'operation', loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
@@ -68,12 +75,16 @@ export const routes: Routes = [
    {path: 'my-account/:id',
     loadComponent: () => import('./components/my-account/my-account.component').then(m => m.MyAccountComponent)
   },
-    {path: 'admin', loadComponent: () => import('./admin/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    {path: 'admin', loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
     canActivate: [authGuard]
   },
-
   {
-    path: 'test-addition',
-    loadComponent: () => import('./components/test-addition/test-addition.component').then(m => m.TestAdditionComponent),
-  },
+  path: 'admin/recover',
+  loadComponent: () => import('./admin/admin-recover/admin-recover.component').then(m => m.AdminRecoverComponent)
+},
+{path: 'admin-login', loadComponent: () => import('./admin/admin-login/admin-login.component').then(m => m.AdminLoginComponent)},
+{path: 'admin-recover', loadComponent: () => import('./admin/admin-recover/admin-recover.component').then(m => m.AdminRecoverComponent)},
+{path: 'user-log', component: UserLogComponent},
+
+  {path: 'analytics', loadComponent:() => import('./components/analytics/analytics.component').then(m=>m.AnalyticsComponent)}
 ];

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import LevelAttempt, get_db
+from model import LevelAttempt
+from database import get_db
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List

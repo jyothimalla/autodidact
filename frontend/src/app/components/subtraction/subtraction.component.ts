@@ -74,6 +74,11 @@ export class SubtractionComponent implements OnInit {
       this.level = parseInt(params['level'] || '0', 10);
       this.currentOperation = params['operation'] || 'subtraction';
       this.currentQIndex = 0;
+
+      // Starting Session
+      this.startSession();
+
+      //Loading Questions
       this.fetchQuestions();
     });
   }
@@ -86,12 +91,30 @@ export class SubtractionComponent implements OnInit {
           console.log('✅ Questions received:', questions);
   
           this.userAnswers = new Array(questions.length).fill('');
+          localStorage.setItem('startTime', Date.now().toString());
+
         this.startTimer();
       },
       error: (err) => console.error('❌ Error loading questions:', err)
     });
   }
 
+  startSession(): void {
+    if (!this.username || !this.user_id) {
+      alert("⚠️ You must be logged in to start the quiz.");
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.username = this.username.trim();
+    this.quizService.startSession(this.username, this.currentOperation, this.level).subscribe({
+      next: (res) => {
+        console.log('✅ Session started:', res.session_id);
+      },
+      error: (err) => {
+        console.error('❌ Failed to start session:', err);
+      }
+    });
+  }
   startTimer(): void {
     this.timer = setInterval(() => {
       this.secondsElapsed++;

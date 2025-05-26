@@ -39,6 +39,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
   baseUrl: string = '';
+  loginError: string = '';
   
 
   constructor(
@@ -89,9 +90,12 @@ export class LoginComponent {
         });
       },
       error: (err) => {
-        console.error('❌ Login failed:', err);
-        this.errorMessage = err?.error?.detail || 'Login failed';
-      }
+    if (err.status === 403) {
+      this.loginError = '⚠️ Your account is deactivated. Please contact support.';
+    } else {
+      this.loginError = '❌ Invalid credentials.';
+    }
+  }
     });
   }
 }

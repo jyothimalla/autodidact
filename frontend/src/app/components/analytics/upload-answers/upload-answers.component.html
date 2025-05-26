@@ -1,0 +1,33 @@
+<div class="upload-container">
+    <h2>📤 Upload Answer Sheet</h2>
+  
+    <form (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+      <p><strong>User:</strong> {{ username }}</p>
+  
+      <label for="operation">Operation:</label>
+      <select id="operation" [(ngModel)]="operation" name="operation" required>
+        <option *ngFor="let op of operations" [value]="op.value">{{ op.label }}</option>
+      </select>
+  
+      <label for="level">Level:</label>
+      <input type="number" id="level" [(ngModel)]="level" name="level" required />
+  
+     
+      <div
+        class="drop-area"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        [class.active]="isDragging"
+      >
+        Drag & Drop your file here or click below
+      </div>
+  
+      <input type="file" id="answerFile" (change)="onFileChange($event)" required />
+  
+      <button type="submit">Upload</button>
+    </form>
+  
+    <p *ngIf="uploadStatus">{{ uploadStatus }}</p>
+  </div>
+  

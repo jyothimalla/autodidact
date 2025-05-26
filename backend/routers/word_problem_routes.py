@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query
 import random
-from database import SessionLocal, GeneratedProblem
+from model import GeneratedProblem
+from database import SessionLocal
 
 router = APIRouter()
 

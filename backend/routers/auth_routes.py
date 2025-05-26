@@ -3,7 +3,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from passlib.hash import bcrypt
-from database import get_db, User
+from database import get_db
+from model import User
 from pydantic.networks import EmailStr
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, HTTPException, Depends
@@ -78,6 +79,8 @@ def login_user(credentials: LoginRequest, db: Session = Depends(get_db)):
     
     if not user or not bcrypt.verify(credentials.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Account is deactivated. Contact support.")
 
     return {"message": "Login successful", 
             "user_id": user.id,
@@ -145,7 +148,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    db.delete(user)
+    user.is_active = False
     db.commit()
     return {"message": "User deleted successfully"}
 

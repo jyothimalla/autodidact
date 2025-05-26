@@ -1,0 +1,26 @@
+<div>
+  <h2>Correct a Paper</h2>
+  <label>Enter Paper ID:</label>
+  <input [(ngModel)]="paperId" placeholder="paper_20250521_xx" />
+
+  <div *ngFor="let q of questions; let i = index">
+    <p><strong>Q{{ i + 1 }}:</strong> {{ q.question }}</p>
+    <input [(ngModel)]="questions[i].student_answer" placeholder="Your Answer" />
+  </div>
+
+  <button (click)="submitAnswers()">Submit for Correction</button>
+
+  <div *ngIf="results">
+    <h3>Score: {{ results.score }}/{{ results.out_of }}</h3>
+    <div *ngFor="let r of results.results">
+      <p>
+        <strong>{{ r.question }}</strong><br />
+        <span [style.color]="r.is_correct ? 'green' : 'red'">
+          Your answer: {{ r.student_answer }}<br />
+          Correct answer: {{ r.correct_answer }}<br />
+        </span>
+        <em>{{ r.explanation }}</em>
+      </p>
+    </div>
+  </div>
+</div>

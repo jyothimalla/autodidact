@@ -1,0 +1,57 @@
+<app-left-sidebar></app-left-sidebar>
+
+<div class="clock-container">
+  <div *ngIf="!quizEnded">
+    <svg width="300" height="300" viewBox="0 0 300 300">
+      <!-- Clock Circle -->
+      <circle cx="150" cy="150" r="140" stroke="black" stroke-width="4" fill="white" />
+
+      <!-- 60 Minute Tick Marks with Numbers Every 5 Minutes -->
+      <g *ngFor="let i of minuteTicks">
+        <line
+          [attr.x1]="getX(i * 6, i % 5 === 0 ? 110 : 115)"
+          [attr.y1]="getY(i * 6, i % 5 === 0 ? 110 : 115)"
+          [attr.x2]="getX(i * 6, 120)"
+          [attr.y2]="getY(i * 6, 120)"
+          stroke="black"
+          [attr.stroke-width]="i % 5 === 0 ? 2 : 1"
+        />
+       
+      </g>
+
+      <!-- Hour Numbers (1 to 12) -->
+      <ng-container *ngFor="let mark of hourMarks">
+        <text
+          [attr.x]="mark.x"
+          [attr.y]="mark.y"
+          text-anchor="middle"
+          alignment-baseline="middle"
+          font-size="16"
+        >
+          {{ mark.label }}
+        </text>
+      </ng-container>
+
+      <!-- Hands -->
+      <line x1="150" y1="150" [attr.x2]="hourHand.x" [attr.y2]="hourHand.y" stroke="blue" stroke-width="6" />
+      <line x1="150" y1="150" [attr.x2]="minuteHand.x" [attr.y2]="minuteHand.y" stroke="green" stroke-width="3" />
+      <line x1="150" y1="150" [attr.x2]="secondHand.x" [attr.y2]="secondHand.y" stroke="red" stroke-width="1" />
+    </svg>
+
+
+    <div class="answer-container">
+      <label for="userAnswer">Your Answer (hh:mm):</label>
+      <input id="userAnswer" type="text" [(ngModel)]="userAnswer" placeholder="e.g. 03:45" />
+      <button (click)="checkAnswer()">Submit</button>
+      <p class="feedback" *ngIf="feedback">{{ feedback }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="quizEnded" class="quiz-end">
+    <h2>🎉 Quiz Completed!</h2>
+    <p>Your Score: {{ score }} / {{ totalQuestions }}</p>
+    <button (click)="restartQuiz()">Try Again</button>
+  </div>
+</div>
+
+<app-right-sidebar></app-right-sidebar>

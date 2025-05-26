@@ -19,17 +19,20 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  register(name: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, { name, password });
+  register(username: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, { username, password });
+  }
+  isAdmin(): boolean {
+    return localStorage.getItem('role') === 'admin';
   }
 
-  login(name: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, { name, password });
+  login(username: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, { username, password });
   }
 
-  saveUserSession(user_id: number, name: string) {
+  saveUserSession(user_id: number, username: string) {
     localStorage.setItem('user_id', user_id.toString());
-    localStorage.setItem('username', name);
+    localStorage.setItem('username', username);
   }
 
   logout() {

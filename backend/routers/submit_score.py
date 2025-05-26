@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Body
 from pydantic import BaseModel
-from database import SessionLocal, UserScore
+from database import SessionLocal
+from model import UserScore
 
 router = APIRouter()
 

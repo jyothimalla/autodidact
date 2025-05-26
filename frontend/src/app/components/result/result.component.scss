@@ -1,195 +1,260 @@
 .result-wrapper {
-    display: flex;
-    justify-content: center;
-    padding: 2rem;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  .result-card {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    max-width: 900px;
-    width: 100%;
-  }
-  
-  .score-box, .retry-box {
-    margin: 1rem 0;
-    text-align: center;
-  }
-  
-  .score-heading {
-    color: blue;
-    font-size: 1.5rem;
-  }
-  
-  .score-value {
-    color: blue;
-    font-size: 1.25rem;
-    font-weight: bold;
-  }
-  
-  .btn {
-    padding: 0.6rem 1.2rem;
-    margin: 0.5rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  
-  .green { background-color: #82e02e; color: white; }
-  .orange { background-color: chocolate; color: white; }
-  .blue { background-color: #4784da; color: white; }
-  
-  .chat-thread {
-    margin-top: 2rem;
-  }
-  
-  .chat-message {
-    margin-bottom: 1.5rem;
-    background: #f9f9f9;
-    padding: 1rem;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .qa-wrapper {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  @media (min-width: 768px) {
-    .qa-wrapper {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-  
-    .left-part, .right-part {
-      width: 48%;
-    }
-  }
-  
-  .q-index {
-    font-weight: bold;
-  }
-  
-  .message-user span.correct {
-    color: green;
-    font-weight: bold;
-  }
-  
-  .message-user span.incorrect {
-    color: red;
-    font-weight: bold;
-  }
-  
-  .explanation {
-    background-color: #eef6ff;
-    padding: 0.75rem;
-    border-radius: 6px;
-    margin-top: 0.5rem;
-    font-size: 0.95rem;
-  }
-  .correct {
-    color: green;
-    font-weight: bold;
-  }
-  
-  .incorrect {
-    color: red;
-    font-weight: bold;
-  }
-  
-  .message-correct {
-    color: green;
-    margin-top: 4px;
-  }
-  
-  .message-explanation {
-    font-style: italic;
-    font-size: 0.95rem;
-    color: #555;
-    margin-top: 4px;
-  }
-  .message-user {
-    font-weight: bold;
-    margin-bottom: 4px;
-  }
-  .message-user span {
-    font-weight: normal;
-  }
-  .message-user span.correct {
-    color: green;
-  }
-  .message-user span.incorrect {
-    color: red;
-  }
-footer {
-    margin-top: 2rem;
-    text-align: center;
-    margin: auto;
-    padding: 1rem;
-    width: 50%;}
-  
-  .footer-text {
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
-  .footer-link {
-    color: #4784da;
-    text-decoration: none;
-  }
-  
-  .footer-link:hover {
-    text-decoration: underline;
-  }
-  
-  .footer-link a {
-    color: inherit;
-    text-decoration: none;
-  }
-  
-  .footer-link a:hover {
-    text-decoration: underline;
-  }
-  .congrats-popup {
-    position: fixed;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fff3cd;
-    border: 2px solid #ffeeba;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    z-index: 1000;
-    animation: popUp 0.5s ease-out;
-  }
-  
-  @keyframes popUp {
-    0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
-    100% { transform: translateX(-50%) scale(1); opacity: 1; }
-  }
-  
-  .congrats-popup h2 {
-    color: #856404;
-  }
-  
-  .congrats-popup button {
-    background-color: #28a745;
+  padding: 2rem 1rem;
+  background: #f8f9fa;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.result-card {
+  max-width: 960px;
+  margin: auto;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  padding: 2rem;
+}
+
+h2 {
+  text-align: center;
+  color: #eff4ef;
+}
+.summary-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  max-width: 300px;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+
+  h3 {
+    background-color: #3db2ff;
     color: white;
-    border: none;
-    margin-top: 15px;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
+    padding: 0.75rem;
+    margin: -1.5rem -1.5rem 1rem;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-size: 1.2rem;
   }
-  
+
+  .summary-row {
+    padding: 0.75rem 0;
+
+    .summary-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .summary-label {
+      font-size: 0.9rem;
+      color: #888;
+    }
+
+    &.green .summary-value {
+      color: #3cb043;
+    }
+    &.orange .summary-value {
+      color: #d97706;
+    }
+    &.blue .summary-value {
+      color: #3b82f6;
+    }
+    &.violet .summary-value {
+      color: #8b5cf6;
+    }
+  }
+
+  hr {
+    margin: 0.25rem 0;
+    border: none;
+    border-top: 1px solid #eee;
+  }
+}
+
+.summary {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+// Summary and Graph container
+
+
+.summary-card,
+.graph-card {
+  flex: 1 1 300px;
+  background: #fafafa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.summary-card p {
+  font-size: 1rem;
+  margin: 0.4rem 0;
+}
+
+canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+// Progress bar
+.progress-container {
+  margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 20px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a9d2ed, #2fa3f0);
+  transition: width 0.4s ease-in-out;
+}
+
+// Congrats and Try Again
+.congrats-popup,
+.try-again-msg {
+  padding: 1rem;
+  text-align: center;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.congrats-popup {
+  background-color: #3db2ff;
+  color: #e7ecee;
+  border: 1px solid #3183e1;
+}
+
+.try-again-msg {
+  background-color: #ffeaea;
+  color: #c62828;
+  border: 1px solid #ef5350;
+}
+
+// Action buttons
+.result-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  button {
+    background-color: #42a5f5;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 6px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background-color: #1e88e5;
+    }
+  }
+
+  button:nth-child(2) { background-color: #f9a825; }
+  button:nth-child(3) { background-color: #66bb6a; }
+  button:nth-child(4) { background-color: #7e57c2; }
+}
+
+// Answer review cards
+.answer-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.answer-card {
+  background: #ffffff;
+  border-left: 6px solid #2196f3;
+  border-bottom: 4px solid #2196f3;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.04);
+}
+
+.question-number {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #504ae7;
+}
+
+.question-text{
+  margin-bottom: 0.6rem;
+  font-size: 1.15rem;
+  color:#1b4bdb
+}
+
+.user-answer{
+  margin-bottom: 0.6rem;
+  font-size: 1.15rem;
+  color:#1bdb4e
+}
+.correct-answer{
+
+    margin-bottom: 0.6rem;
+    font-size: 1.15rem;
+    color:#1bdb4e
+}
+.explanation {
+  margin-bottom: 0.6rem;
+  font-size: 1.15rem;
+  color:#1955c5
+}
+
+.correct {
+  color: #4ee756;
+  font-weight: bold;
+}
+
+.incorrect {
+  color: #c62828;
+  font-weight: bold;
+}
+
+// Responsive
+.result-summary-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem auto;
+  max-width: 1000px;
+  padding: 0 1rem;
+}
+
+.summary-card {
+  flex: 1 1 20%;
+  max-width: 20%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.graph-card {
+  flex: 1 1 65%;
+  max-width: 65%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .summary-card, .graph-card {
+    max-width: 100%;
+    flex: 1 1 100%;
+  }
+}

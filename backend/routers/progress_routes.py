@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import UserProgress, get_db
+from model import UserProgress
+from database import get_db
 from typing import Optional
 
 
@@ -34,7 +35,7 @@ def update_progress(user_name: str, operation: str, level: int, passed: bool, db
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
-from database import get_db, UserProgress, LevelAttempt
+from model import UserProgress, LevelAttempt
 
 router = APIRouter()
 

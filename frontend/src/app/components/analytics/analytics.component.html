@@ -1,0 +1,44 @@
+<div class="analytics-wrapper">
+    <div class="analytics-dashboard">
+        <h2>📊 Analytics Dashboard</h2>
+      
+        
+
+        <div class="analytics-tabs">
+          <button (click)="setTab('usage')">Usage</button>
+          <button (click)="setTab('scores')">Scores</button>
+          <button (click)="setTab('questions')">Questions</button>
+          <button (click)="setTab('progress')">Progress</button>
+          <button (click)="activeTab = 'summary'">📊 Summary</button>
+          <button (click)="activeTab = 'upload'">📤 Upload Answers</button>
+          <!-- Add more buttons for future tabs -->
+        </div>
+        
+        <div class="analytics-content">
+          <!--<app-summary *ngIf="activeTab === 'summary'"></app-summary>-->
+          <app-upload-answers *ngIf="activeTab === 'upload'"></app-upload-answers>
+        </div>
+      
+       <!-- <div class="analytics-content">
+          <ng-container [ngSwitch]="currentTab">
+            <div *ngSwitchCase="'usage'">
+              <app-usage></app-usage>
+            </div>
+            <div *ngSwitchCase="'trouble'">
+              <app-trouble-spots></app-trouble-spots>
+            </div>
+            <div *ngSwitchCase="'scores'">
+              <app-scores></app-scores>
+            </div>
+            <div *ngSwitchCase="'questions'">
+              <app-questions></app-questions>
+            </div>
+            <div *ngSwitchCase="'progress'">
+              <app-progress></app-progress>
+            </div>
+          </ng-container>
+        </div>-->
+      </div>
+      
+  </div>
+  
