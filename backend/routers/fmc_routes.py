@@ -54,11 +54,11 @@ items = ["Apples", "Books", "Coins", "Stickers", "Pencils", "Choclates", "Marble
          "Gardening Kits", "Cooking Kits", "Baking Kits", "Art Kits", "Music Kits", "Dance Kits", "Sports Kits", "Fitness Kits"]
 level_topics = {
     5: ["addition", "subtraction", "evenorodd"],
-    1: ["multiplication", "division"],
+    0: ["multiplication", "division", "logicpattern"],
     2: ["evenorodd", "time", "measurement"],
     3: ["fraction", "money", "probability", "geometry"],
     4: ["patterns", "codes", "guessing"],
-    0: ["addition", "subtraction", "multiplication", "division", "evenorodd", "time", "measurement", "fraction", "money","codes", "realworld", "fmc", "optionalQuestions"],
+    1: ["addition", "subtraction", "multiplication", "division", "evenorodd", "time", "measurement", "fraction", "money","codes", "realworld", "fmc", "optionalQuestions"],
     6: ["fraction", "money", "probability", "geometry", "images", "codes"],
     7: ["optionalQuestions"],
     8: ["optionalQuestions"],
@@ -318,6 +318,59 @@ def generate_fmc_problem(level: int):
                             f"• Digits sum to even\nWhat is a possible code?")
                 answer = code
                 explanation = f"1368 is even, spans all rows & columns, digits add to even"
+    
+    ##Logic Pattern
+    elif op == "logicpattern":
+        subtemplate = random.choice(["digit_sum_year", "digit_sum_diff", "sum_product", "coin_combo"])
+
+        if subtemplate == "digit_sum_year":
+            start_year = random.choice([2022, 2013, 2004])
+            current_sum = sum(map(int, str(start_year)))
+            next_year = start_year + 1
+            while sum(map(int, str(next_year))) != current_sum:
+                next_year += 1
+            diff = next_year - start_year
+            question = f"The digits of the year {start_year} total {current_sum}. How many years will it be until this happens again?"
+            answer = str(diff)
+            explanation = f"Next year with same digit sum is {next_year}, so {diff} years later."
+
+        elif subtemplate == "digit_sum_diff":
+            for tens in range(1, 10):
+                for ones in range(0, 10):
+                    num = 10 * tens + ones
+                    if (tens + ones == 12) and (abs(tens - ones) == 4):
+                        question = (
+                            f"A two-digit number is less than 100. "
+                            f"The sum of the digits is 12 and the difference between them is 4. What is the number?"
+                        )
+                        answer = str(num)
+                        explanation = f"{tens} + {ones} = 12 and |{tens} - {ones}| = 4 → number = {num}"
+                        break
+
+        elif subtemplate == "sum_product":
+            # Find number pair with known sum & product
+            target_sum = 15
+            target_product = 54
+            for x in range(1, target_sum):
+                y = target_sum - x
+                if x * y == target_product:
+                    question = f"Two numbers add together to give {target_sum} and multiply together to give {target_product}.\nThe larger of the two numbers is?"
+                    answer = str(max(x, y))
+                    explanation = f"{x} + {y} = {target_sum}, {x} * {y} = {target_product} → larger = {max(x, y)}"
+                    break
+
+        elif subtemplate == "coin_combo":
+            total_coins = 10
+            for num_5p in range(1, total_coins):
+                num_2p = total_coins - num_5p
+                if 5 * num_5p + 2 * num_2p == 32:
+                    question = (
+                        f"Amanda has {total_coins} coins in her purse. They are 2p and 5p coins. "
+                        f"The coins make 32p in total. How many 5p coins are there in Amanda’s purse?"
+                    )
+                    answer = str(num_5p)
+                    explanation = f"5p × {num_5p} + 2p × {num_2p} = 32p"
+                    break
 
     ## Time
     elif op == "time":
@@ -553,13 +606,17 @@ def generate_fmc_problem(level: int):
 @router.get("/fmc/questions", response_model=List[FMCQuestion])
 def get_fmc_questions(level: int = 0):
     questions = []
-    for _ in range(20):
+    seen = set()
+    while len(questions) < 40:
         try:
             q = generate_fmc_problem(level)
-            if q.question and q.answer and q.explanation:
+            # ensure valid and unique question text
+            if q.question and q.answer and q.explanation and q.question not in seen:
                 questions.append(q)
+                seen.add(q.question)
         except Exception as e:
             print(f"Error in generating FMC question: {e}")
+    
     return questions
 
 @router.get("/fmc/questions", response_model=List[FMCQuestion])
@@ -586,39 +643,6 @@ def get_user_fmc_history(user_name: str, db: Session = Depends(get_db)):
     """Fetch a user's previous solved FMC history."""
     return db.query(GeneratedProblem).filter_by(user_name=user_name).order_by(GeneratedProblem.created_at.desc()).all()
 
-# ---------------------------
-# Admin FMC Routes
-# ---------------------------
-
-@router.post("/fmc/admin/add")
-def add_curated_questions(questions: List[FMCQuestionCreate], level: int, question_type: str, db: Session = Depends(get_db)):
-    """Admin can add manually curated FMC questions."""
-    for q in questions:
-        db_question = FMCQuestionBank(
-            level=level,
-            question_type=question_type,
-            question=q.question,
-            answer=q.answer,
-            explanation=q.explanation
-        )
-        db.add(db_question)
-    db.commit()
-    return {"message": f"{len(questions)} curated questions added successfully!"}
-
-@router.get("/fmc/admin/questions", response_model=List[FMCQuestionRead])
-def get_all_curated_questions(level: Optional[int] = None, question_type: Optional[str] = None, db: Session = Depends(get_db)):
-    """Fetch curated FMC questions by level and/or type."""
-    query = db.query(FMCQuestionBank)
-    if level is not None:
-        query = query.filter(FMCQuestionBank.level == level)
-    if question_type:
-        query = query.filter(FMCQuestionBank.question_type == question_type)
-    return query.all()
-
-@router.get("/fmc/admin/export", response_model=List[FMCQuestionRead])
-def export_all_curated_questions(db: Session = Depends(get_db)):
-    """Export all curated FMC questions."""
-    return db.query(FMCQuestionBank).all()
 
 # ---------------------------
 # Evaluation Route

@@ -1,0 +1,51 @@
+.learning-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+header {
+  background: linear-gradient(135deg, #1a237e 0%, #5c6bc0 100%);
+  border-radius: 16px;
+  padding: 1.6rem 2rem;
+  margin-bottom: 1.5rem;
+  color: #fff;
+
+  h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  p {
+    margin: 0.3rem 0 0;
+    opacity: 0.85;
+    font-size: 1rem;
+  }
+}
+
+.teacher-mode-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.module-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 700px) {
+  .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1100px) {
+  .module-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

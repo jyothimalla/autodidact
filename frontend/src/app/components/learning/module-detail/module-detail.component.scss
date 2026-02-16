@@ -1,0 +1,40 @@
+.module-detail {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.back-link {
+  text-decoration: none;
+  color: #2c5de5;
+  font-weight: 600;
+}
+
+header h1 {
+  margin-bottom: 0.3rem;
+  color: #1f2a44;
+}
+
+header p {
+  margin-top: 0;
+  color: #5f6c7d;
+}
+
+.subskill-grid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 600px) {
+  .subskill-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .subskill-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

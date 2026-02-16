@@ -1,9 +1,5 @@
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-
-
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
 from io import BytesIO
 
 def create_pdf_stream(questions, paper_id="Paper"):

@@ -1,12 +1,12 @@
 header {
-  background: linear-gradient(to right, #e9ebed, #7fb6f0);
-  border-bottom: 2px solid #ccc;
-  padding: 12px 0;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1565c0 100%);
+  border-bottom: 3px solid #0d47a1;
+  padding: 10px 0;
 
   .header-container {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 1.2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,100 +18,83 @@ header {
     gap: 10px;
 
     .logo {
-      width: 150px;
-      height: 150px;
+      width: 70px;
+      height: 70px;
       object-fit: contain;
+      mix-blend-mode: multiply;
     }
 
     .brand-name {
       font-size: 1.4rem;
-      font-weight: 600;
+      font-weight: 700;
       color: white;
     }
   }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1rem;
-    color: white;
-
-    button {
-      background-color: #ffffff;
-      color: #4a90e2;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        background-color: #e3f2fd;
-      }
-    }
-  }
 }
 
-@media (max-width: 768px) {
-  header {
-    .header-container {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 0.5rem;
-    }
-
-    .header-right {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .brand-name {
-      font-size: 1.2rem;
-    }
-
-    .logo {
-      width: 48px;
-      height: 48px;
-    }
-  }
-}
-.header-right button {
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #357ab8;
-  }
-}
-.username {
-  font-weight: 500;
-  color: white;
-}
+// ─── Colourful nav buttons ────────────────────────────────────────────────────
 .nav-menu {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 
   button {
-    background: white;
-    color: #4a96e8;
-    font-weight: bold;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.87rem;
+    padding: 8px 16px;
+    border-radius: 20px;
     border: none;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 
-    &:hover {
-      background-color: #e0f0ff;
-    }
+    &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25); opacity: 0.92; }
+    &:active { transform: none; }
   }
+
+  // Each button gets its own colour
+  button:nth-child(1) { background: #ff7043; color: #fff; }   // 📘 Learning  — orange
+  button:nth-child(2) { background: #00897b; color: #fff; }   // 📝 Practice  — teal
+  button:nth-child(3) { background: #8e24aa; color: #fff; }   // 🎓 Test      — purple
+  button:nth-child(4) { background: #f9a825; color: #1a1a1a; }// 👤 My Account — amber
+  button:nth-child(5) { background: #1e88e5; color: #fff; }   // 📈 Analytics — blue
+}
+
+// ─── Right side ────────────────────────────────────────────────────────────────
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .username {
+    font-weight: 600;
+    color: #e3f2fd;
+    font-size: 0.9rem;
+  }
+
+  button {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover { background: rgba(255,255,255,0.28); }
+  }
+}
+
+// ─── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 900px) {
+  header .header-container {
+    flex-direction: column;
+    gap: 0.6rem;
+    text-align: center;
+  }
+  .nav-menu { justify-content: center; gap: 0.4rem; }
+  .header-right { justify-content: center; }
+  .logo { width: 48px !important; height: 48px !important; }
 }

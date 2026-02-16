@@ -2,11 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
-import { QuizService } from '../../services/quiz.service';
 import { ExampleService } from '../../services/example.service';
-
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { combineLatest } from 'rxjs';
 
+interface LearningModule {
+  title: string;
+  objective: string;
+  tips: string[];
+}
 
 @Component({
   selector: 'app-learn',
@@ -16,60 +20,69 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styleUrls: ['./learn.component.scss']
 })
 export class LearnComponent implements OnInit {
-  level: number = 0;
-  username: string = '';
-  user_id: number = 0;
-  operation: string = '';
-  videoFinished: boolean = false;
-  showExample: boolean = false;
-  example: { question: string, answer: number } | null = null;  // ✅ properly declare example
-  selectedOperation: string='';
-  exampleHtml: string = `
-    <p><strong>Example:</strong> 700 + 500 =</p>
-    <p>Arrange:</p>
-    <pre>700\n+500</pre>
-    <p>Add zeros, then add 7 + 5 = 12</p>
-  `;
-  constructor(private route: ActivatedRoute, private router: Router,
-              private quizService: QuizService,
-              private sanitizer: DomSanitizer,
+  level = 0;
+  username = '';
+  user_id = 0;
+  operation = 'addition';
+  videoFinished = false;
+  example: { question: string; answer: number } | null = null;
+  youtubeUrl: SafeResourceUrl | null = null;
 
-              private exampleService: ExampleService,
+  readonly learningModules: Record<string, LearningModule> = {
+    addition: {
+      title: 'Addition Basics',
+      objective: 'Learn how to combine numbers confidently from simple sums to carrying.',
+      tips: ['Line up place values before adding.', 'Add from right to left.', 'Carry only when sum is 10 or more.']
+    },
+    subtraction: {
+      title: 'Subtraction Basics',
+      objective: 'Understand subtraction as taking away and as finding the difference.',
+      tips: ['Start from ones column.', 'Borrow from the next column only when needed.', 'Check with inverse addition.']
+    },
+    multiplication: {
+      title: 'Multiplication Basics',
+      objective: 'Build quick multiplication thinking using repeated addition and patterns.',
+      tips: ['Know key tables (2, 5, 10) first.', 'Break larger factors into smaller chunks.', 'Use place-value alignment for multi-digit multiplication.']
+    },
+    division: {
+      title: 'Division Basics',
+      objective: 'Practice splitting into equal groups and understanding remainders.',
+      tips: ['Use multiplication facts to estimate.', 'Divide from highest place value first.', 'Check by multiplying quotient with divisor.']
+    },
+    fmc: {
+      title: 'Fast Mental Calculation',
+      objective: 'Develop speed and number sense with structured mental strategies.',
+      tips: ['Round numbers mentally, then adjust.', 'Use compensation methods.', 'Stay consistent with one strategy per problem type.']
+    }
+  };
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private sanitizer: DomSanitizer,
+    private exampleService: ExampleService
   ) {}
 
   ngOnInit(): void {
-   
-    this.route.queryParams.subscribe(params => {
-      this.level = parseInt(params['level'] || '0', 10);
-      this.username = this.route.snapshot.queryParams['username'] || localStorage.getItem('username') || '';
-      this.user_id = parseInt(localStorage.getItem('user_id') || '0', 10);
+    combineLatest([this.route.paramMap, this.route.queryParams]).subscribe(([paramMap, queryParams]) => {
+      const routeOperation = paramMap.get('operation') || paramMap.get('type') || queryParams['operation'] || 'addition';
+      this.operation = this.normalizeOperation(routeOperation);
+      this.level = parseInt(queryParams['level'] || '0', 10);
+      this.username = queryParams['username'] || localStorage.getItem('username') || 'Guest';
+      this.user_id = parseInt(queryParams['user_id'] || localStorage.getItem('user_id') || '0', 10);
 
-      this.route.paramMap.subscribe(params => {
-        this.selectedOperation = params.get('type') || '';
-        this.operation = this.route.snapshot.params['operation'] || 'addition';
-        console.log('selected operation:', this.operation)
-      });
-
-      console.log(`🎓 Loaded Learn Video for ${this.operation} Level ${this.level}`);
-      
-      const videoUrl = this.youtubeVideoMap[this.operation]?.[this.level];
-      console.log('Video id:', videoUrl)
-      if (videoUrl) {
-        this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `https://www.youtube.com/embed/${videoUrl}`
-        );
-        console.log('🎥 Video link:', this.youtubeUrl);
-      } else {
-        console.error('⚠️ Video URL not found for operation:', this.operation, 'level:', this.level);
-      }
-  
-      // Set example
+      localStorage.setItem('operation', this.operation);
+      this.setYoutubeUrl();
       this.example = this.exampleService.getExample(this.operation, this.level);
     });
   }
-  
-  get videoSrc(): string {
-    return `assets/videos/${this.operation}_level${this.level}.mp4`;
+
+  get activeModule(): LearningModule {
+    return this.learningModules[this.operation] || this.learningModules['addition'];
+  }
+
+  get imageSrc(): string {
+    return `assets/images/${this.operation}_level${this.level}.png`;
   }
 
   goBack(): void {
@@ -92,7 +105,7 @@ export class LearnComponent implements OnInit {
   }
   
   goToPractice(): void {
-    this.router.navigate([`/practice/$this.operation}`], {
+    this.router.navigate([`/practice/${this.operation}`], {
       queryParams: {
         level: this.level,
         username: this.username,
@@ -121,10 +134,10 @@ export class LearnComponent implements OnInit {
   getYoutubeIdFromUrl(url: string): string {
     const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
-    return (match && match[2].length == 11) ? match[2] : '';
+    return (match && match[2].length === 11) ? match[2] : '';
   }
 
-  youtubeVideoMap: { [operation: string]: { [level: number]: string } } = {
+  readonly youtubeVideoMap: { [operation: string]: { [level: number]: string } } = {
   addition: {
     0: 'NybHckSEQBI',  // Addition basics
     1: '_NN8g2jWIAs',  // Addition with carry
@@ -192,6 +205,15 @@ export class LearnComponent implements OnInit {
   }
 };
 
+  private normalizeOperation(operation: string): string {
+    const normalized = (operation || '').toLowerCase().trim();
+    return this.learningModules[normalized] ? normalized : 'addition';
+  }
 
-  youtubeUrl: SafeResourceUrl | null = null;
+  private setYoutubeUrl(): void {
+    const videoId = this.youtubeVideoMap[this.operation]?.[this.level];
+    this.youtubeUrl = videoId
+      ? this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`)
+      : null;
+  }
 }

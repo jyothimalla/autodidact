@@ -1,30 +1,38 @@
 <div class="quiz-wrapper">
-  <!-- LEFT SIDEBAR -->
   <app-left-sidebar class="left-sidebar"></app-left-sidebar>
 
-  <!-- MAIN CONTENT -->
   <div class="learn-wrapper">
-    <h2>📘 Let's Learn: {{ operation | titlecase }} - Level {{ level }}</h2>
+    <h2>Learning Module: {{ operation | titlecase }} - Level {{ level }}</h2>
     <p class="learn-caption">
-      Watch this video to understand concepts in {{ operation }} with fun animations!
+      {{ activeModule.objective }}
     </p>
-    
-        <div (ended)="onVideoEnd()" video="video_container" *ngIf="youtubeUrl">
-          <iframe width="560" height="315"
-          [src]="this.youtubeUrl"
-          frameborder="0"
-          allowfullscreen>
-          </iframe>
 
-        </div>
+    <div class="module-card">
+      <h3>{{ activeModule.title }}</h3>
+      <ul>
+        <li *ngFor="let tip of activeModule.tips">{{ tip }}</li>
+      </ul>
+    </div>
 
-    <p class="learn-caption">
-    Read     </p>
+    <div class="video-container" *ngIf="youtubeUrl; else noVideo">
+      <iframe
+        width="560"
+        height="315"
+        [src]="youtubeUrl"
+        title="Learning video"
+        frameborder="0"
+        allowfullscreen
+      >
+      </iframe>
+    </div>
+    <ng-template #noVideo>
+      <p class="learn-caption">No video is configured for this level yet.</p>
+    </ng-template>
 
-    <img [src]="'assets/images/' + operation + '_level' + level + '.png'" alt="Working Example" style="width: 550px; height: 500px;" />
+    <img [src]="imageSrc" alt="Worked example" class="worked-example-image" />
 
-    <div *ngIf="example">
-      <h3>Example:</h3>
+    <div class="module-card" *ngIf="example">
+      <h3>Worked Example</h3>
       <p>{{ example.question }}</p>
       <p>Answer: {{ example.answer }}</p>
     </div>
@@ -32,21 +40,18 @@
     <div class="practice-done-box">
       <div class="hover-options">
         <div class="hover-item" (click)="goToPractice()">
-          <img src="assets/images/yellowPuzzle.png" alt="Learn" class="puzzle-icon" />
-          <span class="hover-text">Not sure Yet? Want to practice few?</span>
+          <img src="assets/images/yellowPuzzle.png" alt="Practice" class="puzzle-icon" />
+          <span class="hover-text">Practice first</span>
         </div>
     
         <div class="hover-item" (click)="takeChallenge()">
           <img src="assets/images/redPuzzle.png" alt="Challenge" class="puzzle-icon" />
-          <span class="hover-text">Ready? Try the challenge now!</span>
+          <span class="hover-text">Take challenge</span>
         </div>
       </div>
     </div>
     
   </div>
 
-  <!-- RIGHT SIDEBAR -->
-  <div class="right-sidebar">
-  
-  </div>
+  <div class="right-sidebar"></div>
 </div>

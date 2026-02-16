@@ -1,0 +1,102 @@
+// 8 unique gradients — one per card via :nth-child
+$card-gradients: (
+  1: (start: #ff7043, end: #ff8a65),   // orange
+  2: (start: #8e24aa, end: #ab47bc),   // purple
+  3: (start: #00897b, end: #26a69a),   // teal
+  4: (start: #1e88e5, end: #42a5f5),   // blue
+  5: (start: #43a047, end: #66bb6a),   // green
+  6: (start: #e53935, end: #ef5350),   // red
+  7: (start: #f9a825, end: #ffca28),   // amber
+  8: (start: #6d4c41, end: #8d6e63),   // brown
+);
+
+.module-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 18px;
+  padding: 1.6rem 1rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.14);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+  aspect-ratio: 1 / 1;
+  justify-content: center;
+  gap: 0.4rem;
+  position: relative;
+  background: linear-gradient(135deg, #1976d2, #42a5f5);  // fallback
+}
+
+// Apply per-card colours
+@each $n, $colors in $card-gradients {
+  :host:nth-child(#{$n}) .module-card,
+  .module-card:nth-child(#{$n}) {
+    background: linear-gradient(135deg, map-get($colors, start), map-get($colors, end));
+  }
+}
+
+// Since cards are created in *ngFor, style via global :nth-of-type on the host
+// The host selector is app-module-card
+:host { display: contents; }
+
+.module-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.22);
+}
+
+.icon {
+  font-size: 2.8rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.4;
+}
+
+.progress-wrap {
+  width: 80%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.3);
+  margin-top: 0.5rem;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.9);
+}
+
+.meta {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.75);
+}
+
+.teacher-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

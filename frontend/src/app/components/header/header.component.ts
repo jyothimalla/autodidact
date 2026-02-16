@@ -76,13 +76,21 @@ export class HeaderComponent implements OnInit {
   }
  
   goToLearning(): void {
-    this.router.navigate(['/operation']);
+    this.router.navigate(['/learning']);
   }
-  
+
+  goToPractice(): void {
+    this.router.navigate(['/parent-paper']);
+  }
+
+  goToTest(): void {
+    this.router.navigate(['/mock-test']);
+  }
+
   goToDashboard(): void {
     this.router.navigate(['/my-account']);
   }
-  
+
   goToAnalytics(): void {
     this.router.navigate(['/analytics']);
   }

@@ -82,9 +82,10 @@ def login_user(credentials: LoginRequest, db: Session = Depends(get_db)):
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Account is deactivated. Contact support.")
 
-    return {"message": "Login successful", 
+    return {"message": "Login successful",
             "user_id": user.id,
-            "username": user.username}
+            "username": user.username,
+            "is_admin": user.is_admin}
 
 
 @router.post("/reset-password")

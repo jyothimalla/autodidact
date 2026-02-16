@@ -66,6 +66,9 @@ export const routes: Routes = [
   {path: 'operation', loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
   { path: 'operation/:type',  loadComponent: () => import('./components/operation/operation.component').then(m => m.OperationComponent) },
   { path: 'operation/:type/:level', loadComponent: () => import('./components/quiz/quiz.component').then(m => m.QuizComponent) },
+  { path: 'learning', loadComponent: () => import('./components/learning/learning.component').then(m => m.LearningComponent) },
+  { path: 'learning/:moduleId/:subskillId', loadComponent: () => import('./components/learning/lesson/lesson.component').then(m => m.LessonComponent) },
+  { path: 'learning/:moduleId', loadComponent: () => import('./components/learning/module-detail/module-detail.component').then(m => m.ModuleDetailComponent) },
   { path: 'learn/:operation', loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent)},
   { path: 'learn/:type', loadComponent: () => import('./components/learn/learn.component').then(m => m.LearnComponent) },
   { path: 'practice/:type', loadComponent: () => import('./components/practice/practice.component').then(m => m.PracticeComponent) },
@@ -86,5 +89,7 @@ export const routes: Routes = [
 {path: 'admin-recover', loadComponent: () => import('./admin/admin-recover/admin-recover.component').then(m => m.AdminRecoverComponent)},
 {path: 'user-log', component: UserLogComponent},
 
-  {path: 'analytics', loadComponent:() => import('./components/analytics/analytics.component').then(m=>m.AnalyticsComponent)}
+  {path: 'analytics', loadComponent:() => import('./components/analytics/analytics.component').then(m=>m.AnalyticsComponent)},
+  { path: 'parent-paper', loadComponent: () => import('./components/parent-paper/parent-paper.component').then(m => m.ParentPaperComponent), canActivate: [authGuard] },
+  { path: 'mock-test', loadComponent: () => import('./components/mock-test/mock-test.component').then(m => m.MockTestComponent), canActivate: [authGuard] }
 ];

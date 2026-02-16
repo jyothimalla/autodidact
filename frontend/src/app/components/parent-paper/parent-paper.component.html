@@ -1,0 +1,72 @@
+<section class="parent-paper-page">
+  <header>
+    <h1>Generate a Practice Paper</h1>
+    <p>Choose a topic, number of questions, and difficulty — then download a question paper and an answer sheet with a QR code.</p>
+  </header>
+
+  <div class="form-card">
+
+    <!-- Topic selector -->
+    <div class="field">
+      <label for="module-select">Topic</label>
+      <select id="module-select" [(ngModel)]="selectedModule">
+        <option *ngFor="let m of modules" [value]="m.id">{{ m.icon }} {{ m.name }}</option>
+      </select>
+    </div>
+
+    <!-- Number of questions -->
+    <div class="field">
+      <label>Number of questions</label>
+      <div class="radio-row">
+        <label *ngFor="let n of numOptions" class="radio-chip" [class.selected]="selectedNum === n">
+          <input type="radio" name="num" [value]="n" [(ngModel)]="selectedNum" hidden>
+          {{ n }}
+        </label>
+      </div>
+    </div>
+
+    <!-- Difficulty -->
+    <div class="field">
+      <label>Difficulty</label>
+      <div class="radio-row">
+        <label *ngFor="let d of difficulties" class="radio-chip diff-{{ d }}" [class.selected]="selectedDifficulty === d">
+          <input type="radio" name="diff" [value]="d" [(ngModel)]="selectedDifficulty" hidden>
+          {{ d | titlecase }}
+        </label>
+      </div>
+    </div>
+
+    <!-- Generate button -->
+    <button class="btn-generate" (click)="generatePaper()" [disabled]="isGenerating">
+      <span *ngIf="!isGenerating">Generate Paper</span>
+      <span *ngIf="isGenerating">Generating...</span>
+    </button>
+
+    <!-- Error -->
+    <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  </div>
+
+  <!-- Downloads — shown once paper is ready -->
+  <div class="download-card" *ngIf="paperId">
+    <h2>Your paper is ready!</h2>
+    <p class="paper-meta">
+      <strong>{{ paperModule }}</strong> &mdash; {{ selectedDifficulty | titlecase }},
+      {{ selectedNum }} questions
+    </p>
+    <p class="paper-id">Paper ID: <code>{{ paperId }}</code></p>
+
+    <div class="download-row">
+      <button class="btn-download questions" (click)="downloadQuestionPaper()">
+        Download Question Paper
+      </button>
+      <button class="btn-download answers" (click)="downloadAnswerSheet()">
+        Download Answer Sheet (with QR code)
+      </button>
+    </div>
+
+    <p class="qr-hint">
+      The answer sheet contains a QR code. When your child has finished, scan the QR code to submit their answers for marking.
+    </p>
+  </div>
+</section>

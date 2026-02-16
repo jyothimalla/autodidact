@@ -1,17 +1,28 @@
-from sqlalchemy.orm import Session
-from model import FMCQuestionSave
+from model import FMCQuestionSave, UserAnswer
 
-def save_answer(db, user_id, username, student_name, operation, level, sublevel, question_number, answer):
-    db_answer = FMCQuestionSave(
+from sqlalchemy.orm import Session
+
+def save_answer(
+    db: Session,
+    user_id: int,
+    username: str,
+    operation: str,
+    level: int,
+    sublevel: str,
+    question_number: int,
+    answer: str,
+):
+    # TODO: replace AnswerModel with your actual table/model name
+    record = UserAnswer(
         user_id=user_id,
         username=username,
-        student_name=student_name,
         operation=operation,
         level=level,
         sublevel=sublevel,
         question_number=question_number,
-        answer=answer
+        answer=answer,
     )
-    db.add(db_answer)
+    db.add(record)
     db.commit()
-    db.refresh(db_answer)
+    db.refresh(record)
+    return record

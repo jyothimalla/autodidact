@@ -1,0 +1,31 @@
+<a class="subskill-card" [routerLink]="['/learning', moduleId, subskill.id]" [class.teacher-view]="isAdmin">
+  <div class="top-row">
+    <span class="status" [class]="subskill.status">{{ badgeLabel(subskill.status) }}</span>
+    <span class="level-chip">Level {{ subskill.level }}</span>
+  </div>
+  <h3>{{ subskill.name }}</h3>
+  <p>{{ subskill.summary }}</p>
+  <p class="meta">Est. {{ subskill.estimatedMinutes }} min</p>
+  <span class="play-icon">▶ Watch Lesson</span>
+
+  <div class="teaching-panel" *ngIf="isAdmin" (click)="$event.stopPropagation()">
+    <h4>Teaching Notes</h4>
+    <p>{{ subskill.teachingNotes }}</p>
+
+    <h4>Common Mistakes</h4>
+    <ul>
+      <li *ngFor="let m of subskill.commonMistakes">{{ m }}</li>
+    </ul>
+
+    <h4>Teaching Strategies</h4>
+    <ul>
+      <li *ngFor="let s of subskill.teachingStrategies">{{ s }}</li>
+    </ul>
+
+    <h4>Prerequisites</h4>
+    <p>{{ subskill.prerequisites.join(', ') }}</p>
+
+    <h4>Assessment Criteria</h4>
+    <p>{{ subskill.assessmentCriteria }}</p>
+  </div>
+</a>
