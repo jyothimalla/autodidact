@@ -1,6 +1,5 @@
 import os
 import logging
-from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from model import Base, Question, QuizSession, User, UserScore, LevelAttempt
 from database import engine, get_db
@@ -18,19 +17,12 @@ from admin_views import register_admin_views
 from routers.fmc_routes import generate_fmc_problem
 from fastapi.responses import HTMLResponse
 from fastapi.responses import RedirectResponse
-from pathlib import Path
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
 
 from fastapi.staticfiles import StaticFiles
 # Initialize DB
-try:
-    init_db()
-    Base.metadata.create_all(bind=engine)
-except Exception as e:
-    logger.error(f"DB init failed: {e}", exc_info=True)
+init_db()
+
+Base.metadata.create_all(bind=engine)
 
 UPLOAD_FOLDER = "uploaded_papers"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -41,8 +33,6 @@ from routers import (word_problem_routes, user_routes, attempt_routes,
     quiz_routes, sudoku_routes, addition_routes, subtraction_routes,
     multiplication_routes, division_routes, submit_score, fmc_routes,
     reasoning_routes, auth_routes, progress_routes, results, generator_paper, generate_paper_excel)
-from routers.custom_paper_routes import router as custom_paper_router
-from routers.mock_test_routes import router as mock_test_router
 
 # Create FastAPI app
 app = FastAPI()
@@ -114,6 +104,8 @@ def custom_home():
     </html>
     """
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -130,7 +122,6 @@ app.add_middleware(
         "http://localhost:4200",           # local Angular dev
         "https://autodidact.uk",           # live Angular site
         "https://www.autodidact.uk" ,
-        "http://localhost:8000",        # local FastAPI dev
         "https://api.autodidact.uk/auth/login" ,      # optional www version
         "https://www.api.autodidact.uk/auth/login" 
         ],  # Angular frontend
@@ -159,64 +150,36 @@ app.include_router(attempt_routes.router)
 app.include_router(results.router)
 app.include_router(generator_paper.router)
 app.include_router(generate_paper_excel.router)
-app.include_router(custom_paper_router, prefix="/paper")
-app.include_router(mock_test_router, prefix="/test")
 
 
 @app.post("/upload-paper/")
 async def upload_and_process_paper(
     student_name: str = Form(...),
-
-    operation: str = Form("FMC"),
-    level: int = Form(0),
-    sublevel: str = Form("C"),
-
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    # 1️⃣ Get user from DB
-    user = db.query(User).filter(User.username == student_name).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    user_id: int = int(user.id)
-    username: str = str(user.username)
-
-    # 2️⃣ Save uploaded file
-    filename = file.filename or "uploaded.pdf"
-    file_path = Path(UPLOAD_FOLDER) / filename
-
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # 3️⃣ Extract answers from PDF
-    answers = extract_answers_from_pdf(str(file_path))
+    answers = extract_answers_from_pdf(file_path)
 
     data = []
     for q_num, answer in answers:
-        crud.save_answer(db, user_id, username, operation, level, sublevel, q_num, answer)
-        # Prepare data for Excel    
-
-
+        crud.save_answer(db, student_name, q_num, answer)
         data.append({
-            "User": username,
-            "Operation": operation,
-            "Level": level,
-            "Sublevel": sublevel,
+            "Student": student_name,
             "Question": q_num,
             "Answer": answer
         })
 
-    # 5️⃣ Save Excel
+    # Save to Excel
     df = pd.DataFrame(data)
-    excel_path = Path(UPLOAD_FOLDER) / f"{username}_answers.xlsx"
+    excel_path = os.path.join(UPLOAD_FOLDER, f"{student_name}_answers.xlsx")
     df.to_excel(excel_path, index=False)
 
-    return FileResponse(
-        str(excel_path),
-        filename=f"{username}_answers.xlsx",
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    return FileResponse(excel_path, filename=f"{student_name}_answers.xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 
 @app.get("/debug/sessions")
 def get_sessions(db: Session = Depends(get_db)):

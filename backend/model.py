@@ -1,14 +1,14 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, JSON, TIMESTAMP
-from sqlalchemy.orm import declarative_base, relationship, Mapped, mapped_column
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, JSON, TIMESTAMP
 
 Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(unique=True)
+    id = Column(Integer, primary_key=True)
+    username = Column(String(255), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     ninja_stars = Column(Integer, default=0)
@@ -23,9 +23,6 @@ class User(Base):
     logs = relationship("UserLog", back_populates="user")
     fmc_question_saves = relationship("FMCQuestionSave", back_populates="user")
     fmc_paper_sets = relationship("FMCPaperSet", back_populates="user")
-    custom_papers = relationship("CustomPaper", back_populates="user")
-    mock_tests = relationship("MockTest", back_populates="user")
-    mock_test_results = relationship("MockTestResult", back_populates="user")
     questions = relationship("Question", back_populates="user")
 
 class UserLog(Base):
@@ -162,21 +159,6 @@ class FMCPaperSet(Base):
 
     user = relationship("User", back_populates="fmc_paper_sets")
 
-
-class CustomPaper(Base):
-    __tablename__ = "custom_papers"
-    id             = Column(Integer, primary_key=True)
-    paper_id       = Column(String(255), unique=True, nullable=False)
-    user_id        = Column(Integer, ForeignKey("users.id"), nullable=False)
-    module_id      = Column(String(100), nullable=False)
-    difficulty     = Column(String(20), nullable=False)
-    num_questions  = Column(Integer, nullable=False)
-    questions_json = Column(JSON, nullable=False)
-    created_at     = Column(TIMESTAMP, default=datetime.utcnow)
-
-    user = relationship("User", back_populates="custom_papers")
-
-
 class Question(Base):
     __tablename__ = "questions"
     id = Column(Integer, primary_key=True, index=True)
@@ -214,44 +196,6 @@ class QuizSession(Base):
 
     user = relationship("User", back_populates="sessions")
     responses = relationship("QuizResponse", back_populates="session")
-
-class MockTest(Base):
-    __tablename__ = "mock_tests"
-    id             = Column(Integer, primary_key=True)
-    test_id        = Column(String(255), unique=True, nullable=False)
-    user_id        = Column(Integer, ForeignKey("users.id"), nullable=False)
-    questions_json = Column(JSON, nullable=False)   # includes correct_option (server-side only)
-    created_at     = Column(TIMESTAMP, default=datetime.utcnow)
-
-    user    = relationship("User", back_populates="mock_tests")
-    results = relationship("MockTestResult", back_populates="test")
-
-
-class MockTestResult(Base):
-    __tablename__ = "mock_test_results"
-    id           = Column(Integer, primary_key=True)
-    test_id      = Column(String(255), ForeignKey("mock_tests.test_id"), nullable=False)
-    user_id      = Column(Integer, ForeignKey("users.id"), nullable=False)
-    score        = Column(Integer, nullable=False)
-    total        = Column(Integer, nullable=False)
-    time_taken   = Column(Integer, nullable=False)   # seconds elapsed
-    answers_json = Column(JSON, nullable=False)      # {q_id: 'A'|'B'|'C'|'D'}
-    submitted_at = Column(TIMESTAMP, default=datetime.utcnow)
-
-    user = relationship("User", back_populates="mock_test_results")
-    test = relationship("MockTest", back_populates="results")
-
-
-class GrammarPaper(Base):
-    """10 fixed, seeded grammar-school style exam papers (shared across all users)."""
-    __tablename__ = "grammar_papers"
-    id             = Column(Integer, primary_key=True)
-    paper_number   = Column(Integer, unique=True, nullable=False)   # 1–10
-    title          = Column(String(100), nullable=False)
-    difficulty     = Column(String(20), default="mixed")
-    questions_json = Column(JSON, nullable=False)    # 50 MCQ items incl. correct_option
-    created_at     = Column(TIMESTAMP, default=datetime.utcnow)
-
 
 class QuizResponse(Base):
     __tablename__ = "quiz_responses"

@@ -16,8 +16,7 @@ class FMCQuestionCreate(BaseModel):
 class FMCQuestionRead(FMCQuestionCreate):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class LevelAttempt(BaseModel):
     user_name: str

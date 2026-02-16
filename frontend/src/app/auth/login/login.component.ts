@@ -59,13 +59,17 @@ export class LoginComponent {
     
 
     // ✅ Set baseUrl at runtime inside constructor
-    if (window.APP_CONFIG?.apiBaseUrl) {
-      this.baseUrl = `${this.config.apiBaseUrl}/auth/login`;
-      
-    } else {
-      console.warn('⚠️ APP_CONFIG.apiUrl is not defined');
-      this.baseUrl = `${environment.apiBaseUrl}/auth/login`; // fallback to environment
-    }
+    const isLocal =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+    const defaultApiBase = isLocal ? 'http://localhost:8000' : 'https://api.autodidact.uk';
+    const runtimeApiBase =
+      this.config.apiBaseUrl ||
+      window.APP_CONFIG?.apiBaseUrl ||
+      environment.apiBaseUrl ||
+      defaultApiBase;
+
+    this.baseUrl = `${runtimeApiBase.replace(/\/+$/, '')}/auth/login`;
   }
 
   onSubmit(): void {
