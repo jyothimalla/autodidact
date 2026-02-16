@@ -1,0 +1,78 @@
+.analytics-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem; // Extra padding for mobile
+  
+    @media (max-width: 768px) {
+      padding: 1rem 0.5rem;
+    }
+  }
+  
+  .analytics-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  
+    h1 {
+      font-size: 1.8rem;
+  
+      @media (max-width: 768px) {
+        font-size: 1.4rem;
+      }
+    }
+  }
+  .analytics-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .analytics-tabs button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #e0e0e0;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .analytics-tabs button:hover {
+    background: #c0c0ff;
+  }
+  
+  .analytics-content {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+  }
+  
+  .analytics-menu {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  
+    @media (max-width: 768px) {
+      gap: 0.5rem;
+    }
+  
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #e0f4ff;
+      border: 1px solid #90caf9;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+  
+      &:hover {
+        background-color: #bbdefb;
+      }
+  
+      @media (max-width: 768px) {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+  

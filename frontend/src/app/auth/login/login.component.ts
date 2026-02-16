@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
-import { EventEmitter, Output } from '@angular/core';
+import { EventEmitter, Output, Optional } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { HttpClient } from '@angular/common/http';
@@ -39,6 +39,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
   baseUrl: string = '';
+  loginError: string = '';
   
 
   constructor(
@@ -48,7 +49,7 @@ export class LoginComponent {
     private route: ActivatedRoute,
     private config: ConfigService,
 
-    public dialogRef: MatDialogRef<LoginComponent>
+    @Optional() public dialogRef: MatDialogRef<LoginComponent>
   ) 
   {
     this.loginForm = this.fb.group({
@@ -79,19 +80,26 @@ export class LoginComponent {
     }).subscribe({
       next: (res) => {
         localStorage.setItem('username', res.username);
-
         localStorage.setItem('user_id', res.user_id.toString());
+        if (res.is_admin) {
+          localStorage.setItem('role', 'admin');
+        } else {
+          localStorage.removeItem('role');
+        }
         alert(`✅ Welcome, ${res.username} (ID: ${res.user_id})!`);
 
-        this.dialogRef.close();
+        this.dialogRef?.close();
         this.router.navigate(['/operation'], {
           queryParams: {username: res.username, user_id: res.user_id }
         });
       },
       error: (err) => {
-        console.error('❌ Login failed:', err);
-        this.errorMessage = err?.error?.detail || 'Login failed';
-      }
+    if (err.status === 403) {
+      this.loginError = '⚠️ Your account is deactivated. Please contact support.';
+    } else {
+      this.loginError = '❌ Invalid credentials.';
+    }
+  }
     });
   }
 }

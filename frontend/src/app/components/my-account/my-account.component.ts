@@ -10,6 +10,7 @@ import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
+import { QuizService } from '../../services/quiz.service';
 
 @Component({
   selector: 'app-my-account',
@@ -25,6 +26,7 @@ export class MyAccountComponent implements OnInit {
   ninjaStars: number = 0;
   attempts: any[] = [];
   isEditing: boolean = false;
+  baseUrl = environment.apiBaseUrl;
 
   // Fields for editing
   editUsername: string = '';
@@ -32,15 +34,29 @@ export class MyAccountComponent implements OnInit {
   editPassword: string = '';
   editConfirmPassword: string = '';
 
-  constructor(private route: ActivatedRoute, private http: HttpClient,   private config: ConfigService , private router: Router) {}
+  constructor(private route: ActivatedRoute, private http: HttpClient,
+      private config: ConfigService , private router: Router,
+      private quizService: QuizService) {}
 
-  ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    this.user_id = idParam ? parseInt(idParam, 10) : 0;
-    this.loadUserProfile();
-    
-  }
-
+      ngOnInit(): void {
+        const idParam = this.route.snapshot.paramMap.get('id');
+        this.user_id = idParam ? parseInt(idParam, 10) : 0;
+        this.username = localStorage.getItem('username') || '';
+      
+        this.loadUserProfile();
+      
+        // ✅ Pass user_id to the service method
+        this.quizService.getUserProgress(this.user_id).subscribe({
+          next: (res) => {
+            this.ninjaStars = res.ninja_stars;
+            this.attempts = res.attempts;
+          },
+          error: (err) => {
+            console.error('❌ Failed to load progress:', err);
+          }
+        });
+      }
+      
   loadUserProfile(): void {
     console.log('🔍 Fetching user profile for ID:', this.user_id);
     this.http.get<any>(`${this.config.apiBaseUrl}/user/profile/${this.user_id}`).subscribe({
@@ -75,7 +91,7 @@ export class MyAccountComponent implements OnInit {
       password: this.editPassword,
     };
 
-    this.http.put(`http://localhost:8000/user/update/${this.user_id}`, updatedData).subscribe({
+    this.http.put(`${this.baseUrl}/user/update/${this.user_id}`, updatedData).subscribe({
       next: () => {
         alert('✅ Profile updated successfully!');
         this.username = this.editUsername;
@@ -98,7 +114,7 @@ export class MyAccountComponent implements OnInit {
   }
   deleteAccount(): void {
     if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      this.http.delete(`http://localhost:8000/user/delete/${this.user_id}`).subscribe({
+      this.http.delete(`${this.baseUrl}/user/delete/${this.user_id}`).subscribe({
         next: () => {
           alert('✅ Account deleted successfully!');
           localStorage.removeItem('user_id');
@@ -124,5 +140,21 @@ export class MyAccountComponent implements OnInit {
       }
     });
   }
+deactivateAccount(): void {
+  if (confirm('Are you sure you want to deactivate your account? You can reactivate it later by contacting support.')) {
+    this.http.delete(`${this.baseUrl}/user/delete/${this.user_id}`).subscribe({
+      next: () => {
+        alert('✅ Account deactivated successfully!');
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('username');
+        window.location.href = '/';
+      },
+      error: (err) => {
+        console.error('❌ Failed to deactivate account:', err);
+        alert('Failed to deactivate account.');
+      }
+    });
+  }
+}
   
 }

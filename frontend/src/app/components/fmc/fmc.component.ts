@@ -5,13 +5,14 @@ import { CommonModule } from '@angular/common';
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
 import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
 import { FormsModule } from '@angular/forms';
+import { PaperDownloadComponent } from "../paper-download/paper-download.component";
 
 @Component({
   selector: 'app-fmc',
   templateUrl: './fmc.component.html',
   styleUrls: ['./fmc.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, LeftSidebarComponent, RightSidebarComponent],
+  imports: [CommonModule, FormsModule, LeftSidebarComponent, RightSidebarComponent, PaperDownloadComponent],
   providers: [QuizService]
 })
 export class FMCComponent implements OnInit {
@@ -38,6 +39,7 @@ export class FMCComponent implements OnInit {
   answerInput = '';
   isCorrect = true;
   quizCompleted = false;
+  operation = 'fmc';
 
   constructor(private quizService: QuizService, private router: Router, private route: ActivatedRoute) {}
 
@@ -46,22 +48,45 @@ export class FMCComponent implements OnInit {
       this.username = params['username'] || localStorage.getItem('username') || '';
       this.user_id = parseInt(params['user_id'] || localStorage.getItem('user_id') || '0', 10);
       this.level = parseInt(params['level'] || '0', 10);
-      this.currentOperation = params['operation'] || 'fmc';
+      this.operation = params['operation'] || 'fmc';
       this.currentQIndex = 0;
+      // ✅ Start session before loading questions
+      this.startSession();
+      
       console.log('📡 Fetching questions for level:', this.level);
-  
-      this.quizService.getFMCQuestions(this.level).subscribe({
-        next: (questions) => {
-          this.questions = questions;
-  
-          console.log('✅ Questions received:', questions);
-  
-          this.userAnswers = new Array(questions.length).fill('');
-          this.startTimer();
-        },
-        error: (err) => console.error('❌ Error loading FMC questions:', err)
-      });     
+      this.fetchQuestions();
     });
+  }
+  startSession(): void {
+    if (!this.username || !this.user_id) {
+      alert("⚠️ You must be logged in to start the quiz.");
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.username = this.username.trim();
+    this.quizService.startSession(this.username, this.operation, this.level).subscribe({
+      next: (res) => {
+        console.log('✅ Session started:', res.session_id);
+      },
+      error: (err) => {
+        console.error('❌ Failed to start session:', err);
+      }
+    });
+  }
+  fetchQuestions(): void {
+    this.quizService.getFMCQuestions(this.level).subscribe({
+      next: (questions) => {
+        this.questions = questions;
+
+        console.log('✅ Questions received:', questions);
+
+        this.userAnswers = new Array(questions.length).fill('');
+        localStorage.setItem('startTime', Date.now().toString());
+
+        this.startTimer();
+      },
+      error: (err) => console.error('❌ Error loading FMC questions:', err)
+    });     
   }
   submitAnswer(): void {
     const currentQ = this.questions[this.currentQIndex];
@@ -148,6 +173,25 @@ export class FMCComponent implements OnInit {
       utterance.onend = () => this.animation?.stop(); // Stop after speaking
     }
   }
+  takeChallenge(): void {
+    this.router.navigate([`/${this.currentOperation}`], {
+      queryParams: {
+        level: this.level,
+        username: this.username,
+        user_id: this.user_id
+      }
+    });
+  }
+
+  goToLearn(): void {
+    this.router.navigate([`/learn/${this.currentOperation}`], {
+      queryParams: {
+        level: this.level,
+        username: this.username,
+        user_id: this.user_id
+      }
+    });
+  }
   ngOnDestroy(): void {
     if (this.timer) clearInterval(this.timer);
   }
@@ -159,7 +203,25 @@ export class FMCComponent implements OnInit {
     localStorage.removeItem('score');
     this.router.navigate(['/']);
   }
-  
+  printQuestions(): void {
+    const html = this.questions.map((q, i) => `
+      <div style="margin-bottom: 20px;">
+        <strong>Q${i + 1}:</strong> ${q.question}
+        <div style="border: 1px solid #000; width: 40px; height: 30px; margin-top: 8px;"></div>
+      </div>
+    `).join('');
+
+    const win = window.open('', '', 'height=800,width=800');
+    if (win) {
+      win.document.write('<html><head><title>Quiz Questions</title></head><body>');
+      win.document.write('<h1 style="text-align:center;">Quiz Paper</h1>');
+      win.document.write(html);
+      win.document.write('</body></html>');
+      win.document.close();
+      win.print();
+    }
+  }
+
   goBack(): void {
     if (this.currentQIndex > 0) {
       this.currentQIndex--;
@@ -169,4 +231,5 @@ export class FMCComponent implements OnInit {
     this.explanation = '';
     this.router.navigate(['/operation']);
   }
+
 }

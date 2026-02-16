@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="5c186e34-4f11-404f-8543-fc0deebb3af9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/alldb.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/fmc_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/fmc_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/utils/generate_pdf.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/generate_pdf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data-dump.sql" beforeDir="false" afterPath="$PROJECT_DIR$/data-dump.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysqlusersandgrants.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sqlusergrants.sql" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "jyothimalla"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/jyothimalla/autodidact",
+    "accountId": "bd63457b-e899-4456-978d-10fd207075fa"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="2xh3FDRFMTGF1Br2XqlykeTMTxL" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "jyothi/results-pageModification",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-PY-251.25410.159" />
+        <option value="bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5c186e34-4f11-404f-8543-fc0deebb3af9" name="Changes" comment="" />
+      <created>1748376373981</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1748376373981</updated>
+      <workItem from="1748376375563" duration="24000" />
+    </task>
+    <servers />
+  </component>
+</project>

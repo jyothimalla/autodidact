@@ -12,7 +12,7 @@ import { query } from 'express';
   styleUrls: ['./operation.component.scss']
 })
 export class OperationComponent implements OnInit {
-  operations: string[] = ['Addition', 'Subtraction', 'Multiplication', 'Division', 'FMC', 'Sudoku'];
+  operations: string[] = ['Addition', 'Subtraction', 'Multiplication', 'Division', 'FMC', 'Sudoku', 'Time'];
   selectedOperation: string = '';
   levels: number[] = [];
   unlockedLevel = 0;
@@ -25,7 +25,8 @@ export class OperationComponent implements OnInit {
   isSudoku: boolean = false;
   actionLabel: string | null = null;
   selectedSublevelType: 'learn' | 'practice' | 'attempt' | null = null;
-
+  currentOperation: string = '';
+  level: number = 0;
 
   sudokuLevels = [
     { label: 'Easy', value: 0 },
@@ -92,40 +93,28 @@ export class OperationComponent implements OnInit {
   }
 
   selectLevel(level: number) {
+  if (this.isLevelLocked(level)) {
+    console.warn(`🚫 Level ${level} is locked!`);
+    return;
+  }
 
-    if (this.isLevelLocked(level)) {
-      console.warn(`🚫 Level ${level} is locked!`);
-      return;
-    }
-    console.log('🧪 Selected level:', level);
+  const operation = this.selectedOperation.toLowerCase();
+  this.level = level;
 
-    const operation = this.selectedOperation.toLowerCase();
-    localStorage.setItem('operation', operation);
-    localStorage.setItem('level', level.toString());
-
-    const directRoutes = ['addition', 'subtraction', 'multiplication', 'division', 'fmc', 'sudoku'];
-
-    if (directRoutes.includes(operation)) {
-      console.log('🔄 Navigating to direct route:', operation);
-      this.selectedLevel = level;
-      this.activeLevel = level;
-      this.subLevels = Array.from({ length: 10 }, (_, i) => i);
-      console.log('🔄 Sublevels:', this.subLevels);
-      console.log('✅ Level selected. Choose a sublevel next.');
-    }
-    else {
-      this.quizService.startSession(operation, level).subscribe({
-        next: () => {
-          console.log('✅ Session started, navigating to /quiz');
-          this.router.navigate(['/quiz']);
-        },
-        error: (err) => {
-          console.error('❌ Failed to start session:', err);
-          alert('Could not start quiz session. Please try again.');
-        }
+  this.quizService.startSession(this.username, operation, level).subscribe({
+    next: () => {
+      console.log(`✅ Session started for ${operation} Level ${level}`);
+      this.router.navigate([`/${operation}`], {
+        queryParams: { level, username: this.username, user_id: this.user_id }
       });
+    },
+    error: (err) => {
+      console.error('❌ Failed to start session:', err);
+      alert('Could not start quiz session. Please try again.');
     }
+  });
 }
+
 
 
 selectSubLevel(type: 'learn' | 'practice' | 'attempt' | null): void {
@@ -172,6 +161,7 @@ selectSubLevel(type: 'learn' | 'practice' | 'attempt' | null): void {
 
   this.router.navigate([targetRoute], {
     queryParams: {
+      operation,
       level,
       sublevel: subLevel,
       username: this.username,

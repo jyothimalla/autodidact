@@ -7,6 +7,7 @@ import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component'
 import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
 import { AnimationItem } from 'lottie-web';
 import confetti from 'canvas-confetti';
+import { PaperDownloadComponent } from "../paper-download/paper-download.component";
 
 interface SubmitChallengeResponse {
   message: string;
@@ -18,7 +19,7 @@ interface SubmitChallengeResponse {
 @Component({
   selector: 'app-addition',
   standalone: true,
-  imports: [CommonModule, FormsModule, RightSidebarComponent, LeftSidebarComponent],
+  imports: [CommonModule, FormsModule, RightSidebarComponent, LeftSidebarComponent, PaperDownloadComponent],
   templateUrl: './addition.component.html',
   styleUrls: ['./addition.component.scss']
 })
@@ -62,7 +63,27 @@ export class AdditionComponent implements OnInit, OnDestroy {
       this.user_id = parseInt(params['user_id'] || localStorage.getItem('user_id') || '0', 10);
       this.level = parseInt(params['level'] || '0', 10);
       this.currentOperation = params['operation'] || 'addition';
+      this.currentQIndex = 0;
+      // ✅ Start session before loading questions
+      this.startSession();
+      // Loading theAddition Questions
       this.fetchQuestions();
+    });
+  }
+  startSession(): void {
+    if (!this.username || !this.user_id) {
+      alert("⚠️ You must be logged in to start the quiz.");
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.username = this.username.trim();
+    this.quizService.startSession(this.username, this.currentOperation, this.level).subscribe({
+      next: (res) => {
+        console.log('✅ Session started:', res.session_id);
+      },
+      error: (err) => {
+        console.error('❌ Failed to start session:', err);
+      }
     });
   }
 
@@ -71,6 +92,8 @@ export class AdditionComponent implements OnInit, OnDestroy {
       next: (questions) => {
         this.questions = questions;
         this.userAnswers = new Array(questions.length).fill('');
+        localStorage.setItem('startTime', Date.now().toString());
+
         this.startTimer();
       },
       error: (err) => console.error('❌ Error loading questions:', err)
@@ -80,9 +103,9 @@ export class AdditionComponent implements OnInit, OnDestroy {
   startTimer(): void {
     this.timer = setInterval(() => {
       this.secondsElapsed++;
-      const minutes = Math.floor(this.secondsElapsed / 60);
-      const seconds = this.secondsElapsed % 60;
-      this.elapsedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      const mins = Math.floor(this.secondsElapsed / 60);
+      const secs = this.secondsElapsed % 60;
+      this.elapsedTime = `${mins}:${secs < 10 ? '0' + secs : secs}`;
     }, 1000);
   }
 
@@ -253,7 +276,16 @@ export class AdditionComponent implements OnInit, OnDestroy {
       printWindow.print();
     }
   }
-  
+  takeChallenge(): void {
+    this.router.navigate([`/${this.currentOperation}`], {
+      queryParams: {
+        level: this.level,
+        username: this.username,
+        user_id: this.user_id
+      }
+    });
+  }
+
   goToNextLevel(): void {
     const nextLevel = this.level + 1;
     const currentOperation = localStorage.getItem('operation'); // or pass it in as input

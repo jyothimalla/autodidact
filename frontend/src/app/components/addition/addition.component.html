@@ -9,6 +9,7 @@
     <div class="spinner"></div>
     <p>Saving your results... Please wait ⏳</p>
   </div>
+
   <div class="example-section" *ngIf="showExample">
     <h3>📘 Learn with an Example</h3>
     <div [innerHTML]="exampleHtml"></div>
@@ -18,10 +19,19 @@
   
   <!-- MAIN CONTENT -->
   <div class="quiz-main-card">
-  <!-- <button (click)="goHome()">🏠 Go to Home</button>-->
- 
+    <app-paper-download
+    [user_id]="user_id"
+    [username]="username"
+    [operation]="currentOperation"
+    [level]="level"> </app-paper-download>
+  
+    <!-- <button (click)="goHome()">🏠 Go to Home</button>-->
+  <div class="button-group">
+    <button (click)="printQuestions()" class="print-button">🖨️ Print </button>
+    <button class="print-button" (click)="goBack()" >🔙 Go Back</button>
+    </div>
     <div class="quiz-header">
-      <h2 class="quiz-title addition">
+      <h2 class="quiz-title addition"> Taking a Challenge in 
         {{ currentOperation | titlecase }} –
         {{
           currentOperation === 'sudoku'
@@ -35,8 +45,7 @@
       <div class="character-container" (click)="readQuestionAloud()">
         <img src="assets/images/bird1.gif" alt="Bird Reader" [class.animate]="isReading" />
       </div>
-      <div class="question-container">
-        <p>
+        
           {{ questions[currentQIndex].question.split('=')[0] }} =
           <input
             type="text"
@@ -46,20 +55,38 @@
             [disabled]="quizCompleted"
             autocomplete="off"
             placeholder="?" />
-        </p>
+        
+          <button class="print-button" *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
+          <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
       </div>
-    </div>
 
     <div class="feedback" *ngIf="feedbackMessage">
       <p>{{ feedbackMessage }}</p>
     </div>
 
-    <div class="button-group">
-      <button *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
-      <button (click)="goBack()">🔙 Go Back</button>
-      <button (click)="printQuestions()" class="print-button">🖨️ Print</button>
-
-      <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
+    
+    <div class="practice-done-box">
+      <div class="hover-options">
+        
+        <div class="hover-item" (click)="goToLearn()">
+          <img src="assets/images/greenPuzzle.png" class="puzzle-icon" />
+          <div class="hover-text">Not sure? Want to learn with example?</div>
+          <div class="example-box">
+            <p><strong>Example:</strong> 300 + 500 = 800</p>
+            <p>Arrange as:</p>
+            <pre>300\n+500</pre>
+          </div>
+        </div>
+    
+        <div class="hover-item" (click)="takeChallenge()">
+          <img src="assets/images/bluePuzzle.png" class="puzzle-icon" />
+          <div class="hover-text">Ready? Try the challenge now!</div>
+          <div class="example-box">
+            <p>Challenge yourself with 5 random questions from this level.</p>
+          </div>
+        </div>
+    
+      </div>
     </div>
   </div>
 

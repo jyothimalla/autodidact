@@ -1,0 +1,17 @@
+<section class="module-detail" *ngIf="module">
+  <a class="back-link" [routerLink]="['/learning']">Back to Learning</a>
+
+  <header>
+    <h1>{{ module.icon }} {{ module.name }}</h1>
+    <p>{{ module.description }}</p>
+  </header>
+
+  <div class="subskill-grid">
+    <app-subskill-card
+      *ngFor="let atom of module.atoms"
+      [moduleId]="module.id"
+      [subskill]="atom"
+      [isAdmin]="isAdmin"
+    ></app-subskill-card>
+  </div>
+</section>

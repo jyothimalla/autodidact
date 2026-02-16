@@ -58,18 +58,43 @@ export class MultiplicationComponent implements OnInit, OnDestroy {
       this.level = parseInt(params['level'] || '0', 10);
       this.currentOperation = params['operation'] || 'multiplication';
       this.currentQIndex = 0;
-
-      this.quizService.getMultiplicationQuestions(this.level).subscribe({
-        next: (questions) => {
-          this.questions = questions;
-          this.userAnswers = new Array(questions.length).fill('');
-          this.startTimer();
-        },
-        error: (err) => console.error('❌ Error loading multiplication questions:', err)
-      });
+      // ✅ Start session before loading questions
+      this.startSession();
+     
+      console.log('📡 Fetching questions for level:', this.level);
+      this.fetchQuestions();
+      
     });
   }
+  fetchQuestions(): void {
+    this.quizService.getMultiplicationQuestions(this.level).subscribe({
+      next: (questions) => {
+        this.questions = questions;
+        this.userAnswers = new Array(questions.length).fill('');
+        localStorage.setItem('startTime', Date.now().toString());
 
+        this.startTimer();
+      },
+      error: (err) => console.error('❌ Error loading multiplication questions:', err)
+    });
+  }
+  startSession(): void {
+    if (!this.username || !this.user_id) {
+      alert("⚠️ You must be logged in to start the quiz.");
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.username = this.username.trim();
+    this.quizService.startSession(this.username, this.currentOperation, this.level).subscribe({
+      next: (res) => {
+        console.log('✅ Session started:', res.session_id);
+      },
+      error: (err) => {
+        console.error('❌ Failed to start session:', err);
+      }
+    });
+  }
+  
   startTimer(): void {
     this.timer = setInterval(() => {
       this.secondsElapsed++;

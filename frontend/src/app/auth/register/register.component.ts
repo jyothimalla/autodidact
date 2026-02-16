@@ -28,7 +28,7 @@ export class RegisterComponent {
   registerForm: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
-  baseUrl: string = '${environment.apiBaseUrl}/auth/register';
+  baseUrl: string = `${environment.apiBaseUrl}/auth/register`;
 
   constructor(
     private fb: FormBuilder,

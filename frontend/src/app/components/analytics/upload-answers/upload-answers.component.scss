@@ -1,0 +1,46 @@
+.upload-container {
+    max-width: 500px;
+    margin: auto;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+  
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  
+    input, select, button {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 5px;
+    }
+  
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      margin-top: 1rem;
+      cursor: pointer;
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+  .drop-area {
+    border: 2px dashed #8a2be2;
+    padding: 1.2rem;
+    text-align: center;
+    color: #666;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .drop-area.active {
+    background-color: #f3d6ff;
+    border-color: #8a2be2;
+  }
+  
+  

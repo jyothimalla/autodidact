@@ -1,0 +1,59 @@
+.lesson-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.back-link {
+  text-decoration: none;
+  color: #2c5de5;
+  font-weight: 600;
+}
+
+header h1 {
+  margin-bottom: 0.2rem;
+  color: #1f2a44;
+}
+
+header p {
+  margin-top: 0;
+  color: #5f6c7d;
+}
+
+.video-box {
+  margin: 1rem 0;
+}
+
+.video-box iframe {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+.summary {
+  color: #3e4b5b;
+}
+
+.actions {
+  margin-top: 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+}
+
+button.practice {
+  background: #2c5de5;
+}
+
+button.challenge {
+  background: #7a3aed;
+}

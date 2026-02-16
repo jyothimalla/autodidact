@@ -6,12 +6,15 @@ import { QuizService } from '../../services/quiz.service';
 import { FooterComponent } from "../footer/footer.component";
 import { ActivatedRoute } from '@angular/router';
 import confetti from 'canvas-confetti';
+import { NgChartsModule } from 'ng2-charts';
+import { ChartOptions, ChartData, ChartType, ChartConfiguration} from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
 
 
 @Component({
   selector: 'app-result',
   standalone: true,
-  imports: [CommonModule, FooterComponent],
+  imports: [CommonModule, NgChartsModule],
   templateUrl: './result.component.html',
   styleUrls: ['./result.component.scss']
 })
@@ -34,6 +37,41 @@ export class ResultComponent implements OnInit {
   performanceEmoji: string = '';
   performanceColor: string = '';
   attemptNumber: number = 1;
+  startTime: number = 0;
+  endTime: number = 0;
+  currentOperation: string = '';
+  sessionScores: number[] = []; 
+
+  lineChartData: ChartData<'line'> = {
+    labels: ['Attempt 1', 'Attempt 2'],
+    datasets: [
+      {
+        data: [7, 10],
+        label: 'SmartScore Progress',
+        borderColor: 'blue',
+        backgroundColor: 'lightblue',
+        fill: false,
+        tension: 0.3
+      }
+    ]
+  };
+  
+  lineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100
+      }
+    },
+    plugins: {
+      legend: {
+        display: true
+      }
+    }
+  };
+  
+  public lineChartType: 'line' = 'line';
 
 
   get attemptedCount(): number {
@@ -43,44 +81,59 @@ export class ResultComponent implements OnInit {
   constructor(private router: Router, private quizService: QuizService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+    
     this.username = this.route.snapshot.queryParams['username'] || localStorage.getItem('username') || '';
     this.user_id = parseInt(localStorage.getItem('user_id') || '0', 10);
     console.log('Storing user_id:', this.user_id, 'username:', this.username);
-    console.log('🧠 Username:', this.username);
     
     const storedScore = localStorage.getItem('score');
     const storedAnswers = localStorage.getItem('answers');
     const storedQuestions = localStorage.getItem('questions');
     const storedExplanation = localStorage.getItem('explanation');
-    const operation = localStorage.getItem('operation') || 'addition';
     const level = parseInt(localStorage.getItem('level') || '0', 10);
     this.attemptNumber = parseInt(this.route.snapshot.queryParams['attempt_number'] || '1', 10);
-
-    this.operation = operation;
-    this.level = level;
+    this.operation = localStorage.getItem('operation') || 'addition';
+    this.level = parseInt(localStorage.getItem('level') || '0', 10);
+    this.startTime = parseInt(localStorage.getItem('startTime') || '0');
+    this.endTime = Date.now();  
+   
     if (!this.username || !storedScore || !storedAnswers || !storedQuestions) {
     this.router.navigate(['/']);
     return;
     }
     try {
-    this.username = this.username;
-    this.score = parseInt(storedScore);
-    this.userAnswers = JSON.parse(storedAnswers);
-    this.questions = JSON.parse(storedQuestions);
-    this.total = this.questions.length;
-    }catch (err){
+      this.score = parseInt(storedScore);
+      this.userAnswers = JSON.parse(storedAnswers);
+      this.questions = JSON.parse(storedQuestions);
+      this.total = this.questions.length;
+    
+      this.questions.forEach((q, i) => {
+        q.userAnswer = this.userAnswers[i] || '';
+        q.correctValue = q.answer || '';
+      });
+    } catch (err) {
       console.error("❌ Failed to parse stored data:", err);
       this.router.navigate(['/']);
+      return;
     }
-
-    this.operation = localStorage.getItem('operation') || 'addition';
-    this.level = parseInt(localStorage.getItem('level') || '0', 10);
-
-    this.questions.forEach((q, i) => {
+    this.questions.forEach((q) => {
       if (!q.correctValue && q.answer) {
-        q.correctValue = q.answer; // fallback
+        q.correctValue = q.answer;
       }
     });
+
+    this.loadGraphData();
+
+    if (this.score === this.total) {
+      const progressKey = `${this.operation}_progress`;
+      const currentUnlocked = parseInt(localStorage.getItem(progressKey) || '0', 10);
+    
+      if (this.level === currentUnlocked) {
+        localStorage.setItem(progressKey, (currentUnlocked + 1).toString());
+        this.levelUnlocked = true;
+        this.launchConfetti();
+      }
+    }
 
   
     // ✅ Check and unlock progress only if needed
@@ -103,6 +156,14 @@ export class ResultComponent implements OnInit {
       }
 }
 
+  }
+
+
+  loadGraphData(): void {
+    this.quizService.getAllSessionsForUser(this.user_id, this.operation).subscribe((sessions) => {
+      this.lineChartData.labels = sessions.map((s, i) => `Attempt ${i + 1}`);
+      this.lineChartData.datasets[0].data = sessions.map(s => s.score);
+    });
   }
   launchConfetti() {
     const duration = 5 * 1000; // 5 seconds
@@ -141,12 +202,6 @@ export class ResultComponent implements OnInit {
     localStorage.removeItem('questions');
     localStorage.removeItem('operation');
     this.router.navigate(['/']);
-  }
-  nextLevel(): void {
-    const nextLevel = this.level + 1;
-    const currentOperation = localStorage.getItem('operation'); // or pass it in as input
-    localStorage.setItem('level', nextLevel.toString());
-    this.router.navigate([`/operation/${currentOperation}/${nextLevel}`]);
   }
   
   retryLevel(): void {
@@ -188,12 +243,19 @@ export class ResultComponent implements OnInit {
     this.level = nextLevel;
     localStorage.setItem('level', nextLevel.toString());
     localStorage.setItem('operation', this.operation);
+    this.currentOperation = this.operation;
 
     // ✅ Call backend to start session for next level
-    this.quizService.startSession(this.operation, nextLevel).subscribe({
+    if (!this.username || !this.user_id) {
+      alert("⚠️ You must be logged in to start the quiz.");
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.username = this.username.trim();
+    this.quizService.startSession(this.username, this.currentOperation, this.level).subscribe({
       next: (res) => {
         console.log('Session started for next level:', res);
-        this.router.navigate(['/operation']);
+        this.router.navigate([`/operation/${this.operation}/${this.level}`]);
       },
       error: (err) => {
         console.error('Failed to start session for next level:', err);
@@ -206,11 +268,21 @@ export class ResultComponent implements OnInit {
     this.router.navigate(['/review']);
   }
   retrySameLevel(): void {
-    localStorage.setItem('operation', 'this.operation');
+    localStorage.setItem('operation', this.operation);
     localStorage.setItem('level', this.level.toString());
     console.log('🔄 Retrying same level:', this.level);
     console.log('🔄 Retrying same operation:', '/operation/${this.operation}/${level}');
     this.router.navigate([`/operation/${this.operation}/${this.level}`]);
   }
   
+  
+  public get timeTaken(): string {
+    const start = parseInt(localStorage.getItem('startTime') || '0', 10);
+    const end = Date.now();
+    const diff = (end - start) / 1000;
+    const mins = Math.floor(diff / 60);
+    const secs = Math.floor(diff % 60);
+    return `${mins}m ${secs}s`;
+  }
+
 }

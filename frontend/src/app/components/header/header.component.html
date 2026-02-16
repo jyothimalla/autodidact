@@ -1,17 +1,27 @@
-<!DOCTYPE html>
-
 <header>
-  <div class="header-left">
-    <div class="logo_wrapper">
-      <img src="assets/logo.png" alt="Logo" class="logo" />
+  <div class="header-container">
+    <div class="header-left">
+      <div class="logo-wrapper">
+        <img src="assets/images/AutoD.png" alt="Logo" class="logo" />
+      </div>
     </div>
-    <h1 style="color: rgb(19, 129, 213); font-size:65%;">Kids Self Learning Application</h1>
-  </div>
 
-  <!-- 🛠 Move this block OUTSIDE of header-left -->
-  <!--<div class="header-right" *ngIf="this.username">
-   <span>👋 Welcome, {{ this.username }} ( {{this.awarded_title}})</span>
-    <button (click)="goToMyAccount()">My Account</button>
-    <button (click)="logout()">Logout</button>
-  </div>-->
+     <!-- Center: Menus -->
+     <div class="header-center" *ngIf="isLoggedIn">
+      <nav class="nav-menu">
+        <button (click)="goToLearning()">📘 Learning</button>
+        <button (click)="goToPractice()">📝 Practice</button>
+        <button (click)="goToTest()">🎓 Test</button>
+        <button (click)="userAccount()">👤 My Account</button>
+        <button (click)="goToAnalytics()">📈 Analytics</button>
+      </nav>
+    </div>
+    <div class="header-right" *ngIf="isLoggedIn" >
+      <span class="username">👋 Welcome, {{ username }} </span>
+
+
+      <!--<button (click)="userAccount()">My Account</button>-->
+      <button (click)="logout()">Logout</button>
+    </div>
+  </div>
 </header>

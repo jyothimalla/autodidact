@@ -1,0 +1,49 @@
+<section class="lesson-page" *ngIf="module && subskill">
+  <a class="back-link" [routerLink]="['/learning', module.id]">Back to {{ module.name }}</a>
+
+  <header>
+    <h1>{{ subskill.name }}</h1>
+    <p>Level {{ subskill.level }} lesson</p>
+  </header>
+
+  <div class="video-box" *ngIf="safeVideoUrl">
+    <iframe
+      [src]="safeVideoUrl"
+      width="800"
+      height="450"
+      title="Lesson video"
+      frameborder="0"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <p class="summary">{{ subskill.summary }}</p>
+
+  <div class="actions">
+    <button type="button" class="practice" (click)="startPractice()">Practice (5 questions)</button>
+    <button type="button" class="challenge" (click)="startChallenge()">Challenge (10 timed)</button>
+  </div>
+
+  <section class="teacher-panel" *ngIf="isAdmin">
+    <h2>Teacher Notes</h2>
+    <p>{{ subskill!.teachingNotes }}</p>
+
+    <h3>Common Mistakes</h3>
+    <ul>
+      <li *ngFor="let m of subskill!.commonMistakes">{{ m }}</li>
+    </ul>
+
+    <h3>Teaching Strategies</h3>
+    <ul>
+      <li *ngFor="let s of subskill!.teachingStrategies">{{ s }}</li>
+    </ul>
+
+    <h3>Prerequisites</h3>
+    <p>{{ subskill!.prerequisites.join(', ') }}</p>
+
+    <h3>Assessment Criteria</h3>
+    <p>{{ subskill!.assessmentCriteria }}</p>
+
+    <p class="meta">Estimated lesson time: {{ subskill!.estimatedMinutes }} minutes</p>
+  </section>
+</section>

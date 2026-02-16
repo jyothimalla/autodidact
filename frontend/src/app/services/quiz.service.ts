@@ -27,15 +27,14 @@ export class QuizService {
   }
 
   // ✅ Start a quiz session
-  startSession(operation: string, level: number): Observable<any> {
-    const user_id = localStorage.getItem('user_id');
-    const username = localStorage.getItem('username') || 'Guest';
+  startSession(username: string, operation: string, level: number): Observable<any> {
+    const user_id = parseInt(localStorage.getItem('user_id') || '0', 10);
     if (!user_id) {
       throw new Error('User not logged in. Cannot start session.');
     }
 
     return this.http.post(`${this.apiBaseUrl}/start-session`, {
-      user_id: parseInt(user_id),
+      user_id,
       username,
       operation,
       level
@@ -54,6 +53,7 @@ export class QuizService {
       multiplication: 'multiplication/questions',
       division: 'division/questions',
       fmc: 'fmc/questions',
+      time: 'time-question/questions'
     };
 
     const endpoint = endpointMap[operation] || endpointMap['addition'];
@@ -105,19 +105,9 @@ export class QuizService {
     );
   }
 
-  // ✅ Get full progress
-  getUserProgress(): Observable<any> {
-    const user_id = localStorage.getItem('user_id');
+  getUserProgress(user_id: number): Observable<any> {
     return this.http.get<any>(`${this.apiBaseUrl}/progress/${user_id}`);
   }
-
-  // ✅ Get progress filtered by operation
-  getUserProgressByOperation(operation: string): Observable<any> {
-    const user_id = localStorage.getItem('user_id');
-    return this.http.get<any>(`${this.apiBaseUrl}/progress/${user_id}?operation=${operation}`);
-  }
-
-  
   getAdditionQuestions(level: number): Observable<any[]> {
   console.log(`🔍 Sending GET to: /addition/questions?level=${level}`);
   return this.http.get<any[]>(`${this.apiBaseUrl}/addition/questions?level=${level}`);
@@ -149,5 +139,20 @@ export class QuizService {
     const level = localStorage.getItem('level');
     return this.http.get<any[]>(`${this.apiBaseUrl}/quiz/questions?user_id=${user_id}&operation=${operation}&level=${level}`);
   }
- 
+
+  getAllSessionsForUser(userId: number, operation: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiBaseUrl}/results/${userId}/${operation}`);
+  }
+  getUserProgressByOperation(operation: string): Observable<any> {
+    const user_id = localStorage.getItem('user_id');
+    return this.http.get<any>(`${this.apiBaseUrl}/progress/${user_id}?operation=${operation}`);
+  }
+  getPaper(user_id: number, level: number, sublevel: string) {
+  const params = new HttpParams()
+    .set('user_id', user_id.toString())
+    .set('level', level.toString())
+    .set('sublevel', sublevel);
+
+  return this.http.get<any>(`${this.apiBaseUrl}/fmc/get-paper-json`, { params });
+}
 }

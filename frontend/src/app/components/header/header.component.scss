@@ -1,122 +1,100 @@
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(to right, #f3f3f3, #d6eaff);
-  padding: 12px 24px;
-  border-bottom: 2px solid #ccc;
-  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1565c0 100%);
+  border-bottom: 3px solid #0d47a1;
+  padding: 10px 0;
 
-  .header-left h1 {
-    margin: 0;
-    font-size: 24px;
-    color: #2c3e50;
+  .header-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  .header-right {
+  .logo-wrapper {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 16px;
-    color: #444;
+    gap: 10px;
 
-    span {
-      font-weight: 500;
+    .logo {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      mix-blend-mode: multiply;
     }
 
-    button {
-      background-color: #4a90e2;
+    .brand-name {
+      font-size: 1.4rem;
+      font-weight: 700;
       color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        background-color: #357ab8;
-      }
     }
   }
 }
-@media (max-width: 600px) {
-  .brand-name {
-    font-size: 1rem;
-  }
 
-  .logo {
-    width: 32px;
-    height: 32px;
-  }
-}
-.logo-wrapper:hover {
-  opacity: 0.9;
-}
-a.active {
-  font-weight: bold;
-  text-decoration: underline;
-}
-.account-section {
-  position: absolute;
-  top: 1rem;
-  right: 2rem;
-  font-size: 1rem;
-  font-weight: bold;
+// ─── Colourful nav buttons ────────────────────────────────────────────────────
+.nav-menu {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 
-  .logout-link {
+  button {
+    font-weight: 700;
+    font-size: 0.87rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
     cursor: pointer;
-    color: #d32f2f;
-    text-decoration: underline;
-    margin-left: 6px;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
+    &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25); opacity: 0.92; }
+    &:active { transform: none; }
   }
+
+  // Each button gets its own colour
+  button:nth-child(1) { background: #ff7043; color: #fff; }   // 📘 Learning  — orange
+  button:nth-child(2) { background: #00897b; color: #fff; }   // 📝 Practice  — teal
+  button:nth-child(3) { background: #8e24aa; color: #fff; }   // 🎓 Test      — purple
+  button:nth-child(4) { background: #f9a825; color: #1a1a1a; }// 👤 My Account — amber
+  button:nth-child(5) { background: #1e88e5; color: #fff; }   // 📈 Analytics — blue
 }
 
-
-.logo-wrapper {
+// ─── Right side ────────────────────────────────────────────────────────────────
+.header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0.5rem 1rem;
-}
+  gap: 12px;
 
-.logo {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-}
-
-.brand-name {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-
-.username {
-  color: #2c3e50;
-}
-
-.quiz-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 2rem;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Reserve space for left sidebar */
-.left-sidebar {
-  width: 200px;
-  height: 100%;
-}
-
-  /* Right sidebar styling */
-  .right-sidebar {
-    width: 220px;
-    background-color: #f7f7f7;
-    padding: 1rem;
-    border-radius: 12px;
-    height: 20%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  .username {
+    font-weight: 600;
+    color: #e3f2fd;
+    font-size: 0.9rem;
   }
+
+  button {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover { background: rgba(255,255,255,0.28); }
+  }
+}
+
+// ─── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 900px) {
+  header .header-container {
+    flex-direction: column;
+    gap: 0.6rem;
+    text-align: center;
+  }
+  .nav-menu { justify-content: center; gap: 0.4rem; }
+  .header-right { justify-content: center; }
+  .logo { width: 48px !important; height: 48px !important; }
+}

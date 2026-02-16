@@ -1,0 +1,84 @@
+.subskill-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: #ffffff;
+  border: 1px solid #e7ebf2;
+  border-radius: 14px;
+  padding: 1.2rem;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.subskill-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+  border-color: #3f7cff;
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+h3 {
+  margin: 0.2rem 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2a44;
+}
+
+p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5f6c7d;
+  line-height: 1.4;
+}
+
+.status {
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status.weak       { background: #fee2e2; color: #b91c1c; }
+.status.developing { background: #fef3c7; color: #92400e; }
+.status.strong     { background: #dcfce7; color: #166534; }
+
+.level-chip {
+  font-size: 0.72rem;
+  color: #8a97a6;
+  font-weight: 600;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: #8a97a6;
+}
+
+.play-icon {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2c5de5;
+}
+
+.teaching-panel {
+  margin-top: 0.8rem;
+  border-top: 1px dashed #d0d7e3;
+  padding-top: 0.8rem;
+  font-size: 0.85rem;
+  color: #374151;
+
+  h4 { margin: 0.6rem 0 0.2rem; font-size: 0.82rem; color: #1f2a44; }
+  p  { margin: 0 0 0.4rem; }
+  ul { margin: 0 0 0.4rem; padding-left: 1.2rem; }
+  li { margin-bottom: 0.15rem; }
+}

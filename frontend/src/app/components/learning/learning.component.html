@@ -1,0 +1,16 @@
+<section class="learning-page">
+  <header>
+    <h1>Learning</h1>
+    <p>Master each skill step-by-step.</p>
+    <span class="teacher-mode-badge" *ngIf="isAdmin">Teacher View — atom teaching notes visible</span>
+  </header>
+
+  <div class="module-grid">
+    <app-module-card
+      *ngFor="let module of modules; let i = index"
+      [module]="module"
+      [isAdmin]="isAdmin"
+      [cardIndex]="i"
+    ></app-module-card>
+  </div>
+</section>

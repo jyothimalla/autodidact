@@ -1,0 +1,15 @@
+<div class="log-container">
+  <h2>🧾 User Activity Logs</h2>
+  <table>
+    <thead>
+      <tr><th>User ID</th><th>Action</th><th>Time</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of logs">
+        <td>{{ log.user_id }}</td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.timestamp | date:'medium' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

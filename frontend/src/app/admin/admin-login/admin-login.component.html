@@ -1,0 +1,29 @@
+<div class="admin-card">
+  <label class="switch">
+    <input type="checkbox" (change)="toggleDarkMode($event)">
+    <span class="slider round"></span>
+  </label>
+
+  <h2>Admin Login</h2>
+
+  <form (submit)="login()">
+    <input type="text" name="username" [(ngModel)]="username" placeholder="👤 Username" required />
+
+    <div class="password-wrapper">
+      <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="password" placeholder="🔑 Password" required />
+      <span class="toggle-icon" (click)="togglePassword()">{{ showPassword ? '🙈' : '👁️' }}</span>
+    </div>
+
+    <button type="submit">🔐 Login</button>
+  </form>
+
+  <div *ngIf="loginError" class="error-msg">
+    ❌ {{ loginError }}
+  </div>
+
+  <div class="social-login">
+    <p>Or login with:</p>
+    <button class="google">G Google</button>
+    <button class="github"> GitHub</button>
+  </div>
+</div>

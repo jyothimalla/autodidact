@@ -1,0 +1,145 @@
+<!-- ═══════════════════════════════════════════════════════════════════
+     WELCOME SCREEN
+════════════════════════════════════════════════════════════════════ -->
+<section class="mock-test-page" *ngIf="state === 'welcome'">
+  <div class="welcome-card">
+    <div class="welcome-icon">🎓</div>
+    <h1>Grammar School Entrance Mock Test</h1>
+    <p class="subtitle">Mathematics — All Topics</p>
+
+    <ul class="rules">
+      <li>📋 <strong>50 questions</strong> covering all 8 mathematics topics</li>
+      <li>⏱ <strong>60 minutes</strong> — the timer starts when you click Begin</li>
+      <li>🔡 <strong>Multiple choice</strong> — select A, B, C or D for each question</li>
+      <li>✅ <strong>60% or above</strong> is a pass (30 / 50)</li>
+      <li>🚫 The exam is auto-submitted when time runs out</li>
+    </ul>
+
+    <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <button class="btn-start" (click)="startExam()">Begin Exam</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     LOADING
+════════════════════════════════════════════════════════════════════ -->
+<section class="mock-test-page loading-screen" *ngIf="state === 'loading'">
+  <div class="spinner"></div>
+  <p>Generating your exam…</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     EXAM SCREEN
+════════════════════════════════════════════════════════════════════ -->
+<section class="exam-page" *ngIf="state === 'exam'">
+
+  <!-- Top bar -->
+  <div class="exam-topbar">
+    <span class="exam-title">Grammar School Mock Test</span>
+    <span class="q-counter">Question {{ currentIndex + 1 }} of {{ questions.length }}</span>
+    <span class="timer" [class]="timerClass">⏱ {{ timerDisplay }}</span>
+    <button class="btn-submit-top" (click)="submitExam()">Submit Test</button>
+  </div>
+
+  <div class="exam-body">
+    <!-- Question panel -->
+    <div class="question-panel">
+      <p class="q-number">Q{{ currentQuestion.question_number }}</p>
+      <p class="q-text">{{ currentQuestion.question }}</p>
+
+      <div class="options">
+        <label
+          *ngFor="let opt of optionLabels"
+          class="option-label"
+          [class.selected]="answers[currentQuestion.question_id] === opt"
+          (click)="selectAnswer(opt)"
+        >
+          <span class="opt-badge">{{ opt }}</span>
+          {{ currentQuestion.options[opt] }}
+        </label>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-nav" (click)="prev()" [disabled]="currentIndex === 0">← Prev</button>
+        <button class="btn-nav skip" (click)="next()" [disabled]="currentIndex === questions.length - 1">Skip</button>
+        <button class="btn-nav" (click)="next()" [disabled]="currentIndex === questions.length - 1">Next →</button>
+      </div>
+    </div>
+
+    <!-- Question grid -->
+    <div class="q-grid">
+      <p class="grid-title">Questions answered: {{ answeredCount }} / {{ questions.length }}</p>
+      <div class="grid-cells">
+        <button
+          *ngFor="let q of questions; let i = index"
+          class="grid-cell"
+          [class]="questionStatus(q)"
+          (click)="goTo(i)"
+        >{{ q.question_number }}</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     RESULTS SCREEN
+════════════════════════════════════════════════════════════════════ -->
+<section class="results-page" *ngIf="state === 'submitted' && result">
+
+  <div class="score-card" [class.passed]="result.passed" [class.failed]="!result.passed">
+    <div class="score-badge">{{ result.score }} / {{ result.total }}</div>
+    <p class="pct">{{ result.percentage }}%</p>
+    <p class="verdict">{{ result.passed ? '🎉 Pass — Well done!' : '📚 Not quite — keep practising!' }}</p>
+    <p class="time-info">Time used: {{ result.time_taken | number }} seconds</p>
+  </div>
+
+  <!-- Per-module breakdown -->
+  <div class="breakdown-card">
+    <h2>Results by Topic</h2>
+    <table>
+      <thead>
+        <tr><th>Topic</th><th>Score</th><th>Out of</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of result.breakdown">
+          <td>{{ row.label }}</td>
+          <td [class.good]="row.score >= row.total * 0.6" [class.weak]="row.score < row.total * 0.6">{{ row.score }}</td>
+          <td>{{ row.total }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Review toggle -->
+  <button class="btn-review-toggle" (click)="showReview = !showReview">
+    {{ showReview ? 'Hide Review' : 'Review All Answers' }}
+  </button>
+
+  <div class="review-list" *ngIf="showReview">
+    <div
+      *ngFor="let item of result.review"
+      class="review-item"
+      [class.correct]="item.is_correct"
+      [class.wrong]="!item.is_correct"
+    >
+      <p class="ri-num">Q{{ item.question_number }}</p>
+      <p class="ri-q">{{ item.question }}</p>
+
+      <div class="ri-options">
+        <span
+          *ngFor="let opt of optionLabels"
+          class="ri-opt"
+          [class.your-answer]="item.your_answer === opt && !item.is_correct"
+          [class.correct-answer]="opt === item.correct_option"
+        >
+          {{ opt }}) {{ item.options[opt] }}
+        </span>
+      </div>
+
+      <p class="ri-explanation" *ngIf="item.explanation">💡 {{ item.explanation }}</p>
+    </div>
+  </div>
+
+  <button class="btn-restart" (click)="restartExam()">Take Another Test</button>
+</section>

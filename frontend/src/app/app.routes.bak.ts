@@ -22,7 +22,7 @@ import { FMCComponent } from './components/fmc/fmc.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { ProgressComponent } from './progress/progress.component';
-import { AdminDashboardComponent } from './admin/admin-dashboard.component';
+import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 import { authGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { TestAdditionComponent } from './components/test-addition/test-addition.component';
@@ -61,7 +61,7 @@ export const routes: Routes = [
     path: 'my-account/:id',
     loadComponent: () => import('./components/my-account/my-account.component').then(m => m.MyAccountComponent)
   },
-    {path: 'admin', loadComponent: () => import('./admin/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    {path: 'admin', loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
     canActivate: [authGuard]
   },
 

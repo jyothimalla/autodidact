@@ -5,6 +5,12 @@
 
   <!-- MAIN QUIZ CONTENT -->
   <div class="quiz-main-card">
+    <app-paper-download></app-paper-download>
+    <div class="button-group">
+      <button (click)="printQuestions()" class="button print-button">🖨️ Print</button>
+      <button (click)="goBack()" class="button print-button">🔙 Go Back</button>
+    </div>
+    
     <div class="quiz-header">
       <h2 class="quiz-title fmc">
         FMC – Level {{ level }}
@@ -14,12 +20,14 @@
     <!-- Question Section -->
     <div *ngIf="questions[currentQIndex]" class="question-row">
       <div class="character-container" (click)="readQuestionAloud()">
-        <img src="assets/images/bird1.png" alt="Bird Reader" [class.animate]="isReading" />
+        <img src="assets/images/bird1.gif" alt="Bird Reader" [class.animate]="isReading" />
       </div>
       <div class="question-container">
         <p>
           {{ questions[currentQIndex]?.question }}
         </p>
+        <div class="button-group">
+
         <label>
           Your answer:
           <input
@@ -27,8 +35,14 @@
             [(ngModel)]="userAnswer"
             (keydown.enter)="submitAnswer()"
             placeholder="?" />
+          </label>
 
-        </label>
+
+          <button *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
+
+          <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
+        </div>
+
       </div>
     </div>
 
@@ -36,18 +50,35 @@
     <div class="feedback" *ngIf="feedbackMessage">
       <p>{{ feedbackMessage }}</p>
     </div>
-    <div class="button-group">
-      <button *ngIf="!quizCompleted" (click)="submitAnswer()">Submit</button>
-      <button (click)="goBack()">🔙 Go Back</button>
-
-      <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
-    </div>
-
+    
     <!-- Retry -->
     <div *ngIf="isFinished">
       <h3>You scored {{ score }}/{{ questions.length }}</h3>
       <button (click)="tryAgain()">Try Again</button>
       <button (click)="reviewAnswers()">Review Your Answers</button>
+    </div>
+    <div class="practice-done-box">
+      <div class="hover-options">
+        
+        <div class="hover-item" (click)="goToLearn()">
+          <img src="assets/images/greenPuzzle.png" class="puzzle-icon" />
+          <div class="hover-text">Not sure? Want to learn with example?</div>
+          <div class="example-box">
+            <p><strong>Example:</strong> 300 + 500 = 800</p>
+            <p>Arrange as:</p>
+            <pre>300\n+500</pre>
+          </div>
+        </div>
+    
+        <div class="hover-item" (click)="takeChallenge()">
+          <img src="assets/images/redPuzzle.png" class="puzzle-icon" />
+          <div class="hover-text">Ready? Try the challenge now!</div>
+          <div class="example-box">
+            <p>Challenge yourself with 5 random questions from this level.</p>
+          </div>
+        </div>
+    
+      </div>
     </div>
   </div>
 
