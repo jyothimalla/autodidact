@@ -6,7 +6,7 @@
   <div class="progress-wrap" aria-label="module progress">
     <div class="progress-bar" [style.width.%]="module.progress"></div>
   </div>
-  <p class="meta">{{ module.progress }}% complete &bull; {{ module.atoms.length }} topics</p>
+  <p class="meta">{{ module.progress }}% complete &bull; {{ (module.atoms?.length || 0) + (module.topics?.length || 0) }} topics</p>
 
   <span class="teacher-badge" *ngIf="isAdmin">Teacher</span>
 </a>

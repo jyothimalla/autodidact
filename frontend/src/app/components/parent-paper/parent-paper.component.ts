@@ -65,15 +65,21 @@ export class ParentPaperComponent {
   }
 
   downloadQuestionPaper(): void {
-    if (!this.paperId) return;
-    const name = `${this.paperModule}_${this.paperId}_id${this.paperDbId}_questions.pdf`;
-    this._downloadBlob(`${this.apiBase}/paper/custom/${this.paperId}/question-pdf`, name);
+    // Backward-compatible wrapper: now downloads combined PDF.
+    this.downloadCombinedPaper();
   }
 
   downloadAnswerSheet(): void {
+    // Backward-compatible wrapper: now downloads combined PDF.
+    this.downloadCombinedPaper();
+  }
+
+  downloadCombinedPaper(): void {
     if (!this.paperId) return;
-    const name = `${this.paperModule}_${this.paperId}_id${this.paperDbId}_answer_sheet.pdf`;
-    this._downloadBlob(`${this.apiBase}/paper/custom/${this.paperId}/answer-sheet-pdf`, name);
+    const studentName = this.auth.getCurrentUser()?.name || localStorage.getItem('username') || '';
+    const name = `${this.paperModule}_${this.paperId}_id${this.paperDbId}_combined.pdf`;
+    const url = `${this.apiBase}/paper/custom/${this.paperId}/combined-pdf?student_name=${encodeURIComponent(studentName)}`;
+    this._downloadBlob(url, name);
   }
 
   private _downloadBlob(url: string, filename: string): void {

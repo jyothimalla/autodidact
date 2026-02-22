@@ -12,16 +12,17 @@
         <button (click)="goToLearning()">📘 Learning</button>
         <button (click)="goToPractice()">📝 Practice</button>
         <button (click)="goToTest()">🎓 Test</button>
-        <button (click)="userAccount()">👤 My Account</button>
-        <button (click)="goToAnalytics()">📈 Analytics</button>
       </nav>
     </div>
     <div class="header-right" *ngIf="isLoggedIn" >
-      <span class="username">👋 Welcome, {{ username }} </span>
-
-
-      <!--<button (click)="userAccount()">My Account</button>-->
-      <button (click)="logout()">Logout</button>
+      <div class="user-menu">
+        <button class="user-menu-trigger" type="button">👋 Welcome, {{ username }}</button>
+        <div class="user-dropdown">
+          <button type="button" (click)="goToAnalytics()">📈 Analytics</button>
+          <button type="button" (click)="userAccount()">👤 My Account</button>
+          <button type="button" (click)="logout()">🚪 Logout</button>
+        </div>
+      </div>
     </div>
   </div>
 </header>

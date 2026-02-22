@@ -1,0 +1,164 @@
+<!-- ─── Submission Page ──────────────────────────────────────────────────── -->
+<div class="submit-page" *ngIf="!result">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Back to Practice</button>
+    <h1>Practice Paper</h1>
+    <p class="attempt-id">{{ numQuestions }} Questions</p>
+  </div>
+
+  <div class="submission-methods">
+    <div class="method-selector">
+      <button
+        class="method-btn"
+        [class.active]="submissionType === 'manual'"
+        (click)="submissionType = 'manual'">
+        ✍️ Answer Questions
+      </button>
+      <button
+        class="method-btn"
+        [class.active]="submissionType === 'upload'"
+        (click)="submissionType = 'upload'">
+        📷 Upload Answer Sheet
+      </button>
+    </div>
+
+    <!-- ─── Online Answer Section ──────────────────────────── -->
+    <div class="manual-entry" *ngIf="submissionType === 'manual'">
+      <div class="progress-bar" *ngIf="numQuestions > 0">
+        <div class="progress-fill" [style.width.%]="(answeredCount() / numQuestions) * 100"></div>
+      </div>
+      <p class="progress-text" *ngIf="numQuestions > 0">
+        {{ answeredCount() }} / {{ numQuestions }} answered
+      </p>
+
+      <!-- Questions with text (normal case) -->
+      <div class="question-list" *ngIf="questions.length > 0">
+        <div *ngFor="let q of questions; let i = index"
+             class="question-card"
+             [class.answered]="manualAnswers['q' + (i + 1)]">
+          <div class="question-header">
+            <span class="q-number">Q{{ i + 1 }}</span>
+            <span class="q-selected" *ngIf="manualAnswers['q' + (i + 1)]">
+              ✓ {{ manualAnswers['q' + (i + 1)] }}
+            </span>
+          </div>
+          <p class="question-text">{{ q.question }}</p>
+          <div class="options-list">
+            <button *ngFor="let key of getOptionKeys(q)"
+                    class="option-row-btn"
+                    [class.selected]="manualAnswers['q' + (i + 1)] === key"
+                    (click)="manualAnswers['q' + (i + 1)] = key">
+              <span class="opt-key">{{ key }}</span>
+              <span class="opt-text">{{ q.options[key] }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fallback: question numbers only (if questions not loaded) -->
+      <div class="answer-grid" *ngIf="questions.length === 0 && numQuestions > 0">
+        <div *ngFor="let qNum of getQuestionNumbers()" class="answer-item">
+          <label class="q-label">Q{{ qNum }}</label>
+          <div class="options">
+            <button
+              *ngFor="let opt of ['A', 'B', 'C', 'D']"
+              class="option-btn"
+              [class.selected]="manualAnswers['q' + qNum] === opt"
+              (click)="manualAnswers['q' + qNum] = opt">
+              {{ opt }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="btn-submit"
+        (click)="submitManually()"
+        [disabled]="submitting || answeredCount() === 0">
+        {{ submitting ? 'Submitting...' : 'Submit Answers (' + answeredCount() + '/' + numQuestions + ')' }}
+      </button>
+    </div>
+
+    <!-- ─── Upload Section ───────────────────────────────────── -->
+    <div class="upload-entry" *ngIf="submissionType === 'upload'">
+      <h2>Upload Your Answer Sheet</h2>
+      <p class="instruction">Take a photo or scan of your completed printed answer sheet</p>
+
+      <div class="upload-zone">
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          (change)="onFileSelected($event)"
+          #fileInput
+          hidden>
+        <div class="upload-icon">📄</div>
+        <button class="btn-choose-file" (click)="fileInput.click()">
+          Choose File
+        </button>
+        <p class="file-name" *ngIf="uploadFile">{{ uploadFile.name }}</p>
+        <p class="file-hint" *ngIf="!uploadFile">JPG, PNG or PDF</p>
+      </div>
+
+      <button
+        class="btn-submit"
+        (click)="submitViaUpload()"
+        [disabled]="!uploadFile || submitting">
+        {{ submitting ? 'Processing...' : 'Submit via OCR' }}
+      </button>
+
+      <div class="ocr-notice">
+        <strong>Note:</strong> Our system will automatically read your answers from the uploaded sheet.
+        Make sure your markings are clear and within the rectangles.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Results View ─────────────────────────────────────────────────────── -->
+<div class="results-view" *ngIf="result">
+  <div class="results-banner" [class.passed]="result.passed">
+    <h2>{{ result.passed ? '✅ Well Done!' : '📚 Keep Practicing!' }}</h2>
+    <div class="score-display">
+      <span class="score-large">{{ result.score }}</span>
+      <span class="divider">/</span>
+      <span class="total">{{ result.total }}</span>
+    </div>
+    <p class="percentage">{{ result.percentage }}%</p>
+  </div>
+
+  <div class="review-section">
+    <h3>Review Your Answers</h3>
+    <div *ngFor="let item of result.review; let i = index"
+         class="review-item"
+         [class.correct]="item.is_correct">
+
+      <div class="review-header" (click)="item.expanded = !item.expanded">
+        <div class="header-left">
+          <span class="q-num">Q{{ item.question_number }}</span>
+          <span class="status-icon">{{ item.is_correct ? '✓' : '✗' }}</span>
+        </div>
+        <span class="toggle">{{ item.expanded ? '▼' : '▶' }}</span>
+      </div>
+
+      <div class="review-body" *ngIf="item.expanded">
+        <p class="question">{{ item.question }}</p>
+        <div class="answer-info">
+          <div class="your-answer" [class.wrong]="!item.is_correct">
+            <strong>Your answer:</strong> {{ item.your_answer || 'Not answered' }}
+          </div>
+          <div class="correct-answer">
+            <strong>Correct answer:</strong> {{ item.correct_option }}) {{ item.correct_answer }}
+          </div>
+        </div>
+        <div class="explanation" *ngIf="item.explanation">
+          <h4>💡 Explanation</h4>
+          <p>{{ item.explanation }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-actions">
+    <button class="btn-back-to-learning" (click)="goBack()">Back to Practice</button>
+  </div>
+</div>

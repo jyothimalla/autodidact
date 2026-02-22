@@ -23,6 +23,7 @@ app = FastAPI()
 class RegisterRequest(BaseModel):
     username: str
     email: EmailStr
+    year: str | None = None
     password: str
     confirm_password: str
 
@@ -56,6 +57,7 @@ def register_user(credentials: RegisterRequest, db: Session = Depends(get_db)):
     new_user = User(
         username=credentials.username,
         email=credentials.email,
+        year=credentials.year,
         password=hashed_password,
         is_active=True,
         is_admin=False,
@@ -116,7 +118,8 @@ def get_profile(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return {
         "username": user.username,  
-        "email": user.email
+        "email": user.email,
+        "year": user.year
     }
 
 
@@ -137,6 +140,7 @@ def update_profile(user_id: int, updated_data: RegisterRequest, db: Session = De
 
     user.username = updated_data.username
     user.email = updated_data.email
+    user.year = updated_data.year
     user.password = bcrypt.hash(updated_data.password)
 
     db.commit()
@@ -166,6 +170,7 @@ def get_me(current_user: User = Depends(get_current_user_from_token)):
     return {
         "user_id": current_user.id,
         "username": current_user.username,
+        "year": current_user.year,
         "awarded_title": current_user.awarded_title,
         "ninja_stars": current_user.ninja_stars,
         "progress": current_user.progress

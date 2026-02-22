@@ -21,7 +21,9 @@ header {
       width: 70px;
       height: 70px;
       object-fit: contain;
-      mix-blend-mode: multiply;
+      background: white;
+      border-radius: 8px;
+      padding: 4px;
     }
 
     .brand-name {
@@ -57,8 +59,6 @@ header {
   button:nth-child(1) { background: #ff7043; color: #fff; }   // 📘 Learning  — orange
   button:nth-child(2) { background: #00897b; color: #fff; }   // 📝 Practice  — teal
   button:nth-child(3) { background: #8e24aa; color: #fff; }   // 🎓 Test      — purple
-  button:nth-child(4) { background: #f9a825; color: #1a1a1a; }// 👤 My Account — amber
-  button:nth-child(5) { background: #1e88e5; color: #fff; }   // 📈 Analytics — blue
 }
 
 // ─── Right side ────────────────────────────────────────────────────────────────
@@ -66,24 +66,75 @@ header {
   display: flex;
   align-items: center;
   gap: 12px;
+}
 
-  .username {
-    font-weight: 600;
+.user-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-bottom: 8px;
+  margin-bottom: -8px;
+
+.user-menu-trigger {
+    background: rgba(255,255,255,0.15);
     color: #e3f2fd;
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 600;
     font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255,255,255,0.28);
+    }
   }
 
-  button {
-    background: rgba(255,255,255,0.15);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 8px;
-    padding: 7px 16px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: background 0.2s;
-    &:hover { background: rgba(255,255,255,0.28); }
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 190px;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #d6deeb;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    padding: 6px;
+    z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+
+    button {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      color: #1f2a44;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+
+      &:hover {
+        background: #eef4ff;
+      }
+    }
+  }
+
+  &:hover .user-dropdown,
+  &:focus-within .user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
   }
 }
 
@@ -97,4 +148,9 @@ header {
   .nav-menu { justify-content: center; gap: 0.4rem; }
   .header-right { justify-content: center; }
   .logo { width: 48px !important; height: 48px !important; }
+  .user-menu .user-dropdown {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }

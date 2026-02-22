@@ -2,9 +2,13 @@
      WELCOME SCREEN
 ════════════════════════════════════════════════════════════════════ -->
 <section class="mock-test-page" *ngIf="state === 'welcome'">
+
+  <button class="btn-page-back" (click)="router.navigate(['/'])">← Back to Home</button>
+
+  <!-- Generate New Test Card -->
   <div class="welcome-card">
     <div class="welcome-icon">🎓</div>
-    <h1>Grammar School Entrance Mock Test</h1>
+    <h1>Generate New Mock Test</h1>
     <p class="subtitle">Mathematics — All Topics</p>
 
     <ul class="rules">
@@ -15,10 +19,76 @@
       <li>🚫 The exam is auto-submitted when time runs out</li>
     </ul>
 
+    <div class="exam-style-picker">
+      <span class="picker-label">Paper Style:</span>
+      <button class="style-btn" [class.active]="examStyle === 'standard'" (click)="examStyle = 'standard'">Standard</button>
+      <button class="style-btn" [class.active]="examStyle === 'cem'" (click)="examStyle = 'cem'">CEM Blueprint</button>
+      <button class="style-btn" [class.active]="examStyle === 'english'" (click)="examStyle = 'english'">English Entrance</button>
+    </div>
+
+    <div class="exam-style-picker">
+      <span class="picker-label">Target Year:</span>
+      <button class="style-btn" [class.active]="targetYear === 'year4'" (click)="targetYear = 'year4'">Year 4</button>
+      <button class="style-btn" [class.active]="targetYear === 'year5'" (click)="targetYear = 'year5'">Year 5</button>
+    </div>
+
     <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-    <button class="btn-start" (click)="startExam()">Begin Exam</button>
+    <button class="btn-start" (click)="startExam()">Generate New Test</button>
   </div>
+<hr class="section-divider">
+
+  <!-- My Generated Tests -->
+  <div class="generated-section" *ngIf="myGeneratedTests.length > 0">
+    <h2>My Generated Tests</h2>
+    <div class="papers-list">
+      <div *ngFor="let test of myGeneratedTests; let i = index" class="paper-row">
+        <div class="paper-row-info">
+          <span class="paper-number">{{ i + 1 }}</span>
+          <div class="paper-details">
+            <h3>Mock Test</h3>
+            <span class="paper-meta">{{ test.test_id }} | Created {{ test.created_at | date:'short' }}</span>
+          </div>
+        </div>
+        <div class="paper-row-actions">
+          <button class="btn-attempt-online" (click)="testId = test.test_id; attemptOnline()">
+            Attempt Online
+          </button>
+          <button class="btn-download-pdf" (click)="testId = test.test_id; downloadBothPDFs()">
+            Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr class="section-divider">
+
+  <!-- Practice Papers List -->
+  <div class="practice-section">
+    <h2>Practice Papers</h2>
+    <p>Start with these practice papers before generating your own test</p>
+    <div class="papers-list">
+      <div *ngFor="let paper of practiceTests; let i = index" class="paper-row">
+        <div class="paper-row-info">
+          <span class="paper-number">{{ i + 1 }}</span>
+          <div class="paper-details">
+            <h3>{{ paper.title }}</h3>
+            <span class="paper-meta">50 Questions | Mixed Difficulty | 60 Minutes</span>
+          </div>
+        </div>
+        <div class="paper-row-actions">
+          <button class="btn-attempt-online" (click)="selectPracticeTest(paper.paper_number, 'online')">
+            Attempt Online
+          </button>
+          <button class="btn-download-pdf" (click)="selectPracticeTest(paper.paper_number, 'download'); $event.stopPropagation()">
+            Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════
@@ -30,12 +100,149 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════
+     TEST READY - Choose Mode
+════════════════════════════════════════════════════════════════════ -->
+<section class="test-ready-page" *ngIf="state === 'test-ready'">
+  <button class="btn-page-back" (click)="state = 'welcome'">← Back to Tests</button>
+  <h2>✅ Test Generated Successfully!</h2>
+  <p class="test-id">Test ID: <code>{{ testId }}</code></p>
+
+  <div class="section-summary" *ngIf="sectionSummary.length > 0">
+    <h3>Recommended Section Timing</h3>
+    <div class="summary-row" *ngFor="let s of sectionSummary">
+      <span>{{ s.section_name }}</span>
+      <span>{{ s.num_questions }} Q</span>
+      <span>{{ s.suggested_minutes }} min</span>
+    </div>
+  </div>
+
+  <div class="section-summary">
+    <h3>{{ styleInstructionTitle }}</h3>
+    <div class="summary-row" *ngFor="let line of styleInstructions; let i = index">
+      <span>{{ i + 1 }}.</span>
+      <span style="grid-column: span 2;">{{ line }}</span>
+    </div>
+  </div>
+
+  <div class="mode-buttons">
+    <button class="btn-mode online" (click)="attemptOnline()">
+      <span class="icon">💻</span>
+      <span>Attempt Online</span>
+    </button>
+    <button class="btn-mode download" (click)="downloadBothPDFs()">
+      <span class="icon">📥</span>
+      <span>Download PDF + Answer Sheet</span>
+    </button>
+  </div>
+
+  <div class="submission-info">
+    <h3>After completing the downloaded test, submit answers using:</h3>
+    <p>Scan the QR code on the answer sheet to access the submission page</p>
+    <button class="btn-submission-page" (click)="state = 'submission'; loadSubmissionQuestions()">Or Go to Submission Page Now</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SUBMISSION PAGE (accessed via QR or direct link)
+════════════════════════════════════════════════════════════════════ -->
+<section class="submission-page" *ngIf="state === 'submission'">
+  <button class="btn-page-back" (click)="state = 'welcome'">← Back to Tests</button>
+  <h2>Submit Answers for Test <code>{{ testId }}</code></h2>
+
+  <!-- Upload Section -->
+  <div class="upload-section">
+    <h3>📤 Upload Answer Sheet</h3>
+    <p class="upload-hint">Upload a photo or scan of your completed bubble sheet</p>
+    <div class="upload-controls">
+      <input type="file"
+             accept="image/*,application/pdf"
+             (change)="onFileSelected($event)"
+             #fileInput
+             hidden>
+      <button (click)="fileInput.click()" class="btn-file-select">Choose File</button>
+      <span *ngIf="uploadFile" class="file-selected">{{ uploadFile.name }}</span>
+      <button *ngIf="uploadFile"
+              class="btn-submit-upload"
+              (click)="submitUploadedAnswers()">
+        Submit via OCR
+      </button>
+    </div>
+  </div>
+
+  <div class="divider-or"><span>OR</span></div>
+
+  <!-- Manual Answer Entry with Questions -->
+  <div class="manual-section">
+    <h3>Select Your Answers</h3>
+    <p class="manual-hint">Click on your chosen answer for each question. Leave as "Unanswered" if you didn't attempt it.</p>
+
+    <div *ngIf="loadingSubmissionQuestions" class="loading-msg">Loading questions...</div>
+
+    <div class="manual-questions-list" *ngIf="submissionQuestions.length > 0">
+      <div *ngFor="let q of submissionQuestions; let i = index" class="manual-q-card">
+        <div class="manual-q-header">
+          <span class="manual-q-num">Q{{ q.question_number }}</span>
+          <span class="manual-q-text">{{ q.question }}</span>
+        </div>
+        <div class="manual-options">
+          <button *ngFor="let opt of optionLabels"
+                  class="manual-opt-btn"
+                  [class.selected]="manualAnswers[q.question_id] === opt"
+                  (click)="selectManualAnswer(q.question_id, opt)">
+            <span class="opt-letter">{{ opt }}</span>
+            <span class="opt-text">{{ q.options[opt] }}</span>
+          </button>
+          <button class="manual-opt-btn unanswered"
+                  [class.selected]="explicitlyUnanswered.has(q.question_id)"
+                  (click)="selectManualAnswer(q.question_id, '')">
+            <span class="opt-letter">—</span>
+            <span class="opt-text">Unanswered</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fallback if questions couldn't load -->
+    <div *ngIf="!loadingSubmissionQuestions && submissionQuestions.length === 0" class="fallback-grid">
+      <p>Could not load questions. Enter answers manually:</p>
+      <div class="answer-grid">
+        <div *ngFor="let q of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]"
+             class="answer-input">
+          <label>Q{{ q }}:</label>
+          <select [(ngModel)]="manualAnswers['q' + q]">
+            <option value="">Unanswered</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary and Submit -->
+    <div class="submission-summary" *ngIf="submissionQuestions.length > 0">
+      <p class="answered-count">
+        Answered: {{ getManualAnsweredCount() }} / {{ submissionQuestions.length }}
+      </p>
+      <button class="btn-submit-answers" (click)="submitManualAnswers()">
+        Submit Answers
+      </button>
+    </div>
+  </div>
+
+  <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <button class="btn-back" (click)="state = 'welcome'">← Back to Home</button>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
      EXAM SCREEN
 ════════════════════════════════════════════════════════════════════ -->
 <section class="exam-page" *ngIf="state === 'exam'">
 
   <!-- Top bar -->
   <div class="exam-topbar">
+    <button class="btn-exit-exam" (click)="goBackFromExam()">← Exit Test</button>
     <span class="exam-title">Grammar School Mock Test</span>
     <span class="q-counter">Question {{ currentIndex + 1 }} of {{ questions.length }}</span>
     <span class="timer" [class]="timerClass">⏱ {{ timerDisplay }}</span>
@@ -65,6 +272,48 @@
         <button class="btn-nav skip" (click)="next()" [disabled]="currentIndex === questions.length - 1">Skip</button>
         <button class="btn-nav" (click)="next()" [disabled]="currentIndex === questions.length - 1">Next →</button>
       </div>
+
+      <div class="question-help">
+        <h3>Question Help</h3>
+        <div class="help-cards">
+          <button class="help-card video" type="button" (click)="openHelpVideo()">
+            <span class="help-mascot">👾</span>
+            <span class="help-title">Watch Video</span>
+            <span class="help-text">Animated walkthrough for {{ moduleLabelForHelp }}</span>
+          </button>
+
+          <button class="help-card notes" type="button" (click)="toggleHelpSheet()">
+            <span class="help-mascot">📘</span>
+            <span class="help-title">Read Helpsheet</span>
+            <span class="help-text">See concept + 2 examples + summary</span>
+          </button>
+
+          <button class="help-card skip" type="button" (click)="openSkipHint()">
+            <span class="help-mascot">⏭️</span>
+            <span class="help-title">Still Stuck?</span>
+            <span class="help-text">Skip to answer explanation</span>
+          </button>
+        </div>
+
+        <div class="helpsheet-panel" *ngIf="showHelpSheet">
+          <h4>{{ moduleLabelForHelp }} - Quick Helpsheet</h4>
+          <p>{{ helpSheetIntro }}</p>
+          <div class="helpsheet-grid">
+            <article class="hs-item">
+              <h5>Example 1</h5>
+              <p>Identify what the question asks, remove impossible options, then solve step by step.</p>
+            </article>
+            <article class="hs-item">
+              <h5>Example 2</h5>
+              <p>Check your result against options and units. If close answers exist, recheck the final step.</p>
+            </article>
+            <article class="hs-item summary">
+              <h5>Summary</h5>
+              <p>Work calmly: understand, eliminate, solve, verify.</p>
+            </article>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Question grid -->
@@ -82,64 +331,102 @@
   </div>
 </section>
 
+<section class="hint-overlay" *ngIf="hintOverlayOpen && state === 'exam'">
+  <div class="hint-modal">
+    <h3>Skip to Answer Explanation</h3>
+    <p>You can skip this question now. This is a support action for learning mode.</p>
+    <div class="hint-answer" *ngIf="currentQuestion?.correct_option && currentQuestion?.correct_answer">
+      <strong>Answer:</strong> {{ currentQuestion.correct_option }}) {{ currentQuestion.correct_answer }}
+    </div>
+    <div class="hint-expl" *ngIf="currentQuestion?.explanation">
+      <strong>Why:</strong> {{ currentQuestion.explanation }}
+    </div>
+    <div class="hint-actions">
+      <button type="button" class="hint-btn ghost" (click)="closeSkipHint()">Go Back</button>
+      <button type="button" class="hint-btn primary" (click)="skipToExplanationAndNext()">Skip This Question</button>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════════════════════════════════════════════════════════════
      RESULTS SCREEN
 ════════════════════════════════════════════════════════════════════ -->
 <section class="results-page" *ngIf="state === 'submitted' && result">
+  <button class="btn-page-back" (click)="restartExam()">← Back to Tests</button>
 
-  <div class="score-card" [class.passed]="result.passed" [class.failed]="!result.passed">
-    <div class="score-badge">{{ result.score }} / {{ result.total }}</div>
-    <p class="pct">{{ result.percentage }}%</p>
-    <p class="verdict">{{ result.passed ? '🎉 Pass — Well done!' : '📚 Not quite — keep practising!' }}</p>
-    <p class="time-info">Time used: {{ result.time_taken | number }} seconds</p>
+  <!-- Total Marks Banner -->
+  <div class="total-marks-banner" [class.passed]="result.passed" [class.failed]="!result.passed">
+    <div class="score-display">
+      <h1>{{ result.score }} <span class="divider">/</span> {{ result.total }}</h1>
+      <p class="percentage">{{ result.percentage }}%</p>
+    </div>
+    <p class="verdict">{{ result.passed ? '✅ Pass - Well done!' : '❌ Not quite - keep practising!' }}</p>
+    <p class="time-info">Time: {{ result.time_taken | number }}s</p>
   </div>
 
-  <!-- Per-module breakdown -->
+  <!-- Module Breakdown -->
   <div class="breakdown-card">
     <h2>Results by Topic</h2>
-    <table>
+    <table class="breakdown-table">
       <thead>
-        <tr><th>Topic</th><th>Score</th><th>Out of</th></tr>
+        <tr>
+          <th>Topic</th>
+          <th>Score</th>
+          <th>Out of</th>
+          <th>Percentage</th>
+        </tr>
       </thead>
       <tbody>
         <tr *ngFor="let row of result.breakdown">
           <td>{{ row.label }}</td>
-          <td [class.good]="row.score >= row.total * 0.6" [class.weak]="row.score < row.total * 0.6">{{ row.score }}</td>
+          <td [class.good]="row.score/row.total >= 0.6">{{ row.score }}</td>
           <td>{{ row.total }}</td>
+          <td>{{ ((row.score/row.total)*100).toFixed(0) }}%</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Review toggle -->
-  <button class="btn-review-toggle" (click)="showReview = !showReview">
-    {{ showReview ? 'Hide Review' : 'Review All Answers' }}
-  </button>
+  <!-- Question Review with Expandable Explanations -->
+  <div class="review-section">
+    <h2>Question Review</h2>
+    <div *ngFor="let item of result.review; let i = index"
+         class="review-item"
+         [class.correct]="item.is_correct"
+         [class.wrong]="!item.is_correct">
 
-  <div class="review-list" *ngIf="showReview">
-    <div
-      *ngFor="let item of result.review"
-      class="review-item"
-      [class.correct]="item.is_correct"
-      [class.wrong]="!item.is_correct"
-    >
-      <p class="ri-num">Q{{ item.question_number }}</p>
-      <p class="ri-q">{{ item.question }}</p>
-
-      <div class="ri-options">
-        <span
-          *ngFor="let opt of optionLabels"
-          class="ri-opt"
-          [class.your-answer]="item.your_answer === opt && !item.is_correct"
-          [class.correct-answer]="opt === item.correct_option"
-        >
-          {{ opt }}) {{ item.options[opt] }}
-        </span>
+      <!-- Question Header (clickable) -->
+      <div class="review-header" (click)="item.expanded = !item.expanded">
+        <div class="header-left">
+          <span class="q-num">Q{{ item.question_number }}</span>
+          <span class="status-icon">{{ item.is_correct ? '✓' : '✗' }}</span>
+        </div>
+        <span class="toggle-icon">{{ item.expanded ? '▼' : '▶' }}</span>
       </div>
 
-      <p class="ri-explanation" *ngIf="item.explanation">💡 {{ item.explanation }}</p>
+      <!-- Question Text -->
+      <div class="question-text">{{ item.question }}</div>
+
+      <!-- Answer (Always Visible) -->
+      <div class="answer-display">
+        <div *ngIf="!item.is_correct" class="your-answer wrong">
+          <strong>Your answer:</strong> {{ item.your_answer || 'Not answered' }}
+        </div>
+        <div class="correct-answer">
+          <strong>Correct answer:</strong> {{ item.correct_option }}) {{ item.correct_answer }}
+        </div>
+      </div>
+
+      <!-- Explanation (Expandable) -->
+      <div class="explanation-section" *ngIf="item.expanded && item.explanation">
+        <h4>💡 Explanation</h4>
+        <p>{{ item.explanation }}</p>
+      </div>
     </div>
   </div>
 
-  <button class="btn-restart" (click)="restartExam()">Take Another Test</button>
+  <div class="action-buttons">
+    <button class="btn-restart" (click)="restartExam()">Take Another Test</button>
+    <button class="btn-home" (click)="router.navigate(['/'])">Back to Home</button>
+  </div>
 </section>

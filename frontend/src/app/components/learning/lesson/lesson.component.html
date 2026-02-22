@@ -1,49 +1,392 @@
-<section class="lesson-page" *ngIf="module && subskill">
-  <a class="back-link" [routerLink]="['/learning', module.id]">Back to {{ module.name }}</a>
-
-  <header>
-    <h1>{{ subskill.name }}</h1>
-    <p>Level {{ subskill.level }} lesson</p>
-  </header>
-
-  <div class="video-box" *ngIf="safeVideoUrl">
-    <iframe
-      [src]="safeVideoUrl"
-      width="800"
-      height="450"
-      title="Lesson video"
-      frameborder="0"
-      allowfullscreen
-    ></iframe>
+<section class="lesson-page" *ngIf="currentLevel">
+  <!-- Header -->
+  <div class="lesson-header">
+    <button class="btn-back" (click)="goBack()">
+      {{ getBackButtonLabel() }}
+    </button>
+    <div class="lesson-title">
+      <h1>{{ topic?.name || currentLevel.name }}</h1>
+      <div class="level-badge">Level {{ currentLevel.level }}</div>
+    </div>
+    <p class="summary">{{ currentLevel.summary }}</p>
   </div>
 
-  <p class="summary">{{ subskill.summary }}</p>
+  <!-- Video & Notes View -->
+  <div class="lesson-content" *ngIf="viewState === 'video'">
+    <!-- Video Section -->
+    <div class="video-section">
+      <h2>📺 Watch the Lesson</h2>
+      <div class="video-container">
+        <iframe
+          *ngIf="safeVideoUrl"
+          [src]="safeVideoUrl"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
 
-  <div class="actions">
-    <button type="button" class="practice" (click)="startPractice()">Practice (5 questions)</button>
-    <button type="button" class="challenge" (click)="startChallenge()">Challenge (10 timed)</button>
+    <!-- Notes Section -->
+    <div class="notes-section">
+      <h2>📝 Study Notes</h2>
+
+      <div class="note-card lesson-goal">
+        <h3>📘 Simple Definition</h3>
+        <p>{{ getSimpleDefinition() }}</p>
+      </div>
+
+      <div class="note-card concept">
+        <h3>🌍 Where We Use This in Real Life</h3>
+        <ul>
+          <li *ngFor="let use of getRealLifeUses()">{{ use }}</li>
+        </ul>
+      </div>
+
+      <div class="note-card method">
+        <h3>🧠 Full Explanation</h3>
+        <p>{{ currentLevel.teachingNotes }}</p>
+      </div>
+
+      <div class="note-card method" *ngIf="getRegularStrategies().length > 0">
+        <h3>🧭 How to Solve (Step-by-Step)</h3>
+        <ol>
+          <li *ngFor="let strategy of getRegularStrategies()">{{ strategy }}</li>
+        </ol>
+      </div>
+
+      <div class="note-card concept">
+        <h3>✍️ Worked Examples</h3>
+        <ul>
+          <li *ngFor="let ex of getWorkedExamples()">{{ ex }}</li>
+        </ul>
+      </div>
+
+      <div class="note-card visuals" *ngIf="module?.id === 'binary-number-system'">
+        <h3>🎨 Binary Helpsheet</h3>
+        <p class="helpsheet-tip">Use ◀ ▶ to move through concept, examples, and summary.</p>
+
+        <div class="helpsheet-controls">
+          <button type="button" class="hs-btn" (click)="scrollHelpSheet(helpScroller, 'left')">◀</button>
+          <button type="button" class="hs-btn" (click)="scrollHelpSheet(helpScroller, 'right')">▶</button>
+        </div>
+
+        <div class="helpsheet-scroller" #helpScroller>
+          <article class="hs-card hs-concept">
+            <h4>Key Words</h4>
+            <p><strong>Bit</strong>: one binary digit (0 or 1)</p>
+            <p><strong>Nibble</strong>: 4 bits</p>
+            <p><strong>Byte</strong>: 8 bits</p>
+            <p><strong>Denary</strong>: normal base-10 numbers</p>
+            <p><strong>Hexadecimal</strong>: base-16 (0-9, A-F)</p>
+            <p><strong>Place Value</strong>: value of each position in a number</p>
+          </article>
+
+          <article class="hs-card hs-concept">
+            <h4>Number Conversions</h4>
+            <p>Binary place values:</p>
+            <div class="bits-row">
+              <span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span>
+            </div>
+            <p><strong>Binary to denary:</strong> add columns where bit = 1.</p>
+            <p><strong>Denary to binary:</strong> fit place values from left to right.</p>
+            <p><strong>Binary to hex:</strong> split into nibbles (4 bits).</p>
+            <p><strong>Hex to binary:</strong> convert each hex digit to 4 bits.</p>
+          </article>
+
+          <article class="hs-card hs-example">
+            <h4>Example 1: Binary → Denary → Hex</h4>
+            <p class="code-line">01001101₂</p>
+            <p>Denary: 64 + 8 + 4 + 1 = <strong>77</strong></p>
+            <p>Hex: 0100 1101 → 4 and 13(D) = <strong>4D</strong></p>
+          </article>
+
+          <article class="hs-card hs-example">
+            <h4>Example 2: Binary Addition</h4>
+            <pre class="mini-diagram">  0100
++ 0101
+------
+  1001</pre>
+            <p>Answer is <strong>1001</strong> (denary 9).</p>
+            <p>Rules: 0+0=0, 0+1=1, 1+1=10, 1+1+1=11.</p>
+            <p>Remember: 1 + 1 = 10 (write 0, carry 1).</p>
+          </article>
+
+          <article class="hs-card hs-example">
+            <h4>Denary to Hex Mini Challenge</h4>
+            <p>Convert <strong>167</strong> to hex using ÷16 method:</p>
+            <p>167 ÷ 16 = 10 remainder 7</p>
+            <p>10 in hex is <strong>A</strong>, so answer is <strong>A7</strong>.</p>
+            <p class="code-line">167₁₀ = A7₁₆</p>
+          </article>
+
+          <article class="hs-card hs-summary">
+            <h4>Summary</h4>
+            <ul>
+              <li>Use place values to convert binary and denary.</li>
+              <li>Group binary into 4 bits for fast hex conversion.</li>
+              <li>In binary addition, always work right to left and carry correctly.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+
+      <div class="note-card mistakes">
+        <h3>⚠️ Common Mistakes to Avoid</h3>
+        <ul>
+          <li *ngFor="let mistake of currentLevel.commonMistakes">{{ mistake }}</li>
+        </ul>
+      </div>
+
+      <div class="note-card references" *ngIf="getTaggedNotes().length > 0">
+        <h3>📚 References and Extra Help</h3>
+        <ul *ngIf="getReferenceNotes().length > 0">
+          <li *ngFor="let note of getReferenceNotes()">{{ note }}</li>
+        </ul>
+        <ul *ngIf="getOnlineNotes().length > 0">
+          <li *ngFor="let note of getOnlineNotes()">{{ note }}</li>
+        </ul>
+        <div class="mini-notes" *ngIf="getQuickNotes().length > 0">
+          <span class="mini-note" *ngFor="let note of getQuickNotes()">{{ note }}</span>
+        </div>
+      </div>
+
+      <div class="note-card prerequisites">
+        <h3>✅ Summary</h3>
+        <ul>
+          <li *ngFor="let point of getLessonSummary()">{{ point }}</li>
+        </ul>
+        <h4>Checkpoint</h4>
+        <p><strong>Success criteria:</strong> {{ currentLevel.assessmentCriteria }}</p>
+        <h4 *ngIf="currentLevel.prerequisites.length > 0">Prerequisites</h4>
+        <ul *ngIf="currentLevel.prerequisites.length > 0">
+          <li *ngFor="let prereq of currentLevel.prerequisites">{{ prereq }}</li>
+        </ul>
+      </div>
+
+      <div class="note-card mini-task">
+        <h3>📝 Mini Task (Try Before Practice)</h3>
+        <p>Complete these quickly to check your understanding:</p>
+        <ol>
+          <li *ngFor="let task of getMiniTask()">{{ task }}</li>
+        </ol>
+        <p><strong>Next:</strong> Click <em>Practice Test</em> below and check your score.</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn-notes-pdf" (click)="downloadNotes()" *ngIf="currentLevel.notesTopicId">
+        <span class="btn-icon">📄</span>
+        <span>Download Notes PDF</span>
+      </button>
+
+      <button class="btn-practice" (click)="startAttempt('practice')">
+        <span class="btn-icon">✏️</span>
+        <span>Practice Test (5 Questions)</span>
+      </button>
+
+      <button class="btn-challenge" (click)="startAttempt('challenge')">
+        <span class="btn-icon">🎯</span>
+        <span>Challenge (10 Questions)</span>
+      </button>
+
+      <button class="btn-history" (click)="showHistory()" *ngIf="attemptHistory.length > 0">
+        <span class="btn-icon">📊</span>
+        <span>View History ({{ attemptHistory.length }} attempts)</span>
+      </button>
+    </div>
+
+    <!-- Attempt History Preview -->
+    <div class="history-preview" *ngIf="attemptHistory.length > 0">
+      <h3>Recent Attempts</h3>
+      <div class="history-grid">
+        <div *ngFor="let attempt of attemptHistory.slice(0, 3)" class="history-card">
+          <div class="history-header">
+            <span class="attempt-type">{{ attempt.attempt_type === 'practice' ? '✏️ Practice' : '🎯 Challenge' }}</span>
+            <span class="attempt-date">{{ attempt.created_at | date:'short' }}</span>
+          </div>
+          <div class="history-score" *ngIf="attempt.score !== null">
+            <span class="score">{{ attempt.score }}/{{ attempt.total }}</span>
+            <span class="percentage" [class.passed]="attempt.percentage >= 60">{{ attempt.percentage }}%</span>
+          </div>
+          <div class="history-status" *ngIf="attempt.score === null">
+            <span class="pending">Pending submission</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <section class="teacher-panel" *ngIf="isAdmin">
-    <h2>Teacher Notes</h2>
-    <p>{{ subskill!.teachingNotes }}</p>
+  <!-- Mode Selection View -->
+  <div class="mode-select-view" *ngIf="viewState === 'mode-select'">
+    <h2>{{ selectedAttemptType === 'practice' ? '✏️ Practice Test - 5 Questions' : '🎯 Challenge - 10 Questions' }}</h2>
+    <p class="instruction">Choose how you'd like to attempt this:</p>
 
-    <h3>Common Mistakes</h3>
-    <ul>
-      <li *ngFor="let m of subskill!.commonMistakes">{{ m }}</li>
-    </ul>
+    <div class="mode-options">
+      <div class="mode-card" (click)="selectMode('online')">
+        <div class="mode-icon">💻</div>
+        <h3>Attempt Online</h3>
+        <p>Answer questions directly on screen with instant feedback</p>
+        <button class="btn-select">Start Now</button>
+      </div>
 
-    <h3>Teaching Strategies</h3>
-    <ul>
-      <li *ngFor="let s of subskill!.teachingStrategies">{{ s }}</li>
-    </ul>
+      <div class="mode-card" (click)="selectMode('download')">
+        <div class="mode-icon">📥</div>
+        <h3>Download to Attempt on Paper</h3>
+        <p>Print questions and answer sheet with QR code for submission</p>
+        <button class="btn-select">Download PDFs</button>
+      </div>
+    </div>
 
-    <h3>Prerequisites</h3>
-    <p>{{ subskill!.prerequisites.join(', ') }}</p>
+    <button class="btn-cancel" (click)="restartLesson()">Cancel</button>
+  </div>
 
-    <h3>Assessment Criteria</h3>
-    <p>{{ subskill!.assessmentCriteria }}</p>
+  <!-- Online Quiz View -->
+  <div class="online-quiz-view" *ngIf="viewState === 'online-quiz' && questions.length > 0">
+    <div class="quiz-progress">
+      <span>Question {{ currentQuestionIndex + 1 }} of {{ questions.length }}</span>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="((currentQuestionIndex + 1) / questions.length) * 100"></div>
+      </div>
+    </div>
 
-    <p class="meta">Estimated lesson time: {{ subskill!.estimatedMinutes }} minutes</p>
-  </section>
+    <div class="question-card">
+      <h3 class="question-text">{{ questions[currentQuestionIndex].question }}</h3>
+
+      <div class="options-list">
+        <div
+          *ngFor="let opt of ['A', 'B', 'C', 'D']"
+          class="option-item"
+          [class.selected]="answers['q' + questions[currentQuestionIndex].question_number] === opt"
+          (click)="selectAnswer(opt)">
+          <span class="option-label">{{ opt }}</span>
+          <span class="option-text">{{ questions[currentQuestionIndex].options[opt] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-navigation">
+      <button class="btn-nav" (click)="prevQuestion()" [disabled]="currentQuestionIndex === 0">
+        ← Previous
+      </button>
+
+      <button class="btn-nav" (click)="nextQuestion()" *ngIf="currentQuestionIndex < questions.length - 1">
+        Next →
+      </button>
+
+      <button class="btn-submit" (click)="submitQuiz()" *ngIf="currentQuestionIndex === questions.length - 1">
+        Submit Answers
+      </button>
+    </div>
+  </div>
+
+  <!-- Results View -->
+  <div class="results-view" *ngIf="viewState === 'results' && result">
+    <div class="results-banner" [class.passed]="result.passed">
+      <h2>{{ result.passed ? '✅ Well Done!' : '📚 Keep Practicing!' }}</h2>
+      <div class="score-display">
+        <span class="score-large">{{ result.score }}</span>
+        <span class="divider">/</span>
+        <span class="total">{{ result.total }}</span>
+      </div>
+      <p class="percentage">{{ result.percentage }}%</p>
+    </div>
+
+    <div class="review-section">
+      <h3>Review Your Answers</h3>
+      <div *ngFor="let item of result.review; let i = index"
+           class="review-card"
+           [class.review-card--correct]="item.is_correct"
+           [class.review-card--wrong]="!item.is_correct">
+
+        <!-- Question header -->
+        <div class="rc-header">
+          <span class="rc-qnum">{{ item.question_number }}.</span>
+          <span class="rc-question">{{ item.question }}</span>
+          <span class="rc-badge" [class.rc-badge--correct]="item.is_correct" [class.rc-badge--wrong]="!item.is_correct">
+            {{ item.is_correct ? '✓ Correct' : '✗ Incorrect' }}
+          </span>
+        </div>
+
+        <!-- Options row (always visible for wrong answers, compact for correct) -->
+        <div class="rc-options-wrap">
+          <p class="rc-correct-label" *ngIf="!item.is_correct">The correct answer is:</p>
+          <div class="rc-options">
+            <div *ngFor="let opt of ['A','B','C','D']"
+                 class="rc-opt"
+                 [class.rc-opt--chosen-wrong]="!item.is_correct && item.your_answer === opt"
+                 [class.rc-opt--correct]="opt === item.correct_option"
+                 [class.rc-opt--neutral]="opt !== item.correct_option && item.your_answer !== opt">
+              <span class="rc-opt-label">{{ opt }}</span>
+              <span class="rc-opt-text">{{ item.options[opt] }}</span>
+              <span class="rc-opt-icon" *ngIf="!item.is_correct && item.your_answer === opt">✗</span>
+              <span class="rc-opt-icon rc-opt-icon--tick" *ngIf="opt === item.correct_option">✓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explanation (only for wrong answers) -->
+        <div class="rc-explanation" *ngIf="!item.is_correct && item.explanation">
+          <h4>Answer Explanation</h4>
+          <ul>
+            <li *ngFor="let step of getExplanationSteps(item.explanation)">{{ step }}</li>
+          </ul>
+        </div>
+
+        <!-- Watch Video footer -->
+        <div class="rc-footer" *ngIf="!item.is_correct && currentLevel?.videoUrl">
+          <a class="rc-watch-video" [href]="currentLevel!.videoUrl.replace('/embed/', '/watch?v=')" target="_blank">
+            <span class="rc-watch-icon">▶</span>
+            <span>Watch Video</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="results-actions">
+      <button class="btn-restart" (click)="restartLesson()">Back to Lesson</button>
+      <button class="btn-next" (click)="completeLevel()">Continue to Next Level</button>
+    </div>
+  </div>
+
+  <!-- History View -->
+  <div class="history-view" *ngIf="viewState === 'history'">
+    <h2>📊 Attempt History</h2>
+
+    <div class="history-list">
+      <div *ngFor="let attempt of attemptHistory" class="history-detail-card">
+        <div class="history-detail-header">
+          <div>
+            <span class="type-badge">{{ attempt.attempt_type === 'practice' ? '✏️ Practice' : '🎯 Challenge' }}</span>
+            <span class="mode-badge">{{ attempt.mode === 'online' ? '💻' : '📥' }}</span>
+          </div>
+          <span class="date">{{ attempt.created_at | date:'medium' }}</span>
+        </div>
+
+        <div class="history-detail-body" *ngIf="attempt.score !== null">
+          <div class="score-row">
+            <span>Score:</span>
+            <span class="score-value">{{ attempt.score }}/{{ attempt.total }} ({{ attempt.percentage }}%)</span>
+          </div>
+          <div class="status-row" [class.passed]="attempt.percentage >= 60">
+            {{ attempt.percentage >= 60 ? '✅ Passed' : '📚 Needs Practice' }}
+          </div>
+        </div>
+
+        <div class="history-detail-body" *ngIf="attempt.score === null">
+          <p class="pending-status">⏳ Waiting for submission</p>
+          <p class="attempt-id">Attempt ID: {{ attempt.attempt_id }}</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-back-lesson" (click)="restartLesson()">Back to Lesson</button>
+  </div>
 </section>
+
+<div class="error-state" *ngIf="!currentLevel">
+  <h2>Lesson not found</h2>
+  <button (click)="goBack()">Return to Learning</button>
+</div>

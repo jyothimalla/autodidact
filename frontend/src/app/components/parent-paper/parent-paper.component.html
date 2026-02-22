@@ -49,24 +49,19 @@
 
   <!-- Downloads — shown once paper is ready -->
   <div class="download-card" *ngIf="paperId">
-    <h2>Your paper is ready!</h2>
-    <p class="paper-meta">
-      <strong>{{ paperModule }}</strong> &mdash; {{ selectedDifficulty | titlecase }},
-      {{ selectedNum }} questions
-    </p>
-    <p class="paper-id">Paper ID: <code>{{ paperId }}</code></p>
+    <h2>✅ Test Generated Successfully!</h2>
+    <p class="paper-id">Test ID: <code>{{ paperId }}</code></p>
 
-    <div class="download-row">
-      <button class="btn-download questions" (click)="downloadQuestionPaper()">
-        Download Question Paper
-      </button>
-      <button class="btn-download answers" (click)="downloadAnswerSheet()">
-        Download Answer Sheet (with QR code)
+    <div class="mode-buttons">
+      <button class="btn-mode download" (click)="downloadCombinedPaper()">
+        <span class="icon">📥</span>
+        <span>Download PDF + Answer Sheet</span>
       </button>
     </div>
 
-    <p class="qr-hint">
-      The answer sheet contains a QR code. When your child has finished, scan the QR code to submit their answers for marking.
-    </p>
+    <div class="submission-info">
+      <h3>After completing the downloaded paper:</h3>
+      <p>Scan the QR code on the answer sheet to submit answers online.</p>
+    </div>
   </div>
 </section>

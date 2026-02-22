@@ -31,6 +31,14 @@
       </span>
     </div>
 
+    <div class="year-row">
+      <label for="studentYear">Current Year:</label>
+      <select id="studentYear" [value]="studentYear" (change)="onStudentYearChange($event)">
+        <option *ngFor="let y of [1,2,3,4,5,6,7,8,9,10,11,12,13]" [value]="y">Year {{ y }}</option>
+      </select>
+      <span class="plan-note">Current plan: Year {{ studentYear }}</span>
+    </div>
+
     <h3>Your Attempts</h3>
     <div *ngIf="attempts.length > 0; else noAttempts">
       <div class="attempt-card" *ngFor="let attempt of attempts">

@@ -93,6 +93,35 @@
     }
   }
 
+  .year-row {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+
+    label {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    select {
+      border: 1px solid #c7d4e4;
+      border-radius: 8px;
+      padding: 0.4rem 0.6rem;
+      background: #fff;
+    }
+
+    .plan-note {
+      font-size: 0.95rem;
+      color: #3d5165;
+      background: #e6f0ff;
+      border-radius: 999px;
+      padding: 0.3rem 0.7rem;
+      font-weight: 600;
+    }
+  }
+
   h3 {
     margin-top: 2rem;
     font-size: 1.4rem;

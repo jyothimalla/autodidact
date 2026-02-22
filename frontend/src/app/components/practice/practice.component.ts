@@ -1,257 +1,317 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../auth/auth.service';
+import { environment } from '../../../environments/environment';
+import { SUBJECTS as LEARNING_SUBJECTS } from '../learning/learning-subjects.data';
 
-import confetti from 'canvas-confetti';
-import { AnimationItem } from 'lottie-web';
+interface Subject {
+  id: string;
+  name: string;
+  icon: string;
+  topics: Topic[];
+}
 
-import { QuizService } from '../../services/quiz.service';
-import { ExampleService } from '../../services/example.service';
+interface Topic {
+  id: string;
+  name: string;
+  backendId: string;
+  supported: boolean;
+}
 
-import { LeftSidebarComponent } from '../left-sidebar/left-sidebar.component';
-import { RightSidebarComponent } from '../right-sidebar/right-sidebar.component';
+interface GeneratedPaper {
+  paper_id: string;
+  subject_id: string;
+  topic_id: string;
+  topic_name: string;
+  num_questions: number;
+  difficulty: string;
+  created_at: string;
+  status: string;
+  score?: number;
+  percentage?: number;
+}
 
 @Component({
   selector: 'app-practice',
   standalone: true,
-  imports: [CommonModule, FormsModule, LeftSidebarComponent, RightSidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './practice.component.html',
-  styleUrl: './practice.component.scss'
+  styleUrls: ['./practice.component.scss']
 })
-export class PracticeComponent implements OnInit, OnDestroy {
-  questions: any[] = [];
-  userAnswers: string[] = [];
-  answerInput = '';
-  feedbackMessage = '';
-  explanation = '';
-  score = 0;
-  level = 0;
-  quizCompleted = false;
-  isCorrect = true;
-  isReading = false;
-  isEnterDisabled = false;
-  savingInProgress = false;
+export class PracticeComponent implements OnInit {
+  // The 4 core grammar school subjects shown as quick-start cards
+  readonly featuredSubjects = [
+    { id: 'maths', name: 'Maths', icon: '🔢', description: 'Arithmetic, fractions, algebra & more' },
+    { id: 'english', name: 'English', icon: '📚', description: 'Grammar, comprehension & vocabulary' },
+    { id: 'verbal-reasoning', name: 'Verbal Reasoning', icon: '🗣️', description: 'Patterns, analogies & logic' },
+    { id: 'non-verbal-reasoning', name: 'Non-Verbal Reasoning', icon: '🧩', description: 'Shapes, sequences & spatial reasoning' },
+  ];
 
-  operation = 'addition';
-  username = '';
-  user_id = 0;
-  currentQIndex = 0;
-  elapsedTime = '0:00';
-  private timer: any;
-  private secondsElapsed = 0;
-  mode: 'practice' | 'guest' = 'practice';
+  // Mapping from learning module IDs to backend generator IDs (where they differ)
+  private readonly backendIdMap: Record<string, string> = {
+    'word-problems': 'multi-step-word-problems',
+    'speed-calculation': 'speed-based-calculation',
+    'number-puzzles': 'logical-number-puzzles'
+  };
 
-  animation!: AnimationItem;
+  // Module IDs that the backend MCQ generator currently supports
+  private readonly supportedModules = new Set([
+    'four-operations', 'fractions-decimals', 'ratios', 'percentages',
+    'multi-step-word-problems', 'mental-arithmetic', 'speed-based-calculation',
+    'logical-number-puzzles',
+    'probability', 'algebra', 'perimeter-area', 'angles',
+    'coordinate-geometry', 'volumes', 'verbal-reasoning',
+    'verbal-reasoning-level-1', 'verbal-reasoning-level-2',
+    'verbal-reasoning-cem-vocab-codes', 'verbal-reasoning-cem-sequences-analogies',
+    'non-verbal-reasoning', 'nvr-cem-pattern-matrices', 'nvr-cem-rotations-reflections',
+    'nvr-cem-odd-one-out', 'nvr-cem-3d-nets',
+    'grammar', 'punctuation', 'synonyms', 'antonyms', 'comprehension',
+    'creative-writing', 'narrative-writing', 'non-chronological-report',
+    'intro-it-safety', 'spreadsheets-basics', 'scratch-programming', 'block-programming',
+    'binary-systems', 'binary-shifts', 'logic-gates', 'circuit-design',
+    'python-basics', 'python-control', 'python-functions', 'python-data-structures',
+    'computer-architecture', 'memory-storage', 'data-representation', 'input-output',
+    'db-basics', 'db-sql-queries', 'os-basics', 'network-basics',
+    'internet-protocols', 'web-basics', 'ds-arrays-lists', 'ds-stack-queue',
+    'algo-searching', 'algo-sorting'
+  ]);
+
+  subjects: Subject[] = [];
+
+  questionOptions = [5, 10, 15, 20];
+  difficultyOptions = ['Easy', 'Medium', 'Hard', 'Mixed'];
+  timeLimitOptions = [
+    { questions: 5,  time: 5  },
+    { questions: 5,  time: 10 },
+    { questions: 10, time: 10 },
+    { questions: 10, time: 15 },
+    { questions: 15, time: 15 },
+    { questions: 15, time: 20 },
+    { questions: 20, time: 20 },
+    { questions: 20, time: 30 }
+  ];
+
+  // Form state
+  selectedSubject: string = '';
+  selectedTopic: string = '';
+  numQuestions: number = 10;
+  difficulty: string = 'Mixed';
+  timeLimit: number = 10;
+
+  // UI state
+  state: 'form' | 'paper-ready' = 'form';
+  availableTopics: Topic[] = [];
+  generatedPapers: GeneratedPaper[] = [];
+  generating = false;
+  readyPaperId = '';
+  readyPaperName = '';
+
+  private readonly apiBase = environment.apiBaseUrl;
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
-    private quizService: QuizService,
-    private exampleService: ExampleService,
-    private sanitizer: DomSanitizer
+    private http: HttpClient,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.level = parseInt(params['level'] || '0', 10);
-      this.username = params['username'] || localStorage.getItem('username') || 'Guest';
-      this.user_id = parseInt(localStorage.getItem('user_id') || '0', 10);
-      this.operation = this.route.snapshot.params['operation'] || 'addition';
+    this.subjects = LEARNING_SUBJECTS.map(s => ({
+      id: s.id,
+      name: s.name,
+      icon: s.icon,
+      topics: s.modules.flatMap(m => {
+        const useAtomsAsTopics =
+          (s.id === 'verbal-reasoning' || s.id === 'non-verbal-reasoning' || s.id === 'computers')
+          && Array.isArray((m as any).atoms)
+          && (m as any).atoms.length > 0;
 
-      this.mode = this.username === 'Guest' ? 'guest' : 'practice';
+        if (useAtomsAsTopics) {
+          return (m as any).atoms.map((a: any) => {
+            const backendId = this.backendIdMap[a.id] || a.id;
+            return {
+              id: a.id,
+              name: a.name,
+              backendId,
+              supported: this.supportedModules.has(backendId)
+            };
+          });
+        }
 
-      if (this.mode === 'guest' && this.guestAlreadyPlayedToday()) {
-        alert('🚫 Guests can only practice once per day.');
-        return;
-      }
-
-      this.loadQuestions();
-    });
+        const backendId = this.backendIdMap[m.id] || m.id;
+        return [{
+          id: m.id,
+          name: m.name,
+          backendId,
+          supported: this.supportedModules.has(backendId)
+        }];
+      })
+    }));
+    this.loadGeneratedPapers();
   }
 
-  guestAlreadyPlayedToday(): boolean {
-    const today = new Date().toISOString().slice(0, 10);
-    const lastPlayed = localStorage.getItem('guest_played_on');
-    if (lastPlayed === today) return true;
-    localStorage.setItem('guest_played_on', today);
-    return false;
+  // ── Subject quick-start ─────────────────────────────────────────────────
+  quickStartSubject(subjectId: string): void {
+    this.selectedSubject = subjectId;
+    this.onSubjectChange();
+    setTimeout(() => {
+      document.getElementById('generation-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 
-  loadQuestions(): void {
-    const mode: 'practice' | 'challenge' | 'guest' =
-      this.username === 'Guest' ? 'guest' : 'practice';
+  // ── Papers grouped by subject ──────────────────────────────────────────
+  getSubjectPapers(subjectId: string): GeneratedPaper[] {
+    return this.generatedPapers.filter(p => p.subject_id === subjectId);
+  }
 
-    if (mode === 'guest') {
-      const today = new Date().toISOString().slice(0, 10);
-      const lastPlayed = localStorage.getItem('guest_played_on');
+  get hasAnyPapers(): boolean {
+    return this.generatedPapers.length > 0;
+  }
 
-      if (lastPlayed === today) {
-        alert('🚫 Guests can only practice once per day.');
-        return;
-      } else {
-        localStorage.setItem('guest_played_on', today);
-      }
+  get otherSubjectPapers(): GeneratedPaper[] {
+    const featuredIds = new Set(this.featuredSubjects.map(s => s.id));
+    return this.generatedPapers.filter(p => !featuredIds.has(p.subject_id));
+  }
+
+  // ── Form helpers ───────────────────────────────────────────────────────
+  onSubjectChange(): void {
+    const subject = this.subjects.find(s => s.id === this.selectedSubject);
+    this.availableTopics = subject ? subject.topics : [];
+    this.selectedTopic = '';
+  }
+
+  onQuestionCountChange(): void {
+    const options = this.timeLimitOptions.filter(opt => opt.questions === this.numQuestions);
+    if (options.length > 0) this.timeLimit = options[0].time;
+  }
+
+  getTimeLimitOptions(): number[] {
+    return this.timeLimitOptions
+      .filter(opt => opt.questions === this.numQuestions)
+      .map(opt => opt.time);
+  }
+
+  canGeneratePaper(): boolean {
+    if (!(this.selectedSubject && this.selectedTopic && this.numQuestions && this.difficulty)) {
+      return false;
     }
-
-    this.quizService.getQuestionsByOperation(this.operation, this.level, this.mode).subscribe({
-      next: questions => {
-        this.questions = questions;
-        this.userAnswers = new Array(questions.length).fill('');
-        this.startTimer();
-      },
-      error: err => console.error('❌ Failed to load questions:', err)
-    });
+    const topic = this.availableTopics.find(t => t.id === this.selectedTopic);
+    return !!topic?.supported;
   }
 
-  startTimer(): void {
-    this.timer = setInterval(() => {
-      this.secondsElapsed++;
-      const minutes = Math.floor(this.secondsElapsed / 60);
-      const seconds = this.secondsElapsed % 60;
-      this.elapsedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    }, 1000);
-  }
-
-  submitAnswer(): void {
-    if (this.quizCompleted) return;
-
-    const currentQ = this.questions[this.currentQIndex];
-    const correct = currentQ.answer.trim();
-    const userAnswer = this.answerInput.trim();
-
-    if (!userAnswer) {
-      alert('⚠️ Please enter your answer!');
+  generatePaper(): void {
+    if (!this.canGeneratePaper()) {
+      alert('Please fill in all fields and select a supported topic');
       return;
     }
 
-    this.isCorrect = userAnswer === correct;
-    this.feedbackMessage = this.isCorrect ? '✅ Correct!' : `❌ Incorrect Answer! The Correct Answer is: ${correct}`;
+    this.generating = true;
+    const userId = this.auth.getUserId();
+    const topic = this.availableTopics.find(t => t.id === this.selectedTopic);
+    const moduleId = topic?.backendId || this.selectedTopic;
 
-    if (this.isCorrect) this.score++;
-    this.userAnswers[this.currentQIndex] = userAnswer;
-    this.answerInput = '';
+    const payload = {
+      user_id: userId,
+      subject_id: this.selectedSubject,
+      module_id: moduleId,
+      num_questions: this.numQuestions,
+      difficulty: this.difficulty.toLowerCase(),
+      time_limit: this.timeLimit
+    };
 
-    if (++this.currentQIndex < this.questions.length) return;
-
-    this.quizCompleted = true;
-    clearInterval(this.timer);
-    this.feedbackMessage = '🎉 Practice Completed!';
-    setTimeout(() => this.finishQuiz(), 1500);
-  }
-
-  finishQuiz(): void {
-    console.log('🎯 Final Score:', this.score);
-    this.savingInProgress = true;
-
-    localStorage.setItem('score', this.score.toString());
-    localStorage.setItem('answers', JSON.stringify(this.userAnswers));
-    localStorage.setItem('questions', JSON.stringify(this.questions));
-
-    const localKey = `practice_${this.operation}_level${this.level}`;
-    const progressKey = `${this.operation}_progress`;
-    const unlocked = parseInt(localStorage.getItem(progressKey) || '0', 10);
-    if (this.score === this.questions.length && this.level >= unlocked) {
-      localStorage.setItem(progressKey, (this.level + 1).toString());
-    }
-    
-
-    localStorage.setItem(localKey, JSON.stringify({
-      score: this.score,
-      total: this.questions.length,
-      date: new Date().toISOString()
-    }));
-    
-    console.log(`📚 Practice result saved locally as ${localKey}`);
-
-    
-  }
-
-  navigateToResult(): void {
-    this.router.navigate(['/result'], {
-      queryParams: {
-        username: this.username,
-        user_id: this.user_id,
-        operation: this.operation,
-        level: this.level
+    this.http.post<any>(`${this.apiBase}/practice/generate`, payload).subscribe({
+      next: (response) => {
+        this.generating = false;
+        const topicName = this.availableTopics.find(t => t.id === this.selectedTopic)?.name || this.selectedTopic;
+        this.generatedPapers.unshift({
+          paper_id: response.paper_id,
+          subject_id: this.selectedSubject,
+          topic_id: this.selectedTopic,
+          topic_name: topicName,
+          num_questions: this.numQuestions,
+          difficulty: this.difficulty,
+          created_at: new Date().toISOString(),
+          status: 'Not Attempted'
+        });
+        this.readyPaperId = response.paper_id;
+        this.readyPaperName = topicName;
+        this.state = 'paper-ready';
+      },
+      error: (err) => {
+        console.error('Failed to generate paper:', err);
+        alert('Failed to generate practice paper. Please try again.');
+        this.generating = false;
       }
     });
   }
 
-  readQuestionAloud(): void {
-    const question = this.questions[this.currentQIndex]?.question;
-    if (question && 'speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(question);
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-      this.animation?.play();
-      utterance.onend = () => this.animation?.stop();
-    }
+  // ── Paper actions ──────────────────────────────────────────────────────
+  attemptOnline(paperId: string): void {
+    this.router.navigate(['/practice-submit', paperId]);
   }
 
-  goToNextLevel(): void {
-    localStorage.setItem('level', (this.level + 1).toString());
-    this.router.navigate([`/operation/${this.operation}/${this.level + 1}`]);
-  }
-
-  printQuestions(): void {
-    const html = this.questions.map((q, i) => `
-      <div style="margin-bottom: 20px;">
-        <strong>Q${i + 1}:</strong> ${q.question}
-        <div style="border: 1px solid #000; width: 40px; height: 30px; margin-top: 8px;"></div>
-      </div>
-    `).join('');
-
-    const win = window.open('', '', 'height=800,width=800');
-    if (win) {
-      win.document.write('<html><head><title>Quiz Questions</title></head><body>');
-      win.document.write('<h1 style="text-align:center;">Quiz Paper</h1>');
-      win.document.write(html);
-      win.document.write('</body></html>');
-      win.document.close();
-      win.print();
-    }
-  }
-
-  playClapSound(): void {
-    new Audio('assets/sounds/claps.mp3').play();
-  }
-  takeChallenge(): void {
-    this.router.navigate([`/${this.operation}`], {
-      queryParams: {
-        level: this.level,
-        username: this.username,
-        user_id: this.user_id
-      }
+  attemptOffline(paperId: string): void {
+    const studentName = this.auth.getCurrentUser()?.name || '';
+    const url = `${this.apiBase}/practice/${paperId}/question-pdf?student_name=${encodeURIComponent(studentName)}`;
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `practice_${paperId}.pdf`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      },
+      error: () => alert('Failed to download paper. Please try again.')
     });
   }
-  goToLearn(): void {
-    this.router.navigate([`/learn/${this.operation}`], {
-      queryParams: {
-        level: this.level,
-        username: this.username,
-        user_id: this.user_id
+
+  uploadAnswers(paperId: string): void {
+    this.router.navigate(['/practice-submit', paperId], { queryParams: { mode: 'upload' } });
+  }
+
+  // ── Load history ───────────────────────────────────────────────────────
+  loadGeneratedPapers(): void {
+    const userId = this.auth.getUserId();
+    this.http.get<any[]>(`${this.apiBase}/practice/history/${userId}`).subscribe({
+      next: (papers) => {
+        this.generatedPapers = papers.map(p => ({
+          paper_id: p.paper_id,
+          subject_id: p.subject_id,
+          topic_id: p.module_id,
+          topic_name: p.module_id.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
+          num_questions: p.num_questions,
+          difficulty: p.difficulty.charAt(0).toUpperCase() + p.difficulty.slice(1),
+          created_at: p.created_at,
+          status: p.status || 'Not Attempted',
+          score: p.score,
+          percentage: p.percentage,
+        }));
+      },
+      error: (err) => {
+        console.error('Failed to load generated papers:', err);
       }
     });
   }
 
-  goHome(): void {
-    clearInterval(this.timer);
-    localStorage.clear();
-    this.router.navigate(['/']);
+  getSubjectIcon(subjectId: string): string {
+    return this.subjects.find(s => s.id === subjectId)?.icon
+      || this.featuredSubjects.find(s => s.id === subjectId)?.icon
+      || '📄';
   }
 
-  restartQuiz(): void {
-    this.router.navigate(['/operation']);
+  formatDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  backToForm(): void {
+    this.state = 'form';
+    this.readyPaperId = '';
+    this.readyPaperName = '';
   }
 
   goBack(): void {
-   
-    this.router.navigate([`/${this.operation}`]);
-  }
-
-  ngOnDestroy(): void {
-    if (this.timer) clearInterval(this.timer);
+    this.router.navigate(['/']);
   }
 }
