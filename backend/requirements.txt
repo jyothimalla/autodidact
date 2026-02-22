@@ -54,6 +54,7 @@ weasyprint
 jinja2
 openpyxl
 PyPDF2
+pypdf
 reportlab
 python-jose
 passlib[bcrypt]

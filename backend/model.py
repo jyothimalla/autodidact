@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, JSON, TIMESTAMP
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, JSON, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, JSON, TIMESTAMP, Float
 
 Base = declarative_base()
 
@@ -10,6 +10,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(255), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)
+    year = Column(String(20), nullable=True)
     password = Column(String(255), nullable=False)
     ninja_stars = Column(Integer, default=0)
     awarded_title = Column(String(255), default="Beginner")
@@ -207,3 +208,62 @@ class QuizResponse(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     session = relationship("QuizSession", back_populates="responses")
+
+class MockTest(Base):
+    __tablename__ = "mock_tests"
+    id = Column(Integer, primary_key=True)
+    test_id = Column(String(255), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    questions_json = Column(JSON, nullable=False)  # 50 MCQ questions with correct_option
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+
+class MockTestResult(Base):
+    __tablename__ = "mock_test_results"
+    id = Column(Integer, primary_key=True)
+    test_id = Column(String(255), ForeignKey("mock_tests.test_id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    score = Column(Integer, nullable=False)
+    total = Column(Integer, nullable=False)
+    time_taken = Column(Integer, default=0)  # seconds
+    answers_json = Column(JSON, nullable=False)
+    submitted_at = Column(TIMESTAMP, default=datetime.utcnow)
+
+class GrammarPaper(Base):
+    __tablename__ = "grammar_papers"
+    id = Column(Integer, primary_key=True)
+    paper_number = Column(Integer, unique=True, nullable=False)
+    title = Column(String(255), nullable=False)
+    difficulty = Column(String(50), default='mixed')
+    questions_json = Column(JSON, nullable=False)  # 50 MCQ questions
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+
+class CustomPaper(Base):
+    __tablename__ = "custom_papers"
+    id = Column(Integer, primary_key=True)
+    paper_id = Column(String(255), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    module_id = Column(String(100), nullable=False)
+    difficulty = Column(String(50), nullable=False)
+    num_questions = Column(Integer, nullable=False)
+    questions_json = Column(JSON, nullable=False)
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+
+class PracticeAttempt(Base):
+    __tablename__ = "practice_attempts"
+    id = Column(Integer, primary_key=True)
+    attempt_id = Column(String(255), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    subject_id = Column(String(100), nullable=False)  # e.g., 'maths', 'computers'
+    module_id = Column(String(100), nullable=False)   # e.g., 'four-operations', 'python-programming'
+    topic_id = Column(String(100), nullable=True)     # e.g., 'addition', 'python-basics'
+    level = Column(Integer, nullable=False)           # Level number
+    attempt_type = Column(String(20), nullable=False) # 'practice' or 'challenge'
+    mode = Column(String(20), nullable=False)         # 'online' or 'download'
+    num_questions = Column(Integer, nullable=False)   # 5 for practice, 10 for challenge
+    questions_json = Column(JSON, nullable=False)     # Questions with correct answers
+    answers_json = Column(JSON, nullable=True)        # Student's answers (null if downloaded but not submitted)
+    score = Column(Integer, nullable=True)            # Number correct (null if not submitted)
+    percentage = Column(Float, nullable=True)         # Score percentage
+    time_taken = Column(Integer, default=0)           # Time in seconds
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+    submitted_at = Column(TIMESTAMP, nullable=True)   # When answers were submitted

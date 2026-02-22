@@ -4,26 +4,53 @@
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Username</mat-label>
     <input matInput formControlName="username" required>
+    <mat-error *ngIf="registerForm.controls['username'].invalid && registerForm.controls['username'].touched">
+      Username is required
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Email</mat-label>
     <input matInput type="email" formControlName="email" required>
+    <mat-error *ngIf="registerForm.controls['email'].invalid && registerForm.controls['email'].touched">
+      Enter a valid email
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Year Group</mat-label>
+    <select matNativeControl formControlName="year" required>
+      <option value="" disabled>Select year</option>
+      <option *ngFor="let yearOption of yearOptions" [value]="yearOption">{{ yearOption }}</option>
+    </select>
+    <mat-error *ngIf="registerForm.controls['year'].invalid && registerForm.controls['year'].touched">
+      Year group is required
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Password</mat-label>
     <input matInput type="password" formControlName="password" required>
+    <mat-error *ngIf="registerForm.controls['password'].invalid && registerForm.controls['password'].touched">
+      Password is required
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Confirm Password</mat-label>
     <input matInput type="password" formControlName="confirm_password" required>
+    <mat-error *ngIf="registerForm.controls['confirm_password'].invalid && registerForm.controls['confirm_password'].touched">
+      Confirm password is required
+    </mat-error>
   </mat-form-field>
 
+  <div *ngIf="errorMessage" style="color: #d32f2f; margin-bottom: 8px;">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" style="color: #2e7d32; margin-bottom: 8px;">{{ successMessage }}</div>
 
   <div class="dialog-actions">
-    <button mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid">Register</button>
-    <button mat-button (click)="dialogRef.close()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid || isSubmitting">
+      {{ isSubmitting ? 'Registering...' : 'Register' }}
+    </button>
+    <button mat-button type="button" (click)="closeDialog()">Cancel</button>
   </div>
 </form>

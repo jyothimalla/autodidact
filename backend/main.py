@@ -32,7 +32,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 from routers import (word_problem_routes, user_routes, attempt_routes,
     quiz_routes, sudoku_routes, addition_routes, subtraction_routes,
     multiplication_routes, division_routes, submit_score, fmc_routes,
-    reasoning_routes, auth_routes, progress_routes, results, generator_paper, generate_paper_excel)
+    reasoning_routes, auth_routes, progress_routes, results, generator_paper,
+    generate_paper_excel, mock_test_routes, grammar_paper_routes, custom_paper_routes,
+    practice_routes, learning_notes_routes)
 
 # Create FastAPI app
 app = FastAPI()
@@ -150,6 +152,11 @@ app.include_router(attempt_routes.router)
 app.include_router(results.router)
 app.include_router(generator_paper.router)
 app.include_router(generate_paper_excel.router)
+app.include_router(mock_test_routes.router, prefix="/test", tags=["Mock Tests"])
+app.include_router(grammar_paper_routes.router, prefix="/grammar", tags=["Grammar Papers"])
+app.include_router(custom_paper_routes.router, prefix="/paper", tags=["Custom Papers"])
+app.include_router(practice_routes.router, prefix="/practice", tags=["Practice & Challenge"])
+app.include_router(learning_notes_routes.router, prefix="/learning", tags=["Learning Notes"])
 
 
 @app.post("/upload-paper/")

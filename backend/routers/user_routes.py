@@ -24,6 +24,7 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
         "userid": user.id,
         "username": user.username,
         "email": user.email,
+        "year": user.year,
         "ninja_stars": user.ninja_stars,
         "awarded_title": "Math Explorer",
         "progress": [
@@ -48,6 +49,7 @@ def get_user_account(user_id: int, db: Session = Depends(get_db)):
         "userid": user.id,
         "username": user.username,
         "email": user.email,
+        "year": user.year,
         "ninja_stars": user.ninja_stars,
         "awarded_title": user.awarded_title,
     }
@@ -60,6 +62,7 @@ def update_user(user_id: int, payload: dict, db: Session = Depends(get_db)):
 
     user.username = payload.get("username", user.username)
     user.email = payload.get("email", user.email)
+    user.year = payload.get("year", user.year)
     if payload.get("password"):
         user.password = bcrypt.hash(payload["password"])  # hash if password provided
 

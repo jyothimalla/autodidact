@@ -20,10 +20,13 @@ import { QuizService } from '../../services/quiz.service';
   imports: [CommonModule, RouterModule, FormsModule],
 })
 export class MyAccountComponent implements OnInit {
+  private readonly studentYearStorageKey = 'student_year';
+  private readonly analyticsYearStorageKey = 'analytics_year_level';
   user_id: number = 0;
   username: string = '';
   awardedName: string = '';
   ninjaStars: number = 0;
+  studentYear: number = 4;
   attempts: any[] = [];
   isEditing: boolean = false;
   baseUrl = environment.apiBaseUrl;
@@ -39,6 +42,7 @@ export class MyAccountComponent implements OnInit {
       private quizService: QuizService) {}
 
       ngOnInit(): void {
+        this.initializeStudentYear();
         const idParam = this.route.snapshot.paramMap.get('id');
         this.user_id = idParam ? parseInt(idParam, 10) : 0;
         this.username = localStorage.getItem('username') || '';
@@ -56,6 +60,23 @@ export class MyAccountComponent implements OnInit {
           }
         });
       }
+
+  private initializeStudentYear(): void {
+    const saved = Number(localStorage.getItem(this.studentYearStorageKey));
+    this.studentYear = saved >= 1 && saved <= 13 ? saved : 4;
+    localStorage.setItem(this.studentYearStorageKey, String(this.studentYear));
+    localStorage.setItem(this.analyticsYearStorageKey, String(this.studentYear));
+  }
+
+  onStudentYearChange(event: Event): void {
+    const nextYear = Number((event.target as HTMLSelectElement).value);
+    if (nextYear < 1 || nextYear > 13) {
+      return;
+    }
+    this.studentYear = nextYear;
+    localStorage.setItem(this.studentYearStorageKey, String(nextYear));
+    localStorage.setItem(this.analyticsYearStorageKey, String(nextYear));
+  }
       
   loadUserProfile(): void {
     console.log('🔍 Fetching user profile for ID:', this.user_id);
@@ -65,6 +86,12 @@ export class MyAccountComponent implements OnInit {
         this.awardedName = res.awarded_title;
         this.ninjaStars = res.ninja_stars;
         this.attempts = res.progress || [];
+        const yearFromProfile = Number(String(res.year || '').replace(/[^\d]/g, ''));
+        if (yearFromProfile >= 1 && yearFromProfile <= 13) {
+          this.studentYear = yearFromProfile;
+          localStorage.setItem(this.studentYearStorageKey, String(yearFromProfile));
+          localStorage.setItem(this.analyticsYearStorageKey, String(yearFromProfile));
+        }
         console.log('✅ User profile loaded:', res);
       },
       error: (err) => {

@@ -2,15 +2,80 @@
   <header>
     <h1>Learning</h1>
     <p>Master each skill step-by-step.</p>
-    <span class="teacher-mode-badge" *ngIf="isAdmin">Teacher View — atom teaching notes visible</span>
+    <span class="teacher-mode-badge" *ngIf="isAdmin">Teacher View — teaching notes visible</span>
   </header>
 
-  <div class="module-grid">
-    <app-module-card
-      *ngFor="let module of modules; let i = index"
-      [module]="module"
-      [isAdmin]="isAdmin"
-      [cardIndex]="i"
-    ></app-module-card>
+  <!-- Subject Selection -->
+  <div class="subjects-grid" *ngIf="!selectedSubject">
+    <div
+      *ngFor="let subject of subjects"
+      class="subject-card"
+      (click)="selectSubject(subject)">
+      <div class="subject-icon">{{ subject.icon }}</div>
+      <h2>{{ subject.name }}</h2>
+      <p>{{ subject.description }}</p>
+    </div>
+  </div>
+
+  <!-- Module Selection (when subject is selected) -->
+  <div class="module-view" *ngIf="selectedSubject && !selectedModule">
+    <div class="breadcrumb">
+      <button (click)="goBack()">← Back to Subjects</button>
+      <span>{{ selectedSubject.name }}</span>
+    </div>
+
+    <div class="module-grid">
+      <div
+        *ngFor="let module of selectedSubject.modules"
+        class="module-card"
+        (click)="selectModule(module)">
+        <div class="module-icon">{{ module.icon }}</div>
+        <h3>{{ module.name }}</h3>
+        <p>{{ module.description }}</p>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="module.progress"></div>
+        </div>
+        <span class="progress-text">{{ module.progress }}% complete</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Topic/Lesson Selection (when module is selected) -->
+  <div class="topic-view" *ngIf="selectedModule">
+    <div class="breadcrumb">
+      <button (click)="goBack()">← Back to {{ selectedSubject?.name }}</button>
+      <span>{{ selectedModule.name }}</span>
+    </div>
+
+    <!-- Show Topics if module has topics (like Four Operations) -->
+    <div class="topics-grid" *ngIf="selectedModule.topics && selectedModule.topics.length > 0">
+      <div
+        *ngFor="let topic of selectedModule.topics"
+        class="topic-card"
+        (click)="selectTopic(topic)">
+        <div class="topic-icon">{{ topic.icon }}</div>
+        <h3>{{ topic.name }}</h3>
+        <p>{{ topic.description }}</p>
+        <div class="levels-info">
+          <span>{{ topic.levels.length }} levels</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show Atoms directly if no topics -->
+    <div class="atoms-list" *ngIf="selectedModule.atoms && selectedModule.atoms.length > 0">
+      <div
+        *ngFor="let atom of selectedModule.atoms"
+        class="atom-card"
+        [routerLink]="['/learning', selectedModule.id, atom.id]">
+        <div class="level-badge">Level {{ atom.level }}</div>
+        <h4>{{ atom.name }}</h4>
+        <p>{{ atom.summary }}</p>
+        <div class="mini-notes" *ngIf="getMiniNotes(atom).length > 0">
+          <span class="mini-note" *ngFor="let note of getMiniNotes(atom)">{{ note }}</span>
+        </div>
+        <span class="status-badge" [class]="atom.status">{{ atom.status }}</span>
+      </div>
+    </div>
   </div>
 </section>

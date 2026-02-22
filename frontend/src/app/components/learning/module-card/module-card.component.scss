@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 // 8 unique gradients — one per card via :nth-child
 $card-gradients: (
   1: (start: #ff7043, end: #ff8a65),   // orange
@@ -33,7 +35,7 @@ $card-gradients: (
 @each $n, $colors in $card-gradients {
   :host:nth-child(#{$n}) .module-card,
   .module-card:nth-child(#{$n}) {
-    background: linear-gradient(135deg, map-get($colors, start), map-get($colors, end));
+    background: linear-gradient(135deg, map.get($colors, start), map.get($colors, end));
   }
 }
 

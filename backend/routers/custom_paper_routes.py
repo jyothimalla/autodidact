@@ -280,3 +280,240 @@ def download_answer_sheet_pdf(paper_id: str, db: Session = Depends(get_db)):
     path = os.path.join(PAPERS_DIR, filename)
     _html_to_pdf(html, path)
     return FileResponse(path, filename=filename, media_type="application/pdf")
+
+
+# ---------------------------------------------------------------------------
+# GET /paper/custom/{paper_id}/combined-pdf
+# Combined PDF with Questions + Answer Sheet in one file
+# ---------------------------------------------------------------------------
+@router.get("/custom/{paper_id}/combined-pdf")
+def download_combined_pdf(paper_id: str, student_name: str = "", db: Session = Depends(get_db)):
+    """Generate a single PDF containing both questions and answer sheet"""
+    paper = db.query(CustomPaper).filter_by(paper_id=paper_id).first()
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found")
+
+    module_name = MODULE_NAMES.get(paper.module_id, paper.module_id)
+    qr_url = f"{FRONTEND_BASE_URL}/submit-answers?paperId={paper_id}"
+    qr_img = _qr_data_uri(qr_url)
+    download_date = datetime.now().strftime("%d/%m/%Y")
+
+    html = Template("""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 20mm 25mm; }
+  body { font-family: 'Arial', sans-serif; color: #222; line-height: 1.6; }
+
+  /* Questions Section */
+  .questions-section { page-break-after: always; }
+  h1 { font-size: 28px; text-align: center; margin-bottom: 10px; font-weight: 700; color: #1a237e; }
+  .meta { text-align: center; font-size: 14px; color: #666; margin-bottom: 30px; }
+  .student-info { display: flex; gap: 40px; margin-bottom: 35px; font-size: 15px; }
+  .student-info label { display: flex; align-items: center; gap: 8px; }
+  .student-info span { border-bottom: 2px solid #333; min-width: 180px; display: inline-block; padding: 4px 8px; font-weight: 600; }
+
+  /* Blue Numbered Box Questions */
+  .question-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    page-break-inside: avoid;
+  }
+  .q-number-box {
+    min-width: 50px;
+    width: 50px;
+    height: 50px;
+    background: #1a237e;
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .q-content {
+    flex: 1;
+    padding-top: 2px;
+  }
+  .q-content p {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.7;
+    color: #333;
+  }
+  .work-space {
+    border: 1px solid #ddd;
+    min-height: 80px;
+    margin-top: 10px;
+    border-radius: 4px;
+    background: #fafafa;
+  }
+
+  /* Answer Sheet Section */
+  .answer-section { page-break-before: always; }
+  .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
+  .qr-section { text-align: center; border: 3px solid #1a237e; padding: 12px; background: #f0f4ff; border-radius: 6px; }
+  .qr-section img { width: 130px; height: 130px; }
+  .qr-section p { font-size: 12px; margin: 8px 0 0; font-weight: 700; color: #1a237e; }
+  .instructions { background: #fff3cd; border: 2px solid #ffc107; padding: 14px; margin: 20px 0; border-radius: 6px; }
+  .instructions p { margin: 0; font-size: 14px; font-weight: 600; color: #856404; }
+
+  /* Answer Grid - Two Column Layout */
+  .answer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 25px;
+  }
+  .grid-column table { width: 100%; border-collapse: collapse; }
+  .grid-column th {
+    background: #1a237e;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    border: 2px solid #1a237e;
+    font-weight: 700;
+    text-align: center;
+  }
+  .grid-column td {
+    padding: 10px;
+    border: 2px solid #666;
+    font-size: 14px;
+    text-align: center;
+  }
+  .grid-q-num {
+    width: 50px;
+    background: #e3f2fd;
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a237e;
+  }
+  .grid-answer-box {
+    min-height: 35px;
+    background: white;
+    width: 120px;
+  }
+
+  .footer { margin-top: 30px; font-size: 11px; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 10px; }
+</style>
+</head>
+<body>
+
+<!-- QUESTIONS SECTION -->
+<div class="questions-section">
+  <h1>{{ module_name }} — Practice Paper</h1>
+  <div class="meta">
+    Difficulty: {{ difficulty | capitalize }} &nbsp;•&nbsp;
+    {{ num_questions }} Questions &nbsp;•&nbsp;
+    Paper ID: {{ paper_id }}
+  </div>
+
+  <div class="student-info">
+    <label>Name: <span>{{ student_name }}</span></label>
+    <label>Date: <span>{{ download_date }}</span></label>
+    <label>Score: <span>&nbsp;&nbsp;&nbsp;&nbsp;</span> / {{ num_questions }}</label>
+  </div>
+
+  <!-- Questions with Blue Number Boxes -->
+  {% for q in questions %}
+  <div class="question-item">
+    <div class="q-number-box">{{ loop.index }}</div>
+    <div class="q-content">
+      <p>{{ q.question }}</p>
+      <div class="work-space"></div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="footer">autodidact.uk — {{ paper_id }}</div>
+</div>
+
+<!-- ANSWER SHEET SECTION (NEW PAGE) -->
+<div class="answer-section">
+  <div class="top-section">
+    <div style="flex: 1;">
+      <h1 style="margin-top: 0;">Answer Sheet</h1>
+      <div class="student-info">
+        <label>Name: <span>{{ student_name }}</span></label>
+        <label>Date: <span>{{ download_date }}</span></label>
+      </div>
+    </div>
+    <div class="qr-section">
+      <img src="{{ qr_img }}" alt="QR Code">
+      <p>SCAN TO SUBMIT</p>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <p>✏️ Write your answers clearly in the boxes below  •  Use dark pen or pencil  •  One answer per question</p>
+  </div>
+
+  <!-- Two Column Answer Grid -->
+  <div class="answer-grid">
+    <!-- Left Column -->
+    <div class="grid-column">
+      <table>
+        <thead>
+          <tr>
+            <th>Q</th>
+            <th>Answer</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for q in questions[:((num_questions + 1) // 2)] %}
+          <tr>
+            <td class="grid-q-num">{{ loop.index }}</td>
+            <td class="grid-answer-box">&nbsp;</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Right Column -->
+    <div class="grid-column">
+      <table>
+        <thead>
+          <tr>
+            <th>Q</th>
+            <th>Answer</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for q in questions[((num_questions + 1) // 2):] %}
+          <tr>
+            <td class="grid-q-num">{{ loop.index + ((num_questions + 1) // 2) }}</td>
+            <td class="grid-answer-box">&nbsp;</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">autodidact.uk — {{ paper_id }}</div>
+</div>
+
+</body>
+</html>
+""").render(
+        module_name=module_name,
+        difficulty=paper.difficulty,
+        num_questions=paper.num_questions,
+        paper_id=paper_id,
+        questions=paper.questions_json,
+        qr_img=qr_img,
+        student_name=student_name,
+        download_date=download_date,
+    )
+
+    filename = f"{paper_id}_complete.pdf"
+    path = os.path.join(PAPERS_DIR, filename)
+    _html_to_pdf(html, path)
+    return FileResponse(path, filename=filename, media_type="application/pdf")

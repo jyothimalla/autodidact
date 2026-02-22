@@ -1,104 +1,180 @@
-<div class="quiz-wrapper" *ngIf="questions.length > 0; else loading">
-    <!-- LEFT SIDEBAR -->
-  
-    
-    <app-left-sidebar></app-left-sidebar>
-  
-     <!-- Saving Spinner -->
-     <div *ngIf="savingInProgress" class="saving-overlay">
-      <div class="spinner"></div>
-      <p>Saving your results... Please wait ⏳</p>
-    </div>
-    
-    
-    <!-- MAIN CONTENT -->
-    <div class="quiz-main-card">
-        <div class="button-group-practice">
-        <button (click)="printQuestions()" class="print-button" style="margin-right: 380px;">🖨️ Print Questions</button>
-        <button class="print-button" (click)="goBack()" style="margin-left: 10px;">🔙 Go Back</button>
-        </div>
-    <!-- <button (click)="goHome()">🏠 Go to Home</button>-->
-   
-      <div class="quiz-header">
-        <h2 class="quiz-title addition">
-         You are practicing  {{ this.operation | titlecase }} –
-          {{
-            this.operation === 'sudoku'
-              ? (level === 0 ? 'Easy' : level === 1 ? 'Medium' : 'Difficult')
-              : 'Level ' + level
-          }}
-        </h2>
-      </div>
-  
-      <div *ngIf="questions[currentQIndex]" class="question-row">
-        <div class="character-container" (click)="readQuestionAloud()">
-          <img src="assets/images/bird1.gif" alt="Bird Reader" [class.animate]="isReading" />
-        </div>
-        <div class="question-container">
-          <p>
-            {{ questions[currentQIndex].question.split('=')[0] }} =
-            <input
-              type="text"
-              [(ngModel)]="answerInput"
-              class="answer-input"
-              (keyup.enter)="submitAnswer()"
-              [disabled]="quizCompleted"
-              autocomplete="off"
-              placeholder="?" />
-          </p>
-        </div>
-       
+<!-- ═══════════════════════════════════════════════════════════════════
+     FORM STATE
+════════════════════════════════════════════════════════════════════ -->
+<div class="practice-page" *ngIf="state === 'form'">
 
-        
-            <button *ngIf="!quizCompleted" (click)="submitAnswer()" class="submit-btn">Submit</button>
-            <!--<button (click)="takeChallenge()" class="print-button">Take a Challenge</button>-->
-            <button class="try-again" *ngIf="quizCompleted && score < questions.length" (click)="restartQuiz()">🔁 Try Again</button>
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">← Back to Home</button>
+    <h1>Practice Papers</h1>
+    <p>Choose a subject and topic, generate a paper, then answer it online</p>
+  </div>
+
+  <!-- ── Subject Quick-Start Cards ─────────────────────────────────── -->
+  <div class="subject-hub">
+    <h2>What would you like to practice?</h2>
+    <div class="subject-cards">
+      <div *ngFor="let subj of featuredSubjects"
+           class="subject-card"
+           [class.selected]="selectedSubject === subj.id"
+           (click)="quickStartSubject(subj.id)">
+        <div class="subj-icon">{{ subj.icon }}</div>
+        <div class="subj-name">{{ subj.name }}</div>
+        <div class="subj-desc">{{ subj.description }}</div>
       </div>
-  
-      <div class="feedback" *ngIf="feedbackMessage">
-        <p>{{ feedbackMessage }}</p>
+    </div>
+  </div>
+
+  <!-- ── Generate New Paper ──────────────────────────────────────── -->
+  <div class="generation-form" id="generation-form">
+    <h2>Generate a Paper</h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="subject">Subject *</label>
+        <select id="subject" [(ngModel)]="selectedSubject" (change)="onSubjectChange()" class="form-control">
+          <option value="">-- Select Subject --</option>
+          <option *ngFor="let subject of subjects" [value]="subject.id">
+            {{ subject.icon }} {{ subject.name }}
+          </option>
+        </select>
       </div>
-  
-      <div class="practice-done-box">
-        <div class="hover-options">
-          
-          <div class="hover-item" (click)="goToLearn()">
-            <img src="assets/images/greenPuzzle.png" class="puzzle-icon" />
-            <div class="hover-text">Not sure? Want to learn with example?</div>
-            <div class="example-box">
-              <p><strong>Example:</strong> 300 + 500 = 800</p>
-              <p>Arrange as:</p>
-              <pre>300\n+500</pre>
+
+      <div class="form-group">
+        <label for="topic">Topic *</label>
+        <select id="topic" [(ngModel)]="selectedTopic" [disabled]="!selectedSubject" class="form-control">
+          <option value="">-- Select Topic --</option>
+          <option *ngFor="let topic of availableTopics"
+                  [value]="topic.id"
+                  [disabled]="!topic.supported">
+            {{ topic.name }}{{ !topic.supported ? ' (Coming Soon)' : '' }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="questions">Questions *</label>
+        <select id="questions" [(ngModel)]="numQuestions" (change)="onQuestionCountChange()" class="form-control">
+          <option *ngFor="let num of questionOptions" [value]="num">{{ num }} Questions</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="difficulty">Difficulty *</label>
+        <select id="difficulty" [(ngModel)]="difficulty" class="form-control">
+          <option *ngFor="let diff of difficultyOptions" [value]="diff">{{ diff }}</option>
+        </select>
+      </div>
+    </div>
+
+    <button
+      class="btn-generate"
+      (click)="generatePaper()"
+      [disabled]="!canGeneratePaper() || generating">
+      {{ generating ? 'Generating...' : '✦ Generate & Answer Online' }}
+    </button>
+  </div>
+
+  <!-- ── My Practice History by Subject ────────────────────────── -->
+  <div class="practice-history" *ngIf="hasAnyPapers">
+    <h2>My Practice History</h2>
+
+    <div *ngFor="let subj of featuredSubjects">
+      <div class="subject-section" *ngIf="getSubjectPapers(subj.id).length > 0">
+        <div class="subject-section-header">
+          <span class="subj-hdr-icon">{{ subj.icon }}</span>
+          <span class="subj-hdr-name">{{ subj.name }}</span>
+          <span class="subj-hdr-count">{{ getSubjectPapers(subj.id).length }} paper(s)</span>
+        </div>
+
+        <div class="papers-list">
+          <div *ngFor="let paper of getSubjectPapers(subj.id)" class="paper-row">
+            <div class="paper-info">
+              <span class="paper-topic">{{ paper.topic_name }}</span>
+              <span class="paper-meta">
+                {{ paper.num_questions }} Qs · {{ paper.difficulty }} · {{ formatDate(paper.created_at) }}
+              </span>
+            </div>
+
+            <div class="paper-result" *ngIf="paper.status === 'submitted' && paper.percentage != null">
+              <span class="score-badge" [class.pass]="paper.percentage! >= 60">
+                {{ paper.percentage }}%
+              </span>
+            </div>
+            <div class="paper-status-badge" *ngIf="paper.status !== 'submitted'">
+              <span class="status-chip">{{ paper.status }}</span>
+            </div>
+
+            <div class="paper-actions">
+              <button class="btn-action btn-online" (click)="attemptOnline(paper.paper_id)">
+                ✍️ Answer Online
+              </button>
+              <button class="btn-action btn-offline" (click)="attemptOffline(paper.paper_id)">
+                📥 Attempt Offline
+              </button>
+              <button class="btn-action btn-upload" (click)="uploadAnswers(paper.paper_id)">
+                📷 Upload Photo
+              </button>
             </div>
           </div>
-      
-          <div class="hover-item" (click)="takeChallenge()">
-            <img src="assets/images/bluePuzzle.png" class="puzzle-icon" />
-            <div class="hover-text">Ready? Try the challenge now!</div>
-            <div class="example-box">
-              <p>Challenge yourself with 5 random questions from this level.</p>
-            </div>
-          </div>
-      
         </div>
       </div>
-      
-      
+    </div>
+
+    <!-- Papers from other subjects (Computers, Science, etc.) -->
+    <div class="subject-section" *ngIf="otherSubjectPapers.length > 0">
+      <div class="subject-section-header">
+        <span class="subj-hdr-icon">📄</span>
+        <span class="subj-hdr-name">Other Subjects</span>
+        <span class="subj-hdr-count">{{ otherSubjectPapers.length }} paper(s)</span>
+      </div>
+      <div class="papers-list">
+        <div *ngFor="let paper of otherSubjectPapers" class="paper-row">
+          <div class="paper-info">
+            <span class="paper-topic">{{ getSubjectIcon(paper.subject_id) }} {{ paper.topic_name }}</span>
+            <span class="paper-meta">{{ paper.num_questions }} Qs · {{ paper.difficulty }} · {{ formatDate(paper.created_at) }}</span>
+          </div>
+          <div class="paper-actions">
+            <button class="btn-action btn-online" (click)="attemptOnline(paper.paper_id)">✍️ Answer Online</button>
+            <button class="btn-action btn-offline" (click)="attemptOffline(paper.paper_id)">📥 Attempt Offline</button>
+            <button class="btn-action btn-upload" (click)="uploadAnswers(paper.paper_id)">📷 Upload Photo</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-    <!-- RIGHT SIDEBAR -->
-     <div class="right-sidebar ">
-    <app-right-sidebar *ngIf="username"
-      class="sidebar right"
-      [username]="username"
-      [score]="score"
-      [currentQIndex]="currentQIndex"
-      [totalQuestions]="questions.length"
-      [elapsedTime]="elapsedTime">
-    </app-right-sidebar>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!hasAnyPapers">
+    <div class="empty-icon">📝</div>
+    <h3>No Papers Yet</h3>
+    <p>Pick a subject above and generate your first practice paper!</p>
   </div>
-  </div>
-    <!-- LOADING TEMPLATE -->
-  <ng-template #loading>
-    <p>⏳ Loading questions...</p>
-  </ng-template>
-  
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAPER READY STATE
+════════════════════════════════════════════════════════════════════ -->
+<section class="paper-ready-page" *ngIf="state === 'paper-ready'">
+  <div class="ready-badge">✅ Paper Ready!</div>
+  <h2>{{ readyPaperName }}</h2>
+  <p class="paper-id-display">Paper ID: <code>{{ readyPaperId }}</code></p>
+
+  <button class="btn-start-online" (click)="attemptOnline(readyPaperId)">
+    ✍️ Answer Questions Now
+  </button>
+
+  <div class="or-divider">— or —</div>
+
+  <button class="btn-offline-ready" (click)="attemptOffline(readyPaperId)">
+    📥 Attempt Offline (Download PDF)
+  </button>
+
+  <div class="or-divider">— or —</div>
+
+  <button class="btn-upload-ready" (click)="uploadAnswers(readyPaperId)">
+    📷 Upload a Photo of Your Answers
+  </button>
+
+  <button class="btn-back-to-form" (click)="backToForm()">← Back to Practice</button>
+</section>

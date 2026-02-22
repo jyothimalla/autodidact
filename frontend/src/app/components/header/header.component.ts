@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { QuizService } from '../../services/quiz.service';
@@ -8,6 +8,8 @@ import { ConfigService } from '../../services/config.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserService } from '../../services/user.service';
+import { NavigationEnd } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 interface UserProfile {
   username: string;
@@ -26,7 +28,7 @@ interface UserProfile {
   styleUrls: ['./header.component.scss']
 })
 
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   @Input() username = 'Guest'; // Bind this from parent
   isLoggedIn = false;
   user_id: number = 0;
@@ -34,6 +36,7 @@ export class HeaderComponent implements OnInit {
   ninjaStars = 0;
   attempts: any[] = [];
   userData: any = null;
+  private routerSub?: Subscription;
   
   
   constructor(public router: Router, 
@@ -44,17 +47,37 @@ export class HeaderComponent implements OnInit {
               private quizService: QuizService  ) {}
   
   ngOnInit(): void {
-    this.username = this.route.snapshot.queryParams['username']  || localStorage.getItem('username') || 'Guest';
-    this.user_id = this.route.snapshot.queryParams['user_id'] || localStorage.getItem('user_id') || '0';
+    this.refreshUserState();
+    this.routerSub = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.refreshUserState();
+      }
+    });
+  }
 
-    this.isLoggedIn = this.username !== 'Guest';
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+  }
+
+  private refreshUserState(): void {
+    // Prefer the persisted session user. Query params are only a fallback.
+    const routeUsername = this.route.snapshot.queryParams['username'];
+    const routeUserId = this.route.snapshot.queryParams['user_id'];
+    this.username = localStorage.getItem('username') || routeUsername || 'Guest';
+    this.user_id = parseInt(localStorage.getItem('user_id') || routeUserId || '0', 10);
+    this.isLoggedIn = this.username !== 'Guest' && this.user_id > 0;
+
+    if (!this.isLoggedIn) {
+      this.attempts = [];
+      return;
+    }
+
     this.quizService.getUserProgress(this.user_id).subscribe({
       next: (res) => {
-        this.attempts = res.attempts || [];  // ← Ensure the structure matches the backend response
-        console.log('✅ Attempts loaded:', this.attempts);
+        this.attempts = res.attempts || [];
       },
-      error: (err) => {
-        console.error('❌ Failed to load attempts:', err);
+      error: () => {
+        this.attempts = [];
       }
     });
   }
@@ -80,7 +103,7 @@ export class HeaderComponent implements OnInit {
   }
 
   goToPractice(): void {
-    this.router.navigate(['/parent-paper']);
+    this.router.navigate(['/practice']);
   }
 
   goToTest(): void {

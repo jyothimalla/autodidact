@@ -17,7 +17,7 @@ class QuestionAdmin(ModelView, model=Question):
     column_list = [Question.id, Question.question_text, Question.correct_answer]
 
 class UserAdmin(ModelView, model=User):
-    column_list = [User.id, User.username, User.email, User.ninja_stars, User.awarded_title, User.is_active]
+    column_list = [User.id, User.username, User.email, User.year, User.ninja_stars, User.awarded_title, User.is_active]
 
 class FMCAdmin(ModelView, model=UserScore):
     column_list = [UserScore.id, UserScore.score]

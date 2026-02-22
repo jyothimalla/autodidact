@@ -93,7 +93,7 @@ export class LoginComponent {
         alert(`✅ Welcome, ${res.username} (ID: ${res.user_id})!`);
 
         this.dialogRef?.close();
-        this.router.navigate(['/operation'], {
+        this.router.navigate(['/learning'], {
           queryParams: {username: res.username, user_id: res.user_id }
         });
       },

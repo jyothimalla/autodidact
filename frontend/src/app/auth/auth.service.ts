@@ -13,6 +13,11 @@ interface AuthResponse {
   name?: string;
 }
 
+interface CurrentUser {
+  id: number | null;
+  name: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private baseUrl = `${environment.apiBaseUrl}/auth`;
@@ -46,5 +51,12 @@ export class AuthService {
   getUserId(): number | null {
     const id = localStorage.getItem('user_id');
     return id ? parseInt(id) : null;
+  }
+
+  getCurrentUser(): CurrentUser {
+    return {
+      id: this.getUserId(),
+      name: this.getUsername(),
+    };
   }
 }

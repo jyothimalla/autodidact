@@ -1,44 +1,165 @@
-<div class="analytics-wrapper">
-    <div class="analytics-dashboard">
-        <h2>📊 Analytics Dashboard</h2>
-      
-        
+<div class="analytics-page" *ngIf="!loading; else loadingTpl">
+  <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-        <div class="analytics-tabs">
-          <button (click)="setTab('usage')">Usage</button>
-          <button (click)="setTab('scores')">Scores</button>
-          <button (click)="setTab('questions')">Questions</button>
-          <button (click)="setTab('progress')">Progress</button>
-          <button (click)="activeTab = 'summary'">📊 Summary</button>
-          <button (click)="activeTab = 'upload'">📤 Upload Answers</button>
-          <!-- Add more buttons for future tabs -->
-        </div>
-        
-        <div class="analytics-content">
-          <!--<app-summary *ngIf="activeTab === 'summary'"></app-summary>-->
-          <app-upload-answers *ngIf="activeTab === 'upload'"></app-upload-answers>
-        </div>
-      
-       <!-- <div class="analytics-content">
-          <ng-container [ngSwitch]="currentTab">
-            <div *ngSwitchCase="'usage'">
-              <app-usage></app-usage>
-            </div>
-            <div *ngSwitchCase="'trouble'">
-              <app-trouble-spots></app-trouble-spots>
-            </div>
-            <div *ngSwitchCase="'scores'">
-              <app-scores></app-scores>
-            </div>
-            <div *ngSwitchCase="'questions'">
-              <app-questions></app-questions>
-            </div>
-            <div *ngSwitchCase="'progress'">
-              <app-progress></app-progress>
-            </div>
-          </ng-container>
-        </div>-->
+  <ng-container *ngIf="!errorMessage">
+    <h1>Track {{ studentName }}'s exam preparation</h1>
+
+    <div class="year-control">
+      <label for="yearSelect">Student Year</label>
+      <select id="yearSelect" [value]="selectedYear" (change)="onYearChange($event)">
+        <option *ngFor="let y of yearLevels" [value]="y">Year {{ y }}</option>
+      </select>
+    </div>
+
+    <div class="year-plan-card">
+      <strong>Year {{ selectedYear }} Plan</strong>
+      <span>Benchmark: {{ yearPlan.benchmark }}%</span>
+      <span>Active days/week: {{ yearPlan.activeDays }}</span>
+      <span>Mocks/week: {{ yearPlan.weeklyMocks }}</span>
+      <span>Learning minutes/week: {{ yearPlan.weeklyMinutes }}</span>
+    </div>
+
+    <p class="intro">
+      It is wonderful to see {{ studentName }} staying dedicated this week for <strong>Year {{ selectedYear }}</strong>.
+      {{ studentName }} logged in on <strong>{{ activeDays }}</strong> day{{ activeDays === 1 ? '' : 's' }},
+      spent <strong>{{ learningMinutes }}</strong> minutes learning,
+      answered <strong>{{ questionsAnswered }}</strong> questions,
+      completed <strong>{{ islandsCompleted }}</strong> learning journey islands,
+      finished <strong>{{ mockTestsCompleted }}</strong> mock test{{ mockTestsCompleted === 1 ? '' : 's' }},
+      and completed <strong>{{ customPracticesCompleted }}</strong> custom practice{{ customPracticesCompleted === 1 ? '' : 's' }}.
+      <ng-container *ngIf="targetsMet.length > 0">
+        {{ studentName }} met targets in {{ targetsMet.join(', ') }}.
+      </ng-container>
+    </p>
+
+    <div class="subject-strip">
+      <div class="summary-card">
+        <h3>Summary</h3>
+        <p>Everything at a glance</p>
       </div>
-      
-  </div>
-  
+
+      <div class="subject-card" *ngFor="let subject of subjects; trackBy: trackBySubject">
+        <h4>{{ subject.label }}</h4>
+        <span
+          class="badge"
+          [class.badge-strong]="subject.status === 'Strong'"
+          [class.badge-good]="subject.status === 'Good'"
+          [class.badge-needs]="subject.status === 'Needs focus'"
+          [class.badge-empty]="subject.status === 'No data'"
+        >
+          {{ subject.status }}
+        </span>
+      </div>
+    </div>
+
+    <h2>Performance comparison</h2>
+
+    <section class="performance-grid">
+      <aside class="recommendations-panel">
+        <div class="status-pill" [class.status-warning]="performanceLabel === 'Needs attention'">
+          <span class="bars" aria-hidden="true"></span>
+          <span>{{ performanceLabel }}</span>
+        </div>
+
+        <h3>To stay above the benchmark:</h3>
+
+        <div class="tip" *ngFor="let rec of recommendations">{{ rec }}</div>
+      </aside>
+
+      <div class="chart-panel">
+        <div class="chart-head">
+          <span>{{ studentName }}</span>
+          <span>Year {{ selectedYear }} benchmark</span>
+          <span>Average student preparing for an exam</span>
+        </div>
+
+        <div class="chart-body">
+          <div class="benchmark-line"></div>
+          <div class="student-bar" [style.height.%]="progressBarWidth" [style.left.%]="78">
+            <span>{{ performanceScore }}%</span>
+          </div>
+
+          <div class="months">
+            <span *ngFor="let point of timeline">{{ point.label }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <h2>Weekly activities</h2>
+
+    <section class="weekly-grid">
+      <article class="activity-card topic">
+        <header>
+          <div class="count">{{ examTopicsDoneThisWeek }}</div>
+          <div>
+            <h3>Exam topics done this week</h3>
+            <p>Progress in topics that are expected in exams.</p>
+          </div>
+        </header>
+
+        <div class="item-row" *ngFor="let item of weeklyTopicItems">
+          <span>{{ item.title }}</span>
+          <span>{{ item.when }}</span>
+        </div>
+
+        <div class="item-row" *ngIf="weeklyTopicItems.length === 0">
+          <span>No completed topic attempts this week yet.</span>
+          <span></span>
+        </div>
+      </article>
+
+      <article class="activity-card test">
+        <header>
+          <div class="count">{{ testsDoneThisWeek }}</div>
+          <div>
+            <h3>Tests done this week</h3>
+            <p>Progress in mock tests completed this week.</p>
+          </div>
+        </header>
+
+        <div class="item-row" *ngFor="let item of weeklyTestItems">
+          <span>{{ item.title }}</span>
+          <span>{{ item.score }} · {{ item.when }}</span>
+        </div>
+
+        <div class="item-row" *ngIf="weeklyTestItems.length === 0">
+          <span>No mock tests completed this week yet.</span>
+          <span></span>
+        </div>
+      </article>
+    </section>
+
+    <section class="focus-area" *ngIf="weakTopics.length > 0">
+      <h3>{{ studentName }} needs more practice in:</h3>
+      <p>{{ weakTopics.join(', ') }}</p>
+    </section>
+
+    <section class="needs-attention-plan">
+      <h2>Needs Attention Plan (Year {{ selectedYear }})</h2>
+      <p class="plan-sub">Predefined targets and timetable for this year level.</p>
+
+      <div class="plan-grid">
+        <article class="plan-card">
+          <h3>Targets</h3>
+          <ul>
+            <li *ngFor="let target of needsAttentionTargets">{{ target }}</li>
+          </ul>
+        </article>
+
+        <article class="plan-card">
+          <h3>Weekly Timetable</h3>
+          <div class="slot-row" *ngFor="let slot of needsAttentionTimetable">
+            <span class="day">{{ slot.day }}</span>
+            <span class="focus">{{ slot.focus }}</span>
+            <span class="duration">{{ slot.duration }} mins</span>
+          </div>
+        </article>
+      </div>
+    </section>
+  </ng-container>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="analytics-page loading">Loading analytics...</div>
+</ng-template>
