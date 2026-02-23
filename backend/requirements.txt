@@ -24,6 +24,7 @@ pandas
 passlib==1.7.4
 pdf2image
 pdfplumber
+qrcode
 psycopg2-binary==2.9.10
 pycparser==2.22
 pydantic==2.11.4
