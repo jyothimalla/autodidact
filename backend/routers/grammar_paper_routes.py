@@ -389,12 +389,18 @@ def _render_answer_sheet_html(*, title, questions, student_name, download_date,
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: Arial, Helvetica, sans-serif; color: #222; }
 {% if standalone %}
-  @page { size: A4; margin: 24mm 10mm 10mm 10mm; }
+  @page {
+    size: A4;
+    margin: 24mm 10mm 10mm 10mm;
+    /* Running element fills the full top margin box on every page */
+    @top-left { content: element(page-hdr); }
+  }
 
-  /* ── Compact page header: position:fixed repeats on every page ──
-     Full table layout — no flexbox inside fixed elements in WeasyPrint ── */
+  /* ── Compact page header: running element — lives in the top margin box,
+     never overlaps page content, repeats on every page ── */
   .as-page-hdr {
-    position: fixed; top: 0; left: 0; right: 0;
+    position: running(page-hdr);
+    width: 100%;
     background: white; border-bottom: 2.5px solid #1f6fff;
     padding: 2.5mm 10mm;
   }

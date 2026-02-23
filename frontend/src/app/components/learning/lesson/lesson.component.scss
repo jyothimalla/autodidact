@@ -420,6 +420,201 @@ button.challenge {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// Karel notes — scoped inside .notes-section for correct specificity
+// ─────────────────────────────────────────────────────────────
+
+.notes-section {
+
+  // Colourful top banner for Karel lesson only
+  .kn-banner {
+    background: linear-gradient(135deg, #16213e 0%, #0f3460 55%, #0f9b58 100%);
+    color: white;
+    padding: 1.5rem 1.8rem;
+    border-radius: 14px;
+    margin-bottom: 1.4rem;
+
+    .kn-banner-tag {
+      display: inline-block;
+      background: #0f9b58;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    h2 { font-size: 24px; font-weight: 900; margin: 0 0 4px; color: white; }
+    p  { font-size: 13px; color: #a8d8c0; margin: 0; }
+  }
+
+  // Section cards — each with a coloured top stripe
+  .kn-section {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    border: 1.5px solid #e8eaf0;
+
+    .kn-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 1.4rem;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .kn-section-body { padding: 1.2rem 1.4rem; }
+
+    &.kn-meet   .kn-section-header { background: linear-gradient(90deg, #0f9b58, #27ae60); }
+    &.kn-cmds   .kn-section-header { background: linear-gradient(90deg, #1565c0, #1976d2); }
+    &.kn-ex1    .kn-section-header { background: linear-gradient(90deg, #e65100, #ef6c00); }
+    &.kn-ex2    .kn-section-header { background: linear-gradient(90deg, #6a1b9a, #8e24aa); }
+    &.kn-funcs  .kn-section-header { background: linear-gradient(90deg, #00838f, #0097a7); }
+  }
+
+  // Summary card — dark navy (needs !important to override .note-card bg)
+  .kn-summary-card {
+    background: #0f3460 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15,52,96,0.3);
+
+    h3 { font-size: 16px; font-weight: 700; color: #0f9b58 !important; margin: 0 0 0.9rem; }
+    ul { padding-left: 1.3rem; margin: 0; }
+    li { line-height: 1.9; font-size: 14px; color: #d0e8f0 !important; }
+    code { background: rgba(255,255,255,0.12) !important; color: #7ed6a7 !important; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace; }
+    p { color: #a8c8e0 !important; font-size: 13px; margin-top: 0.5rem; }
+  }
+
+  // Resources card
+  .kn-resources {
+    background: #fff8e1 !important;
+    border: 2px solid #f9a825 !important;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+
+    h3 { color: #e65100 !important; }
+    .kn-res-item { margin-bottom: 0.6rem; font-size: 14px; }
+    .kn-res-label { font-weight: 700; color: #0f3460; display: block; }
+    .kn-res-url {
+      font-size: 12px; color: #1565c0;
+      word-break: break-all; text-decoration: underline;
+    }
+    em { font-size: 12px; color: #777; }
+  }
+
+  .kn-callout {
+    border-left: 4px solid #0f9b58;
+    background: #f0fbf5;
+    padding: 0.7rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #1a3a2a;
+
+    &.kn-fun { border-color: #e67e22; background: #fef9f0; color: #5d3000; }
+    &.kn-tip { border-color: #1976d2; background: #e3f2fd; color: #0d2b4e; }
+    code { background: rgba(0,0,0,0.07); padding: 1px 5px; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace; }
+    ol { padding-left: 1.2rem; margin: 0.4rem 0 0; }
+    li { font-size: 14px; line-height: 1.8; }
+  }
+
+  .kn-two-col {
+    display: flex; gap: 1.5rem; align-items: flex-start;
+    @media (max-width: 600px) { flex-direction: column; }
+  }
+  .kn-col {
+    flex: 1;
+    p  { font-size: 14px; line-height: 1.7; color: #333; margin-bottom: 0.5rem; }
+    ul { padding-left: 1.3rem; margin: 0.4rem 0; }
+    li { font-size: 14px; line-height: 1.8; color: #333; }
+  }
+  .kn-hi { color: #0f9b58; font-size: 16px; font-weight: 800; }
+
+  .kn-world-label {
+    font-size: 11px; font-weight: 700; color: #555;
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;
+  }
+  .kn-world {
+    border-collapse: collapse;
+    border: 2.5px solid #0f3460;
+
+    td {
+      width: 32px; height: 32px;
+      border: 1px solid #b0bce8; text-align: center;
+      font-size: 14px; vertical-align: middle;
+      background: #f0f4ff; font-weight: 600;
+    }
+    &.kn-world--sm td { width: 26px; height: 26px; }
+    td.kn-karel { background: #c8f7dc; color: #0a4a25; font-size: 16px; }
+    td.kn-ball  { background: #fff0b0; color: #7d5200; }
+    td.kn-wall  { background: #37474f; }
+  }
+  .kn-legend { font-size: 11px; color: #666; margin-top: 5px; }
+
+  .kn-world-pair {
+    display: flex; align-items: center; gap: 1.2rem;
+    margin: 1rem 0; flex-wrap: wrap;
+  }
+  .kn-world-cell { display: flex; flex-direction: column; }
+  .kn-arrow { font-size: 32px; font-weight: 900; color: #0f9b58; flex-shrink: 0; line-height: 1; }
+
+  .kn-code {
+    background: #1a2535; border-radius: 10px; overflow: hidden; margin: 0.9rem 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .kn-code-title {
+    background: #0d2b50; color: #7ed6a7;
+    padding: 6px 14px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.5px; font-family: 'Courier New', monospace;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .kn-pre {
+    color: #e8f4fd; font-family: 'Courier New', monospace;
+    font-size: 13.5px; line-height: 1.8; padding: 12px 16px;
+    margin: 0; white-space: pre; overflow-x: auto;
+
+    .kn-kw  { color: #c792ea; font-weight: 700; }
+    .kn-fn  { color: #82aaff; }
+    .kn-cm  { color: #7a9cac; font-style: italic; }
+    .kn-st  { color: #c3e88d; }
+    .kn-num { color: #f78c6c; }
+  }
+
+  .kn-cmd-table {
+    width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 14px;
+    border-radius: 8px; overflow: hidden;
+
+    thead tr { background: linear-gradient(90deg, #1565c0, #1e88e5); color: white; }
+    th { padding: 9px 14px; text-align: left; font-size: 13px; }
+    tbody tr:nth-child(even) { background: #f0f4ff; }
+    tbody tr:nth-child(odd)  { background: white; }
+    td { padding: 9px 14px; border-bottom: 1px solid #e0e6f8; vertical-align: middle; }
+    code {
+      background: #e3eafd; color: #0f3460; font-family: 'Courier New', monospace;
+      font-weight: 700; padding: 2px 7px; border-radius: 5px; font-size: 13px;
+    }
+  }
+
+  .kn-try {
+    background: linear-gradient(135deg, #e3f2fd, #e8f5e9);
+    border: 2px dashed #1976d2;
+    border-radius: 8px; padding: 0.8rem 1.1rem; margin-top: 0.9rem;
+    font-size: 14px; color: #0d2b4e; line-height: 1.65;
+    code { background: rgba(0,0,0,0.07); padding: 1px 5px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px; }
+  }
+
+} // end .notes-section
+
 // Mode Selection
 .mode-select-view {
   max-width: 900px;

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, HostListener, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { QuizService } from '../../services/quiz.service';
@@ -36,15 +36,33 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ninjaStars = 0;
   attempts: any[] = [];
   userData: any = null;
+  dropdownOpen = false;
   private routerSub?: Subscription;
-  
-  
-  constructor(public router: Router, 
-              private route: ActivatedRoute, 
-              private config: ConfigService, 
+
+
+  constructor(public router: Router,
+              private route: ActivatedRoute,
+              private config: ConfigService,
               private userService: UserService,
               private http: HttpClient,
-              private quizService: QuizService  ) {}
+              private quizService: QuizService,
+              private elRef: ElementRef) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.elRef.nativeElement.contains(event.target)) {
+      this.dropdownOpen = false;
+    }
+  }
+
+  toggleDropdown(event: MouseEvent): void {
+    event.stopPropagation();
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  closeDropdown(): void {
+    this.dropdownOpen = false;
+  }
   
   ngOnInit(): void {
     this.refreshUserState();
@@ -86,10 +104,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
+    this.closeDropdown();
     localStorage.clear();
     this.router.navigate(['/']);
   }
   userAccount() {
+    this.closeDropdown();
     const userId = localStorage.getItem('user_id');
     if (userId) {
       this.router.navigate(['/my-account', userId]);
@@ -115,6 +135,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   goToAnalytics(): void {
+    this.closeDropdown();
     this.router.navigate(['/analytics']);
   }
   

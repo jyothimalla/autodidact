@@ -223,14 +223,32 @@ export class LessonComponent {
 
   // Check if next level exists
   completeLevel(): void {
-    if (this.topic && this.currentLevel) {
+    if (!this.currentLevel) return;
+
+    if (this.topic) {
       const nextLevel = this.topic.levels.find(l => l.level === this.currentLevel!.level + 1);
       if (nextLevel) {
         this.router.navigate(['/learning', this.module?.id, this.topic.id, 'level', nextLevel.level]);
-      } else {
-        alert('Congratulations! You completed all levels for ' + this.topic.name);
-        this.router.navigate(['/learning']);
+        return;
       }
+      alert('Congratulations! You completed all levels for ' + this.topic.name);
+      this.router.navigate(['/learning']);
+      return;
+    }
+
+    // Modules that use direct atoms instead of nested topics.
+    if (this.module?.atoms?.length) {
+      const orderedAtoms = [...this.module.atoms].sort((a, b) => a.level - b.level);
+      const currentIdx = orderedAtoms.findIndex(a => a.id === this.currentLevel!.id);
+      const nextAtom = currentIdx >= 0 ? orderedAtoms[currentIdx + 1] : undefined;
+
+      if (nextAtom) {
+        this.router.navigate(['/learning', this.module.id, nextAtom.id]);
+        return;
+      }
+
+      alert('Congratulations! You completed all levels for ' + this.module.name);
+      this.router.navigate(['/learning']);
     }
   }
 

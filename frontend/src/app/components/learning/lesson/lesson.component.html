@@ -31,6 +31,297 @@
     <div class="notes-section">
       <h2>📝 Study Notes</h2>
 
+      <!-- ═══════════════════════════════════════════════════════════
+           KAREL: Introduction to Python with Karel — rich notes
+      ═══════════════════════════════════════════════════════════ -->
+      <ng-container *ngIf="currentLevel.id === 'python-with-karel'">
+
+        <!-- Hero Banner -->
+        <div class="kn-banner">
+          <div class="kn-banner-tag">Python Lesson 1</div>
+          <h2>Introduction to Python with Karel</h2>
+          <p>Meet your first robot — and write your very first Python program!</p>
+        </div>
+
+        <!-- 1 — Meet Karel -->
+        <div class="kn-section kn-meet">
+          <div class="kn-section-header">🐕 Meet Karel</div>
+          <div class="kn-section-body">
+            <div class="kn-callout kn-fun">
+              <strong>Who is Karel?</strong> Karel is a friendly robot that lives inside a grid world.
+              You are the programmer — you give Karel instructions and Karel follows them <em>exactly</em>.
+              If you make a mistake, Karel gets confused! That's why we must write our code carefully.
+            </div>
+            <div class="kn-two-col">
+              <div class="kn-col">
+                <p>Karel's world is a <strong>grid of squares</strong>. Karel can:</p>
+                <ul>
+                  <li>Move forward one square</li>
+                  <li>Turn left (90°)</li>
+                  <li>Pick up and place balls</li>
+                  <li>Follow functions you define</li>
+                </ul>
+                <p style="margin-top:0.6rem">
+                  The <strong class="kn-hi">►</strong> symbol shows where Karel is and which direction it faces.
+                  Karel always starts at the <strong>bottom-left</strong> corner facing <strong>East (right)</strong>.
+                </p>
+              </div>
+              <div class="kn-col">
+                <div class="kn-world-label">Start position</div>
+                <table class="kn-world">
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td class="kn-karel">►</td><td></td><td></td><td></td><td></td><td></td></tr>
+                </table>
+                <p class="kn-legend">► Karel &nbsp;|&nbsp; ● Ball &nbsp;|&nbsp; ■ Wall</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 — Basic Commands -->
+        <div class="kn-section kn-cmds">
+          <div class="kn-section-header">📋 Karel's Basic Commands</div>
+          <div class="kn-section-body">
+            <div class="kn-callout kn-tip">
+              <strong>Important rule:</strong> All commands must be written <em>exactly</em> right —
+              correct spelling, brackets <code>()</code>, and no extra spaces.
+              Python is case-sensitive: <code>Move()</code> is NOT the same as <code>move()</code>!
+            </div>
+            <table class="kn-cmd-table">
+              <thead>
+                <tr><th>Command</th><th>What it does</th><th>Think of it as…</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>move()</code></td><td>Karel moves one square forward</td><td>🏃 Take one step</td></tr>
+                <tr><td><code>turn_left()</code></td><td>Karel turns 90° to the left</td><td>↺ Spin left</td></tr>
+                <tr><td><code>put_ball()</code></td><td>Places a ball on the current square</td><td>🎾 Drop a ball here</td></tr>
+                <tr><td><code>take_ball()</code></td><td>Picks up a ball from the current square</td><td>🤏 Pick it up</td></tr>
+                <tr><td><code>turn_around()</code></td><td>Karel turns 180° — faces opposite direction</td><td>↩ U-turn</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3 — Example 1: Moving -->
+        <div class="kn-section kn-ex1">
+          <div class="kn-section-header">🧪 Example 1 — Moving Karel Across the Grid</div>
+          <div class="kn-section-body">
+            <div class="kn-callout">
+              <strong>Challenge:</strong> Karel starts at the left side facing right.
+              Move Karel <strong>3 squares to the right</strong>.
+            </div>
+            <div class="kn-world-pair">
+              <div class="kn-world-cell">
+                <div class="kn-world-label">Before</div>
+                <table class="kn-world">
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td class="kn-karel">►</td><td></td><td></td><td></td><td></td><td></td></tr>
+                </table>
+              </div>
+              <div class="kn-arrow">→</div>
+              <div class="kn-world-cell">
+                <div class="kn-world-label">After 3 × move()</div>
+                <table class="kn-world">
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td class="kn-karel">►</td><td></td><td></td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="kn-code">
+              <div class="kn-code-title">🖥 solution_example1.py</div>
+<pre class="kn-pre"><span class="kn-cm"># Move Karel 3 squares to the right</span>
+<span class="kn-fn">move</span>()   <span class="kn-cm"># step 1 — Karel moves to column 1</span>
+<span class="kn-fn">move</span>()   <span class="kn-cm"># step 2 — Karel moves to column 2</span>
+<span class="kn-fn">move</span>()   <span class="kn-cm"># step 3 — Karel moves to column 3</span></pre>
+            </div>
+            <div class="kn-callout kn-tip">
+              <strong>Key idea:</strong> Each <code>move()</code> is one instruction.
+              The computer runs them <strong>one at a time, top to bottom</strong>.
+              This is called <em>sequential execution</em>.
+            </div>
+            <div class="kn-try">
+              <strong>✏️ Try it yourself!</strong>
+              What code would move Karel <strong>5 squares</strong> to the right?
+              Write it out on paper before typing!
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 — Example 2: Placing Balls -->
+        <div class="kn-section kn-ex2">
+          <div class="kn-section-header">🎾 Example 2 — Placing Tennis Balls</div>
+          <div class="kn-section-body">
+            <div class="kn-callout">
+              <strong>Challenge:</strong> Karel starts facing right.
+              Place a ball on <strong>each of the first 3 squares</strong> Karel visits.
+            </div>
+            <div class="kn-world-pair">
+              <div class="kn-world-cell">
+                <div class="kn-world-label">Before</div>
+                <table class="kn-world">
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td class="kn-karel">►</td><td></td><td></td><td></td><td></td><td></td></tr>
+                </table>
+              </div>
+              <div class="kn-arrow">→</div>
+              <div class="kn-world-cell">
+                <div class="kn-world-label">After placing 3 balls</div>
+                <table class="kn-world">
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td class="kn-ball">●</td><td class="kn-ball">●</td><td class="kn-karel">►</td><td></td><td></td><td></td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="kn-code">
+              <div class="kn-code-title">🖥 solution_example2.py</div>
+<pre class="kn-pre"><span class="kn-cm"># Place a ball, move, repeat…</span>
+<span class="kn-fn">put_ball</span>()  <span class="kn-cm"># drop ball on square 0</span>
+<span class="kn-fn">move</span>()      <span class="kn-cm"># step to square 1</span>
+<span class="kn-fn">put_ball</span>()  <span class="kn-cm"># drop ball on square 1</span>
+<span class="kn-fn">move</span>()      <span class="kn-cm"># step to square 2</span>
+<span class="kn-fn">put_ball</span>()  <span class="kn-cm"># drop ball on square 2</span></pre>
+            </div>
+            <div class="kn-callout kn-fun">
+              <strong>Spot the pattern!</strong> We repeated <code>put_ball() → move()</code> three times.
+              Whenever you repeat something, there's usually a smarter way — called a <em>loop</em>.
+              We'll learn loops in the next lesson! 🚀
+            </div>
+            <div class="kn-try">
+              <strong>✏️ Try it yourself!</strong>
+              How would you pick up all 3 balls Karel just placed?
+              Hint: use <code>take_ball()</code> and <code>move()</code>.
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 — Functions -->
+        <div class="kn-section kn-funcs">
+          <div class="kn-section-header">⚙️ Creating Your Own Commands — Functions</div>
+          <div class="kn-section-body">
+            <div class="kn-callout">
+              <strong>Problem:</strong> Karel can turn <em>left</em> with <code>turn_left()</code>,
+              but there is <strong>no</strong> <code>turn_right()</code> command built in!
+              How do we make Karel turn right?
+            </div>
+            <div class="kn-callout kn-tip">
+              <strong>Maths trick:</strong> Turning left 3 times = turning right once!
+              (3 × 90° left = 270° left = 90° right)
+            </div>
+            <div class="kn-world-pair">
+              <div class="kn-world-cell">
+                <div class="kn-world-label">Karel faces North (▲)</div>
+                <table class="kn-world kn-world--sm">
+                  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td class="kn-karel">▲</td><td></td><td></td><td></td><td></td></tr>
+                </table>
+              </div>
+              <div class="kn-arrow">→</div>
+              <div class="kn-world-cell">
+                <div class="kn-world-label">After turn_right(): faces East (►)</div>
+                <table class="kn-world kn-world--sm">
+                  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td class="kn-karel">►</td><td></td><td></td><td></td><td></td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="kn-code">
+              <div class="kn-code-title">🖥 turn_right_function.py</div>
+<pre class="kn-pre"><span class="kn-cm"># Define a new command called turn_right</span>
+<span class="kn-kw">def</span> <span class="kn-fn">turn_right</span>():
+    <span class="kn-fn">turn_left</span>()  <span class="kn-cm"># 1st left turn  (90°)</span>
+    <span class="kn-fn">turn_left</span>()  <span class="kn-cm"># 2nd left turn (180°)</span>
+    <span class="kn-fn">turn_left</span>()  <span class="kn-cm"># 3rd left turn (270° = turn right!)</span>
+
+<span class="kn-cm"># ── Now use our new command ──</span>
+<span class="kn-fn">move</span>()        <span class="kn-cm"># Karel steps forward</span>
+<span class="kn-fn">turn_right</span>()  <span class="kn-cm"># Karel turns right</span>
+<span class="kn-fn">move</span>()        <span class="kn-cm"># Karel steps forward again</span></pre>
+            </div>
+            <div class="kn-callout">
+              <strong>Rules for writing a function:</strong>
+              <ol style="margin-top:0.4rem; padding-left:1.2rem; line-height:1.8">
+                <li>Start with the keyword <code>def</code></li>
+                <li>Write the function name (no spaces!)</li>
+                <li>Add brackets <code>()</code> and a colon <code>:</code></li>
+                <li>Indent the body by <strong>4 spaces</strong> — Python is strict about this!</li>
+                <li>Call the function anywhere by writing its name followed by <code>()</code></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 — Summary -->
+        <div class="note-card kn-summary-card">
+          <h3>✅ What You Learned Today</h3>
+          <ul>
+            <li>Karel is a robot that lives in a grid — you control it with Python commands</li>
+            <li><code>move()</code> moves Karel one square forward in the direction it faces</li>
+            <li><code>turn_left()</code> rotates Karel 90° to the left</li>
+            <li><code>put_ball()</code> and <code>take_ball()</code> interact with balls</li>
+            <li>Python runs instructions <strong>one line at a time</strong>, top to bottom</li>
+            <li>You can create <strong>your own commands</strong> using <code>def name():</code></li>
+            <li>Indentation (4 spaces) inside a function is <strong>not optional</strong></li>
+            <li>Turning left 3 times = turning right once — a clever trick!</li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="note-card kn-resources">
+          <h3>📚 Further Resources</h3>
+          <div class="kn-res-item">
+            <span class="kn-res-label">🎥 freeCodeCamp — Learn Python (Beginner)</span>
+            <a class="kn-res-url" href="https://www.youtube.com/watch?v=rfscVS0vtbw" target="_blank">youtube.com/watch?v=rfscVS0vtbw</a>
+            <em>Full beginner course — 4 hours, 38M+ views</em>
+          </div>
+          <div class="kn-res-item">
+            <span class="kn-res-label">🤖 Stanford Karel Reader</span>
+            <a class="kn-res-url" href="https://compedu.stanford.edu/karel-reader/docs/python/en/intro.html" target="_blank">compedu.stanford.edu/karel-reader</a>
+            <em>Official Karel the Robot Python reference</em>
+          </div>
+          <div class="kn-res-item">
+            <span class="kn-res-label">📄 Offline Study</span>
+            <em>Use the "Download Notes PDF" button below to save these notes.</em>
+          </div>
+        </div>
+
+        <!-- Mini Tasks -->
+        <div class="note-card mini-task">
+          <h3>📝 Mini Tasks (Try These First!)</h3>
+          <ol>
+            <li>Write a program that moves Karel forward 2 squares.</li>
+            <li>Write a program that makes Karel turn right (hint: 3 × turn_left).</li>
+            <li>Write a program that places a ball, moves forward, then places another ball.</li>
+          </ol>
+          <p><strong>Next:</strong> Click <em>Practice Test</em> below and check your score.</p>
+        </div>
+
+      </ng-container>
+      <!-- ═══════════════════════════════════════════════════════════
+           END Karel notes
+      ═══════════════════════════════════════════════════════════ -->
+
+      <!-- Generic notes for all other lessons -->
+      <ng-container *ngIf="currentLevel.id !== 'python-with-karel'">
+
       <div class="note-card lesson-goal">
         <h3>📘 Simple Definition</h3>
         <p>{{ getSimpleDefinition() }}</p>
@@ -172,6 +463,8 @@
         </ol>
         <p><strong>Next:</strong> Click <em>Practice Test</em> below and check your score.</p>
       </div>
+
+      </ng-container><!-- end generic notes -->
     </div>
 
     <!-- Action Buttons -->

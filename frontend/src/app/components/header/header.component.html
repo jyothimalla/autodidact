@@ -16,11 +16,55 @@
     </div>
     <div class="header-right" *ngIf="isLoggedIn" >
       <div class="user-menu">
-        <button class="user-menu-trigger" type="button">👋 Welcome, {{ username }}</button>
-        <div class="user-dropdown">
-          <button type="button" (click)="goToAnalytics()">📈 Analytics</button>
-          <button type="button" (click)="userAccount()">👤 My Account</button>
-          <button type="button" (click)="logout()">🚪 Logout</button>
+        <button class="user-menu-trigger" type="button" (click)="toggleDropdown($event)">
+          <span class="trigger-avatar">{{ username.charAt(0).toUpperCase() }}</span>
+          <span class="trigger-name">{{ username }}</span>
+          <span class="trigger-chevron" [class.open]="dropdownOpen">▾</span>
+        </button>
+        <div class="user-dropdown" [class.open]="dropdownOpen">
+
+          <!-- User banner -->
+          <div class="dd-user-banner">
+            <div class="dd-avatar-lg">{{ username.charAt(0).toUpperCase() }}</div>
+            <div class="dd-user-info">
+              <div class="dd-username">{{ username }}</div>
+              <div class="dd-role">Student</div>
+            </div>
+          </div>
+
+          <div class="dd-divider"></div>
+
+          <!-- My Account -->
+          <button type="button" class="dd-item dd-account" (click)="userAccount()">
+            <span class="dd-item-icon">🏠</span>
+            <span class="dd-item-body">
+              <span class="dd-item-label">My Account</span>
+              <span class="dd-item-sub">Profile &amp; settings</span>
+            </span>
+            <span class="dd-item-arrow">›</span>
+          </button>
+
+          <div class="dd-divider"></div>
+
+          <!-- Analytics -->
+          <button type="button" class="dd-item dd-analytics" (click)="goToAnalytics()">
+            <span class="dd-item-icon">📊</span>
+            <span class="dd-item-body">
+              <span class="dd-item-label">Analytics</span>
+              <span class="dd-item-sub">Track exam progress</span>
+            </span>
+            <span class="dd-item-arrow">›</span>
+          </button>
+
+          <!-- Log Out -->
+          <button type="button" class="dd-item dd-logout" (click)="logout()">
+            <span class="dd-item-icon">🚪</span>
+            <span class="dd-item-body">
+              <span class="dd-item-label">Log Out</span>
+              <span class="dd-item-sub">End your session</span>
+            </span>
+          </button>
+
         </div>
       </div>
     </div>

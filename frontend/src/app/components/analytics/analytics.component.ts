@@ -72,6 +72,30 @@ interface TimetableSlot {
   duration: number;
 }
 
+type PerfStyle = 'needs' | 'developing' | 'strong' | 'master' | 'none';
+
+interface ResultsRow {
+  id: string;
+  name: string;
+  setBy: string;
+  type: 'Online' | 'On paper';
+  score: number | null;
+  dateCompleted: string;
+  status: 'completed' | 'not-started';
+  subjectKey: string;
+}
+
+interface CurriculumTopic {
+  id: string;
+  name: string;
+  subtopic: string;
+  subject: string;
+  moduleIds: string[];
+  performance: { label: string; pct: number; style: PerfStyle };
+  lastUpdated: string;
+  selected: boolean;
+}
+
 @Component({
   selector: 'app-analytics',
   standalone: true,
@@ -128,6 +152,77 @@ export class AnalyticsComponent implements OnInit {
   private mockResultsCache: MockTestResult[] = [];
   private practiceHistoryCache: PracticeHistoryItem[] = [];
   private practiceAnalyticsCache: PracticeAnalyticsResponse = {};
+
+  // ── Curriculum Progress ──────────────────────────────────────────────────
+  readonly curriculumFilters = [
+    { key: 'all',                    label: 'Full exam curriculum' },
+    { key: 'grammar',                label: 'Grammar' },
+    { key: 'punctuation',            label: 'Punctuation' },
+    { key: 'reading-comprehension',  label: 'Reading Comprehension' },
+    { key: 'spelling',               label: 'Spelling' },
+    { key: 'vocabulary',             label: 'Vocabulary' },
+  ];
+
+  readonly performanceLevelFilters = [
+    { key: 'all',        label: 'All performance levels' },
+    { key: 'needs',      label: 'Needs Practice' },
+    { key: 'developing', label: 'Developing' },
+    { key: 'strong',     label: 'Strong' },
+    { key: 'master',     label: 'Master' },
+    { key: 'none',       label: 'Not enough data' },
+  ];
+
+  curriculumFilter = 'grammar';
+  performanceFilter = 'all';
+  curriculumTopics: CurriculumTopic[] = [];
+
+  // ── Subject Selection ────────────────────────────────────────────────────
+  selectedSubject = 'english';
+
+  // ── Results Table ─────────────────────────────────────────────────────────
+  resultsTab: 'topics' | 'tests' | 'practices' = 'tests';
+  resultsPage = 1;
+  readonly resultsPageSize = 8;
+  private allTestRows: ResultsRow[] = [];
+  private allTopicRows: ResultsRow[] = [];
+  private allPracticeRows: ResultsRow[] = [];
+
+  private readonly ALL_CURRICULUM_TOPICS: Omit<CurriculumTopic, 'performance' | 'lastUpdated' | 'selected'>[] = [
+    // Grammar — Parts of Speech
+    { id: 'nouns',          name: 'Nouns',                                    subtopic: 'Parts of Speech', subject: 'grammar',               moduleIds: ['nouns', 'english-nouns'] },
+    { id: 'verbs',          name: 'Verbs',                                    subtopic: 'Parts of Speech', subject: 'grammar',               moduleIds: ['verbs', 'english-verbs'] },
+    { id: 'pronouns',       name: 'Pronouns',                                 subtopic: 'Parts of Speech', subject: 'grammar',               moduleIds: ['pronouns'] },
+    { id: 'adj-adverbs',    name: 'Adjectives and Adverbs',                   subtopic: 'Parts of Speech', subject: 'grammar',               moduleIds: ['adjectives', 'adverbs', 'adjectives-and-adverbs'] },
+    { id: 'prepositions',   name: 'Prepositions',                             subtopic: 'Parts of Speech', subject: 'grammar',               moduleIds: ['prepositions'] },
+    { id: 'determiners',    name: 'Determiners',                              subtopic: 'Parts of Speech', subject: 'grammar',               moduleIds: ['determiners'] },
+    { id: 'conjunctions',   name: 'Conjunctions',                             subtopic: 'Parts of Speech', subject: 'grammar',               moduleIds: ['conjunctions'] },
+    // Grammar — Verb Agreement
+    { id: 'subj-verb-agr',  name: 'Person: Subject/Verb Agreement',           subtopic: 'Verb Agreement',  subject: 'grammar',               moduleIds: ['subject-verb-agreement', 'verb-agreement', 'subject-verb'] },
+    { id: 'tenses-simple',  name: 'Tenses: Simple Past, Present and Future',  subtopic: 'Verb Agreement',  subject: 'grammar',               moduleIds: ['tenses-simple', 'simple-tenses', 'tenses'] },
+    { id: 'tenses-prog',    name: 'Tenses: Progressive and Perfect',          subtopic: 'Verb Agreement',  subject: 'grammar',               moduleIds: ['tenses-progressive', 'progressive-tenses', 'perfect-tenses'] },
+    // Grammar — Syntax
+    { id: 'phrases',        name: 'Phrases',                                  subtopic: 'Syntax',          subject: 'grammar',               moduleIds: ['phrases'] },
+    { id: 'sentences-main', name: 'Sentences and Main Clauses',               subtopic: 'Syntax',          subject: 'grammar',               moduleIds: ['sentences', 'main-clauses', 'sentences-main-clauses'] },
+    { id: 'subordinate',    name: 'Subordinate Clauses',                      subtopic: 'Syntax',          subject: 'grammar',               moduleIds: ['subordinate-clauses', 'subordinate'] },
+    { id: 'relative',       name: 'Relative Clauses',                         subtopic: 'Syntax',          subject: 'grammar',               moduleIds: ['relative-clauses', 'relative'] },
+    // Punctuation
+    { id: 'comma-use',      name: 'Comma Use',                                subtopic: 'Punctuation Marks', subject: 'punctuation',         moduleIds: ['comma-use', 'commas'] },
+    { id: 'apostrophe',     name: 'Apostrophe',                               subtopic: 'Punctuation Marks', subject: 'punctuation',         moduleIds: ['apostrophe'] },
+    { id: 'speech-marks',   name: 'Speech Marks',                             subtopic: 'Direct Speech',   subject: 'punctuation',           moduleIds: ['speech-marks', 'direct-speech', 'inverted-commas'] },
+    { id: 'capitals',       name: 'Capital Letters',                          subtopic: 'Punctuation Marks', subject: 'punctuation',         moduleIds: ['capital-letters', 'capitals'] },
+    // Reading Comprehension
+    { id: 'inference',      name: 'Inference',                                subtopic: 'Comprehension Skills', subject: 'reading-comprehension', moduleIds: ['inference'] },
+    { id: 'retrieval',      name: 'Retrieval',                                subtopic: 'Comprehension Skills', subject: 'reading-comprehension', moduleIds: ['retrieval'] },
+    { id: 'author-intent',  name: "Author's Intent and Language",             subtopic: 'Language Analysis', subject: 'reading-comprehension', moduleIds: ['author-intent', 'language-analysis'] },
+    // Spelling
+    { id: 'prefixes',       name: 'Prefixes',                                 subtopic: 'Word Formation',  subject: 'spelling',              moduleIds: ['prefixes'] },
+    { id: 'suffixes',       name: 'Suffixes',                                 subtopic: 'Word Formation',  subject: 'spelling',              moduleIds: ['suffixes'] },
+    { id: 'homophones',     name: 'Homophones',                               subtopic: 'Word Accuracy',   subject: 'spelling',              moduleIds: ['homophones'] },
+    // Vocabulary
+    { id: 'synonyms',       name: 'Synonyms',                                 subtopic: 'Word Meaning',    subject: 'vocabulary',            moduleIds: ['synonyms'] },
+    { id: 'antonyms',       name: 'Antonyms',                                 subtopic: 'Word Meaning',    subject: 'vocabulary',            moduleIds: ['antonyms'] },
+    { id: 'context-clues',  name: 'Word in Context',                          subtopic: 'Word Meaning',    subject: 'vocabulary',            moduleIds: ['context-clues', 'vocabulary-context'] },
+  ];
 
   constructor(private readonly http: HttpClient) {}
 
@@ -221,6 +316,8 @@ export class AnalyticsComponent implements OnInit {
     this.computePerformance(this.mockResultsCache, this.practiceHistoryCache);
     this.buildRecommendations();
     this.buildNeedsAttentionPlan();
+    this.buildCurriculumTopics();
+    this.buildResultsTable();
   }
 
   private get currentPolicy(): YearPolicy {
@@ -429,6 +526,218 @@ export class AnalyticsComponent implements OnInit {
       duration: policy.sessionMinutes
     }));
   }
+
+  // ── Curriculum Progress ──────────────────────────────────────────────────
+
+  selectCurriculumFilter(key: string): void {
+    this.curriculumFilter = key;
+    this.performanceFilter = 'all';
+    this.buildCurriculumTopics();
+  }
+
+  selectPerformanceFilter(event: Event): void {
+    this.performanceFilter = (event.target as HTMLSelectElement).value;
+  }
+
+  toggleTopicSelection(topic: CurriculumTopic): void {
+    topic.selected = !topic.selected;
+  }
+
+  toggleAllTopics(): void {
+    const allSel = this.allTopicsSelected;
+    this.filteredCurriculumTopics.forEach(t => { t.selected = !allSel; });
+  }
+
+  practiceWeakest(): void {
+    this.performanceFilter = 'all';
+    this.curriculumTopics.forEach(t => { t.selected = t.performance.style === 'needs'; });
+  }
+
+  get filteredCurriculumTopics(): CurriculumTopic[] {
+    if (this.performanceFilter === 'all') return this.curriculumTopics;
+    return this.curriculumTopics.filter(t => t.performance.style === this.performanceFilter);
+  }
+
+  get allTopicsSelected(): boolean {
+    const visible = this.filteredCurriculumTopics;
+    return visible.length > 0 && visible.every(t => t.selected);
+  }
+
+  get selectedTopicCount(): number {
+    return this.curriculumTopics.filter(t => t.selected).length;
+  }
+
+  private buildCurriculumTopics(): void {
+    const englishModules: Record<string, ModuleAnalytics> = {};
+    Object.entries(this.practiceAnalyticsCache).forEach(([subjectId, data]) => {
+      if (this.mapSubjectKey(subjectId) === 'english') {
+        Object.assign(englishModules, data.by_module || {});
+      }
+    });
+
+    const filtered = this.ALL_CURRICULUM_TOPICS.filter(
+      t => this.curriculumFilter === 'all' || t.subject === this.curriculumFilter
+    );
+
+    this.curriculumTopics = filtered.map(topic => {
+      let totalScore = 0;
+      let totalQuestions = 0;
+      let latestDate = '';
+
+      // Flexible match — module ID contains any of the topic's keywords
+      Object.entries(englishModules).forEach(([modId, stats]) => {
+        const m = modId.toLowerCase();
+        if (topic.moduleIds.some(tid => m.includes(tid) || tid.includes(m))) {
+          totalScore += stats.score;
+          totalQuestions += stats.total;
+        }
+      });
+
+      this.practiceHistoryCache.forEach(item => {
+        const m = item.module_id.toLowerCase();
+        if (topic.moduleIds.some(tid => m.includes(tid) || tid.includes(m)) &&
+            item.status === 'submitted' && item.submitted_at && item.submitted_at > latestDate) {
+          latestDate = item.submitted_at;
+        }
+      });
+
+      const lastUpdated = latestDate
+        ? new Date(latestDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        : '';
+
+      let performance: CurriculumTopic['performance'];
+      if (!totalQuestions) {
+        performance = { label: 'Not enough data', pct: 0, style: 'none' };
+      } else {
+        const pct = Math.round((totalScore / totalQuestions) * 100);
+        if (pct >= 90) {
+          performance = { label: 'Master', pct, style: 'master' };
+        } else if (pct >= this.currentPolicy.strongThreshold) {
+          performance = { label: 'Strong', pct, style: 'strong' };
+        } else if (pct >= this.currentPolicy.goodThreshold) {
+          performance = { label: 'Developing', pct, style: 'developing' };
+        } else {
+          performance = { label: 'Needs Practice', pct, style: 'needs' };
+        }
+      }
+
+      return { ...topic, performance, lastUpdated, selected: false };
+    });
+  }
+
+  // ── Subject Selection ─────────────────────────────────────────────────────
+
+  selectSubject(key: string): void {
+    this.selectedSubject = key;
+    this.resultsPage = 1;
+    if (key !== 'summary' && key !== 'english') {
+      this.resultsTab = 'topics';
+    } else {
+      this.resultsTab = 'tests';
+    }
+  }
+
+  get selectedSubjectLabel(): string {
+    if (this.selectedSubject === 'summary') return 'All subjects';
+    return this.subjects.find(s => s.key === this.selectedSubject)?.label || '';
+  }
+
+  /** Module-level performance rows for the selected non-English subject */
+  get subjectModuleRows(): Array<{ name: string; attempts: number; pct: number }> {
+    if (this.selectedSubject === 'summary' || this.selectedSubject === 'english') return [];
+    const rows: Array<{ name: string; attempts: number; pct: number }> = [];
+    Object.entries(this.practiceAnalyticsCache).forEach(([subjectId, data]) => {
+      if (this.mapSubjectKey(subjectId) === this.selectedSubject) {
+        Object.entries(data.by_module || {}).forEach(([moduleId, stats]) => {
+          rows.push({
+            name: this.prettifyModule(moduleId),
+            attempts: stats.attempts,
+            pct: Math.round(stats.percentage)
+          });
+        });
+      }
+    });
+    return rows.sort((a, b) => b.attempts - a.attempts);
+  }
+
+  // ── Results Table ─────────────────────────────────────────────────────────
+
+  selectResultsTab(tab: 'topics' | 'tests' | 'practices'): void {
+    this.resultsTab = tab;
+    this.resultsPage = 1;
+  }
+
+  get activeResultsRows(): ResultsRow[] {
+    const rows = this.resultsTab === 'tests' ? this.allTestRows
+      : this.resultsTab === 'topics' ? this.allTopicRows
+      : this.allPracticeRows;
+    if (this.selectedSubject === 'summary' || this.resultsTab === 'tests') return rows;
+    return rows.filter(r => r.subjectKey === this.selectedSubject);
+  }
+
+  get resultsPageCount(): number {
+    return Math.max(1, Math.ceil(this.activeResultsRows.length / this.resultsPageSize));
+  }
+
+  get paginatedResultsRows(): ResultsRow[] {
+    const start = (this.resultsPage - 1) * this.resultsPageSize;
+    return this.activeResultsRows.slice(start, start + this.resultsPageSize);
+  }
+
+  get resultsFrom(): number {
+    if (!this.activeResultsRows.length) return 0;
+    return (this.resultsPage - 1) * this.resultsPageSize + 1;
+  }
+
+  get resultsTo(): number {
+    return Math.min(this.resultsPage * this.resultsPageSize, this.activeResultsRows.length);
+  }
+
+  get resultsPageNumbers(): number[] {
+    return Array.from({ length: Math.min(this.resultsPageCount, 5) }, (_, i) => i + 1);
+  }
+
+  prevResultsPage(): void { if (this.resultsPage > 1) this.resultsPage--; }
+  nextResultsPage(): void { if (this.resultsPage < this.resultsPageCount) this.resultsPage++; }
+
+  private buildResultsTable(): void {
+    const fmtDate = (iso: string | null) =>
+      iso ? new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
+    this.allTestRows = [...this.mockResultsCache]
+      .sort((a, b) => (b.submitted_at || '').localeCompare(a.submitted_at || ''))
+      .map(m => ({
+        id: m.test_id,
+        name: `Mock Test ${m.test_id.slice(-6).toUpperCase()}`,
+        setBy: 'You',
+        type: 'Online' as const,
+        score: m.percentage != null ? Math.round(m.percentage) : null,
+        dateCompleted: fmtDate(m.submitted_at),
+        status: 'completed' as const,
+        subjectKey: 'summary'
+      }));
+
+    const submitted = [...this.practiceHistoryCache]
+      .filter(p => p.status === 'submitted')
+      .sort((a, b) => (b.submitted_at || '').localeCompare(a.submitted_at || ''));
+
+    const toRow = (p: PracticeHistoryItem): ResultsRow => ({
+      id: p.attempt_id,
+      name: this.prettifyModule(p.module_id),
+      setBy: 'You',
+      type: 'Online' as const,
+      score: p.percentage != null ? Math.round(p.percentage) : null,
+      dateCompleted: fmtDate(p.submitted_at),
+      status: 'completed' as const,
+      subjectKey: this.mapSubjectKey(p.subject_id) || 'summary'
+    });
+
+    this.allTopicRows    = submitted.filter(p => p.attempt_type !== 'practice').map(toRow);
+    this.allPracticeRows = submitted.filter(p => p.attempt_type === 'practice').map(toRow);
+    this.resultsPage = 1;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
 
   private extractMetTargets(practiceAnalytics: PracticeAnalyticsResponse): string[] {
     const met = new Set<string>();

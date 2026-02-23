@@ -4,13 +4,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoginComponent } from '../../auth/login/login.component';
 import { RegisterComponent } from '../../auth/register/register.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 
 @Component({
   selector: 'app-home',
+  standalone: true,
   templateUrl: './home.component.html',
-  imports: [CommonModule, FormsModule, LoginComponent, RegisterComponent],
+  imports: [CommonModule, FormsModule, MatDialogModule, LoginComponent, RegisterComponent],
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {

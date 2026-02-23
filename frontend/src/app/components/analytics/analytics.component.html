@@ -19,26 +19,19 @@
       <span>Learning minutes/week: {{ yearPlan.weeklyMinutes }}</span>
     </div>
 
-    <p class="intro">
-      It is wonderful to see {{ studentName }} staying dedicated this week for <strong>Year {{ selectedYear }}</strong>.
-      {{ studentName }} logged in on <strong>{{ activeDays }}</strong> day{{ activeDays === 1 ? '' : 's' }},
-      spent <strong>{{ learningMinutes }}</strong> minutes learning,
-      answered <strong>{{ questionsAnswered }}</strong> questions,
-      completed <strong>{{ islandsCompleted }}</strong> learning journey islands,
-      finished <strong>{{ mockTestsCompleted }}</strong> mock test{{ mockTestsCompleted === 1 ? '' : 's' }},
-      and completed <strong>{{ customPracticesCompleted }}</strong> custom practice{{ customPracticesCompleted === 1 ? '' : 's' }}.
-      <ng-container *ngIf="targetsMet.length > 0">
-        {{ studentName }} met targets in {{ targetsMet.join(', ') }}.
-      </ng-container>
-    </p>
-
+    <!-- ══════════════════ SUBJECT STRIP ══════════════════ -->
     <div class="subject-strip">
-      <div class="summary-card">
+      <div class="summary-card"
+           [class.active]="selectedSubject === 'summary'"
+           (click)="selectSubject('summary')">
         <h3>Summary</h3>
         <p>Everything at a glance</p>
       </div>
 
-      <div class="subject-card" *ngFor="let subject of subjects; trackBy: trackBySubject">
+      <div class="subject-card"
+           *ngFor="let subject of subjects; trackBy: trackBySubject"
+           [class.active]="selectedSubject === subject.key"
+           (click)="selectSubject(subject.key)">
         <h4>{{ subject.label }}</h4>
         <span
           class="badge"
@@ -52,7 +45,8 @@
       </div>
     </div>
 
-    <h2>Performance comparison</h2>
+    <!-- ══════════════════ PERFORMANCE COMPARISON ══════════════════ -->
+    <h2>Performance comparison<ng-container *ngIf="selectedSubject !== 'summary'"> – {{ selectedSubjectLabel }}</ng-container></h2>
 
     <section class="performance-grid">
       <aside class="recommendations-panel">
@@ -86,6 +80,232 @@
       </div>
     </section>
 
+    <!-- ══════════════════ INTRO SUMMARY ══════════════════ -->
+    <p class="intro">
+      It is wonderful to see {{ studentName }} staying dedicated this week for <strong>Year {{ selectedYear }}</strong>.
+      {{ studentName }} logged in on <strong>{{ activeDays }}</strong> day{{ activeDays === 1 ? '' : 's' }},
+      spent <strong>{{ learningMinutes }}</strong> minutes learning,
+      answered <strong>{{ questionsAnswered }}</strong> questions,
+      completed <strong>{{ islandsCompleted }}</strong> learning journey islands,
+      finished <strong>{{ mockTestsCompleted }}</strong> mock test{{ mockTestsCompleted === 1 ? '' : 's' }},
+      and completed <strong>{{ customPracticesCompleted }}</strong> custom practice{{ customPracticesCompleted === 1 ? '' : 's' }}.
+      <ng-container *ngIf="targetsMet.length > 0">
+        {{ studentName }} met targets in {{ targetsMet.join(', ') }}.
+      </ng-container>
+    </p>
+
+    <!-- ══════════════════ ENGLISH CURRICULUM (English / Summary only) ══════════════════ -->
+    <section class="curriculum-section"
+             *ngIf="selectedSubject === 'english' || selectedSubject === 'summary'">
+
+      <div class="curriculum-hero">
+        <div>
+          <h2 class="curriculum-title">{{ studentName }}'s exam curriculum progress</h2>
+          <p class="curriculum-sub">See how {{ studentName }} is progressing in the English topics that will be on their exams.</p>
+        </div>
+      </div>
+
+      <div class="curriculum-cta-bar">
+        <p class="cta-hint">Select topics below to practise, or…</p>
+        <button class="btn-weakest" (click)="practiceWeakest()">
+          Set a practice on {{ studentName }}'s weakest areas
+        </button>
+      </div>
+
+      <!-- Filter strip -->
+      <div class="curriculum-filter-strip">
+        <div class="filter-tabs">
+          <button *ngFor="let f of curriculumFilters"
+                  class="filter-tab"
+                  [class.active]="curriculumFilter === f.key"
+                  (click)="selectCurriculumFilter(f.key)">
+            <span *ngIf="curriculumFilter === f.key" class="tick">✓ </span>{{ f.label }}
+          </button>
+        </div>
+        <select class="perf-level-select" [value]="performanceFilter" (change)="selectPerformanceFilter($event)">
+          <option *ngFor="let f of performanceLevelFilters" [value]="f.key">{{ f.label }}</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="curriculum-table-wrap">
+        <table class="curriculum-table">
+          <thead>
+            <tr>
+              <th class="col-sel">
+                <input type="checkbox" [checked]="allTopicsSelected" (change)="toggleAllTopics()">
+              </th>
+              <th class="col-topic">Topic</th>
+              <th class="col-sub">Subtopic</th>
+              <th class="col-perf">Performance ⓘ</th>
+              <th class="col-date">Last updated</th>
+              <th class="col-res">Resources</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let topic of filteredCurriculumTopics"
+                [class.row-selected]="topic.selected">
+              <td class="col-sel">
+                <input type="checkbox" [checked]="topic.selected" (change)="toggleTopicSelection(topic)">
+              </td>
+              <td class="col-topic">{{ topic.name }}</td>
+              <td class="col-sub">{{ topic.subtopic }}</td>
+              <td class="col-perf">
+                <ng-container *ngIf="topic.performance.style !== 'none'; else noDataTpl">
+                  <span class="perf-label perf-label--{{ topic.performance.style }}">{{ topic.performance.label }}</span>
+                  <div class="perf-bar-track">
+                    <div class="perf-bar perf-bar--{{ topic.performance.style }}"
+                         [style.width.%]="topic.performance.pct"></div>
+                  </div>
+                </ng-container>
+                <ng-template #noDataTpl>
+                  <span class="perf-no-data">Not enough data</span>
+                </ng-template>
+              </td>
+              <td class="col-date">
+                <span *ngIf="topic.lastUpdated; else notStartedTpl">{{ topic.lastUpdated }}</span>
+                <ng-template #notStartedTpl><span class="not-started">Not started</span></ng-template>
+              </td>
+              <td class="col-res">
+                <div class="res-icons">
+                  <button class="res-btn res-btn--play" title="Watch video">▶</button>
+                  <button class="res-btn res-btn--notes" title="Study notes">📖</button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredCurriculumTopics.length === 0">
+              <td colspan="6" class="empty-row">No topics match this filter.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curriculum-footer" *ngIf="selectedTopicCount > 0">
+        <span>{{ selectedTopicCount }} topic{{ selectedTopicCount === 1 ? '' : 's' }} selected</span>
+        <button class="btn-practise-selected">Start practice on selected topics →</button>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════ MODULE PERFORMANCE (non-English subjects) ══════════════════ -->
+    <section class="module-perf-section"
+             *ngIf="selectedSubject !== 'summary' && selectedSubject !== 'english'">
+      <h2 class="module-perf-title">{{ selectedSubjectLabel }} — Module Performance</h2>
+      <p class="module-perf-sub">Practice accuracy by topic for {{ studentName }}.</p>
+
+      <div class="module-perf-table-wrap">
+        <table class="module-perf-table" *ngIf="subjectModuleRows.length > 0; else noModuleData">
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Attempts</th>
+              <th>Score %</th>
+              <th>Performance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of subjectModuleRows">
+              <td class="mod-name">{{ row.name }}</td>
+              <td class="mod-att">{{ row.attempts }}</td>
+              <td class="mod-pct">{{ row.pct }}%</td>
+              <td class="mod-bar-cell">
+                <div class="mod-bar-track">
+                  <div class="mod-bar"
+                       [class.mod-bar--needs]="row.pct < 50"
+                       [class.mod-bar--developing]="row.pct >= 50 && row.pct < 70"
+                       [class.mod-bar--strong]="row.pct >= 70"
+                       [style.width.%]="row.pct"></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #noModuleData>
+          <p class="module-no-data">No {{ selectedSubjectLabel }} practice data yet. Complete some practice sessions to see your performance here.</p>
+        </ng-template>
+      </div>
+    </section>
+
+    <!-- ══════════════════ RESULTS TABLE ══════════════════ -->
+    <section class="results-section">
+      <h2 class="results-title">
+        {{ studentName }}'s
+        <ng-container *ngIf="selectedSubject !== 'summary'">{{ selectedSubjectLabel }} </ng-container>results
+      </h2>
+
+      <div class="results-tabs">
+        <button class="rtab" [class.active]="resultsTab === 'tests'" (click)="selectResultsTab('tests')">
+          <span *ngIf="resultsTab === 'tests'" class="rtab-check">✓ </span>Tests
+        </button>
+        <button class="rtab" [class.active]="resultsTab === 'topics'" (click)="selectResultsTab('topics')">
+          <span *ngIf="resultsTab === 'topics'" class="rtab-check">✓ </span>Exam topics
+        </button>
+        <button class="rtab" [class.active]="resultsTab === 'practices'" (click)="selectResultsTab('practices')">
+          <span *ngIf="resultsTab === 'practices'" class="rtab-check">✓ </span>Extra practices
+        </button>
+      </div>
+
+      <div class="results-table-wrap">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th class="rc-name">
+                <ng-container [ngSwitch]="resultsTab">
+                  <span *ngSwitchCase="'tests'">Test ({{ activeResultsRows.length }} items)</span>
+                  <span *ngSwitchCase="'topics'">Topic ({{ activeResultsRows.length }} items)</span>
+                  <span *ngSwitchDefault>Practice ({{ activeResultsRows.length }} items)</span>
+                </ng-container>
+              </th>
+              <th class="rc-setby">Set by</th>
+              <th class="rc-type">Type</th>
+              <th class="rc-score">Score ⓘ</th>
+              <th class="rc-date">Date completed <span class="sort-arrow">↓</span></th>
+              <th class="rc-result">Results</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of paginatedResultsRows">
+              <td class="rc-name">{{ row.name }}</td>
+              <td class="rc-setby">{{ row.setBy }}</td>
+              <td class="rc-type">
+                <span class="type-badge type-badge--{{ row.type === 'Online' ? 'online' : 'paper' }}">
+                  {{ row.type === 'Online' ? '🖥' : '📄' }} {{ row.type }}
+                </span>
+              </td>
+              <td class="rc-score">
+                <span *ngIf="row.score !== null; else dashTpl" class="score-val">{{ row.score }}%</span>
+                <ng-template #dashTpl><span class="score-dash">–</span></ng-template>
+              </td>
+              <td class="rc-date">
+                <span *ngIf="row.dateCompleted; else notStartedDateTpl">{{ row.dateCompleted }}</span>
+                <ng-template #notStartedDateTpl><span class="rs-not-started">Not started</span></ng-template>
+              </td>
+              <td class="rc-result">
+                <button *ngIf="row.status === 'completed'" class="btn-view">👁 View</button>
+                <button *ngIf="row.status === 'not-started'" class="btn-add">✏ Add</button>
+              </td>
+            </tr>
+            <tr *ngIf="paginatedResultsRows.length === 0">
+              <td colspan="6" class="empty-results">No results found for this category yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="results-pagination" *ngIf="activeResultsRows.length > resultsPageSize">
+        <span class="page-info">{{ resultsFrom }} – {{ resultsTo }} of {{ activeResultsRows.length }} items</span>
+        <div class="page-btns">
+          <button class="page-btn" (click)="prevResultsPage()" [disabled]="resultsPage === 1">‹</button>
+          <button class="page-btn"
+                  *ngFor="let p of resultsPageNumbers"
+                  [class.active]="resultsPage === p"
+                  (click)="resultsPage = p">{{ p }}</button>
+          <button class="page-btn" (click)="nextResultsPage()" [disabled]="resultsPage === resultsPageCount">›</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ WEEKLY ACTIVITIES ══════════════════ -->
     <h2>Weekly activities</h2>
 
     <section class="weekly-grid">

@@ -91,6 +91,20 @@ h2 {
   border-radius: 14px;
   padding: 14px;
   min-height: 96px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+
+  &:hover {
+    background: #e8f0fe;
+    box-shadow: 0 2px 10px rgba(44, 93, 229, 0.12);
+    transform: translateY(-2px);
+  }
+
+  &.active {
+    background: #ffffff;
+    box-shadow: 0 0 0 2.5px #2c5de5, 0 4px 16px rgba(44, 93, 229, 0.15);
+    transform: translateY(-3px);
+  }
 }
 
 .summary-card {
@@ -392,6 +406,549 @@ h2 {
 .duration {
   color: #284a7a;
   font-weight: 600;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Exam Curriculum Progress
+// ════════════════════════════════════════════════════════════════════════════
+
+.curriculum-section {
+  margin: 28px 0;
+  background: #fff;
+  border: 1.5px solid #dce6f4;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(44, 93, 229, 0.07);
+}
+
+.curriculum-hero {
+  background: linear-gradient(135deg, #f8fbff 0%, #eef4ff 100%);
+  padding: 22px 26px 16px;
+  border-bottom: 1px solid #e5edf8;
+}
+
+.curriculum-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2a44;
+  margin: 0 0 4px;
+}
+
+.curriculum-sub {
+  font-size: 0.95rem;
+  color: #5f6c7d;
+  margin: 0;
+}
+
+.curriculum-cta-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 26px;
+  background: #e8f0fe;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .cta-hint {
+    margin: 0;
+    font-weight: 600;
+    color: #2c3e6a;
+    font-size: 0.93rem;
+  }
+
+  .btn-weakest {
+    background: linear-gradient(135deg, #1565c0, #1976d2);
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.15s;
+
+    &:hover {
+      background: linear-gradient(135deg, #0d47a1, #1565c0);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.curriculum-filter-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px;
+  border-bottom: 1px solid #edf2fa;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+
+    .filter-tab {
+      border: 1.5px solid #d1dcef;
+      background: #f7faff;
+      color: #3d5280;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+
+      &.active {
+        background: #2c5de5;
+        color: white;
+        border-color: #2c5de5;
+      }
+
+      &:hover:not(.active) {
+        border-color: #2c5de5;
+        color: #2c5de5;
+        background: #eef4ff;
+      }
+    }
+  }
+
+  .perf-level-select {
+    border: 1.5px solid #d1dcef;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #3d5280;
+    background: #f7faff;
+    cursor: pointer;
+    outline: none;
+
+    &:hover { border-color: #2c5de5; }
+  }
+}
+
+.curriculum-table-wrap {
+  overflow-x: auto;
+}
+
+.curriculum-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead tr {
+    background: #f5f8fe;
+    border-bottom: 2px solid #dce6f4;
+
+    th {
+      padding: 11px 14px;
+      font-weight: 700;
+      color: #2c3e6a;
+      text-align: left;
+      white-space: nowrap;
+      font-size: 0.83rem;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #edf2fa;
+    transition: background 0.12s;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: #f7fbff; }
+    &.row-selected { background: #eef4ff; }
+
+    td { padding: 10px 14px; color: #2d3748; vertical-align: middle; }
+  }
+
+  .col-sel  { width: 44px; text-align: center; }
+  .col-topic { font-weight: 600; min-width: 180px; }
+  .col-sub  { color: #5f6c7d; white-space: nowrap; }
+  .col-perf { min-width: 200px; }
+  .col-date { white-space: nowrap; color: #5f6c7d; font-size: 0.84rem; }
+  .col-res  { width: 90px; }
+}
+
+// Performance labels & bars
+.perf-label {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+
+  &--needs      { color: #d97706; }
+  &--developing { color: #2563eb; }
+  &--strong     { color: #16a34a; }
+  &--master     { color: #7c3aed; }
+}
+
+.perf-bar-track {
+  height: 8px;
+  background: #e8edf7;
+  border-radius: 99px;
+  overflow: hidden;
+  width: 160px;
+  max-width: 100%;
+}
+
+.perf-bar {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+
+  &--needs      { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+  &--developing { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+  &--strong     { background: linear-gradient(90deg, #4ade80, #16a34a); }
+  &--master     { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+}
+
+.perf-no-data {
+  color: #9ca3af;
+  font-size: 0.83rem;
+  font-style: italic;
+}
+
+.not-started {
+  color: #9ca3af;
+  font-size: 0.83rem;
+}
+
+.empty-row {
+  text-align: center;
+  color: #9ca3af;
+  padding: 22px !important;
+  font-style: italic;
+}
+
+// Resource icon buttons
+.res-icons {
+  display: flex;
+  gap: 6px;
+}
+
+.res-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #d1dcef;
+  background: #f7faff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.15s;
+
+  &--play  { color: #1565c0; &:hover { background: #dbeafe; border-color: #1565c0; } }
+  &--notes { font-size: 15px; &:hover { background: #fef3c7; border-color: #d97706; } }
+}
+
+// Footer bar
+.curriculum-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 22px;
+  background: #f0f7ff;
+  border-top: 1px solid #dce6f4;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  span {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #2c3e6a;
+  }
+
+  .btn-practise-selected {
+    background: linear-gradient(135deg, #0f9b58, #27ae60);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+
+    &:hover {
+      background: linear-gradient(135deg, #0a7540, #0f9b58);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Module Performance Section (non-English subjects)
+// ════════════════════════════════════════════════════════════════════════════
+
+.module-perf-section {
+  margin: 28px 0;
+  background: #fff;
+  border: 1.5px solid #dce6f4;
+  border-radius: 20px;
+  padding: 22px 26px;
+  box-shadow: 0 4px 20px rgba(44, 93, 229, 0.07);
+}
+
+.module-perf-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1f2a44;
+  margin: 0 0 4px;
+}
+
+.module-perf-sub {
+  font-size: 0.93rem;
+  color: #5f6c7d;
+  margin: 0 0 16px;
+}
+
+.module-perf-table-wrap { overflow-x: auto; }
+
+.module-perf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead tr {
+    background: #f5f8fe;
+    border-bottom: 2px solid #dce6f4;
+    th {
+      padding: 10px 14px;
+      font-weight: 700;
+      color: #2c3e6a;
+      text-align: left;
+      font-size: 0.83rem;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #edf2fa;
+    &:last-child { border-bottom: none; }
+    &:hover { background: #f7fbff; }
+    td { padding: 10px 14px; color: #2d3748; vertical-align: middle; }
+  }
+
+  .mod-name { font-weight: 600; min-width: 180px; }
+  .mod-att  { color: #5f6c7d; text-align: center; width: 80px; }
+  .mod-pct  { font-weight: 700; width: 70px; }
+  .mod-bar-cell { min-width: 160px; }
+}
+
+.mod-bar-track {
+  height: 8px;
+  background: #e8edf7;
+  border-radius: 99px;
+  overflow: hidden;
+  max-width: 200px;
+}
+
+.mod-bar {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+  &--needs      { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+  &--developing { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+  &--strong     { background: linear-gradient(90deg, #4ade80, #16a34a); }
+}
+
+.module-no-data {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 0.93rem;
+  padding: 16px 0;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Results Table Section
+// ════════════════════════════════════════════════════════════════════════════
+
+.results-section {
+  margin: 28px 0;
+  background: #fff;
+  border: 1.5px solid #dce6f4;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(44, 93, 229, 0.07);
+}
+
+.results-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2a44;
+  margin: 0;
+  padding: 20px 24px 12px;
+}
+
+.results-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 24px 14px;
+  flex-wrap: wrap;
+
+  .rtab {
+    border: 1.5px solid #d1dcef;
+    background: #f7faff;
+    color: #3d5280;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    .rtab-check { color: #2c5de5; }
+
+    &.active {
+      background: #2c5de5;
+      color: white;
+      border-color: #2c5de5;
+      .rtab-check { color: white; }
+    }
+
+    &:hover:not(.active) {
+      border-color: #2c5de5;
+      color: #2c5de5;
+      background: #eef4ff;
+    }
+  }
+}
+
+.results-table-wrap { overflow-x: auto; }
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead tr {
+    background: #f5f8fe;
+    border-bottom: 2px solid #dce6f4;
+    th {
+      padding: 11px 14px;
+      font-weight: 700;
+      color: #2c3e6a;
+      text-align: left;
+      font-size: 0.83rem;
+      white-space: nowrap;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #edf2fa;
+    transition: background 0.12s;
+    &:last-child { border-bottom: none; }
+    &:hover { background: #f7fbff; }
+    td { padding: 11px 14px; color: #2d3748; vertical-align: middle; }
+  }
+
+  .rc-name   { font-weight: 600; min-width: 220px; }
+  .rc-setby  { color: #5f6c7d; white-space: nowrap; }
+  .rc-type   { white-space: nowrap; }
+  .rc-score  { font-weight: 700; text-align: center; width: 80px; }
+  .rc-date   { white-space: nowrap; color: #5f6c7d; font-size: 0.84rem; }
+  .rc-result { width: 90px; }
+
+  .sort-arrow { color: #2c5de5; font-size: 0.9em; }
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &--online { background: #e0f2fe; color: #0369a1; }
+  &--paper  { background: #f3f4f6; color: #4b5563; }
+}
+
+.score-val { color: #1565c0; font-weight: 700; }
+.score-dash { color: #9ca3af; }
+.rs-not-started { color: #9ca3af; font-size: 0.83rem; }
+
+.btn-view {
+  background: transparent;
+  border: 1.5px solid #2c5de5;
+  color: #2c5de5;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  &:hover { background: #2c5de5; color: white; }
+}
+
+.btn-add {
+  background: transparent;
+  border: 1.5px solid #16a34a;
+  color: #16a34a;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  &:hover { background: #16a34a; color: white; }
+}
+
+.empty-results {
+  text-align: center;
+  color: #9ca3af;
+  padding: 28px !important;
+  font-style: italic;
+}
+
+.results-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  border-top: 1px solid #edf2fa;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  .page-info {
+    font-size: 0.86rem;
+    color: #5f6c7d;
+    font-weight: 600;
+  }
+
+  .page-btns {
+    display: flex;
+    gap: 4px;
+  }
+
+  .page-btn {
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid #d1dcef;
+    border-radius: 8px;
+    background: #f7faff;
+    color: #3d5280;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.active { background: #2c5de5; color: white; border-color: #2c5de5; }
+    &:hover:not(.active):not(:disabled) { border-color: #2c5de5; color: #2c5de5; }
+    &:disabled { opacity: 0.35; cursor: default; }
+  }
 }
 
 @media (max-width: 1200px) {

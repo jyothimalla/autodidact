@@ -287,10 +287,34 @@ def generate_questions_for_module(module_id: str, num_questions: int = 5, diffic
         else [difficulty] * 10
     )
 
+    def _question_signature(q: dict) -> tuple[str, tuple[str, ...]]:
+        question_text = str(q.get('question', '')).strip().lower()
+        options = tuple(sorted(str(v).strip().lower() for v in q.get('options', {}).values()))
+        return (question_text, options)
+
     questions = []
+    seen_signatures: set[tuple[str, tuple[str, ...]]] = set()
+    max_attempts_per_slot = 12
+
     for i in range(num_questions):
-        d = random.choice(diff_weights)
-        q = generate_mcq(module_id, d)
+        chosen_q = None
+        fallback_q = None
+
+        for _ in range(max_attempts_per_slot):
+            d = random.choice(diff_weights)
+            candidate = generate_mcq(module_id, d)
+            fallback_q = candidate
+            sig = _question_signature(candidate)
+            if sig not in seen_signatures:
+                chosen_q = candidate
+                seen_signatures.add(sig)
+                break
+
+        # If uniqueness is exhausted for a module bank, keep progress by accepting fallback.
+        q = chosen_q or fallback_q
+        if q is None:
+            continue
+
         q['question_number'] = i + 1
         q['question_id'] = f'q{i + 1}'
         questions.append(q)

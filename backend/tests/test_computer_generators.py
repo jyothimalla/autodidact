@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+from unittest.mock import patch
 
 
 # Ensure local backend package imports resolve when running from repo root.
@@ -79,6 +80,42 @@ class TestComputerGenerators(unittest.TestCase):
                     difficulty=difficulty,
                 )
                 self.assertEqual(len(questions), 2)
+
+    def test_generate_questions_retries_to_avoid_duplicates(self):
+        def _fake_mcq(question_text: str) -> dict:
+            return {
+                "module_id": "python-functions",
+                "question": question_text,
+                "options": {
+                    "A": "Option A",
+                    "B": "Option B",
+                    "C": "Option C",
+                    "D": "Option D",
+                },
+                "correct_option": "A",
+                "correct_answer": "Option A",
+                "explanation": "Test explanation",
+            }
+
+        side_effect = [
+            _fake_mcq("Why use functions?"),
+            _fake_mcq("Why use functions?"),  # duplicate candidate for Q2, should be retried
+            _fake_mcq("What does a loop do?"),
+        ]
+
+        with patch("generators.mcq_generator.random.choice", return_value="medium"), \
+             patch("generators.mcq_generator.generate_mcq", side_effect=side_effect) as gen_mock:
+            questions = generate_questions_for_module(
+                module_id="python-functions",
+                num_questions=2,
+                difficulty="mixed",
+            )
+
+        self.assertEqual(len(questions), 2)
+        self.assertEqual(questions[0]["question"], "Why use functions?")
+        self.assertEqual(questions[1]["question"], "What does a loop do?")
+        self.assertNotEqual(questions[0]["question"], questions[1]["question"])
+        self.assertEqual(gen_mock.call_count, 3)
 
 
 if __name__ == "__main__":
