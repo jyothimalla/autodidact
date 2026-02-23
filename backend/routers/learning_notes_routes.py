@@ -212,6 +212,41 @@ def _generate_karel_notes_html() -> str:
                                   label="End world (3 balls placed)")
     fn_start        = _karel_grid(4, 5, (3, 0), "▲", label="Start world (Karel faces North)")
     fn_end          = _karel_grid(4, 5, (3, 0), "►", label="End world (after turn_right())")
+    ex1_code = _code(
+        "walk_karel.py",
+        """
+<span class="cm"># Let's take Karel for a walk — 3 steps to the right!</span>
+<span class="fn">move</span>()   <span class="cm"># 🐾 step 1 → Karel trots to column 1</span>
+<span class="fn">move</span>()   <span class="cm"># 🐾 step 2 → Karel trots to column 2</span>
+<span class="fn">move</span>()   <span class="cm"># 🐾 step 3 → Karel trots to column 3</span>
+""".strip(),
+    )
+    ex2_code = _code(
+        "fetch_balls.py",
+        """
+<span class="cm"># Karel drops a ball, then moves — and repeats!</span>
+<span class="fn">put_ball</span>()  <span class="cm"># 🎾 drop ball on square 0</span>
+<span class="fn">move</span>()      <span class="cm"># 🐾 trot to square 1</span>
+<span class="fn">put_ball</span>()  <span class="cm"># 🎾 drop ball on square 1</span>
+<span class="fn">move</span>()      <span class="cm"># 🐾 trot to square 2</span>
+<span class="fn">put_ball</span>()  <span class="cm"># 🎾 drop ball on square 2</span>
+""".strip(),
+    )
+    fn_code = _code(
+        "turn_right.py",
+        """
+<span class="cm"># ── DEFINE the new trick first ──────────────────</span>
+<span class="kw">def</span> <span class="fn">turn_right</span>():          <span class="cm"># "def" means DEFINE a new command</span>
+    <span class="fn">turn_left</span>()  <span class="cm"># 🔄 1st left (90°)</span>
+    <span class="fn">turn_left</span>()  <span class="cm"># 🔄 2nd left (180°)</span>
+    <span class="fn">turn_left</span>()  <span class="cm"># 🔄 3rd left = 270° = turned right! ✅</span>
+
+<span class="cm"># ── NOW use the new trick ───────────────────────</span>
+<span class="fn">move</span>()           <span class="cm"># 🐾 Karel steps forward</span>
+<span class="fn">turn_right</span>()    <span class="cm"># ↻ Karel uses our new trick to turn right</span>
+<span class="fn">move</span>()           <span class="cm"># 🐾 Karel steps forward again</span>
+""".strip(),
+    )
 
     return f"""<!DOCTYPE html>
 <html>
@@ -443,12 +478,7 @@ def _generate_karel_notes_html() -> str:
     <div class="wp-cell">{ex1_end_world}</div>
   </div>
 
-  {_code("walk_karel.py",
-    '<span class="cm"># Let\'s take Karel for a walk — 3 steps to the right!</span>\n'
-    '<span class="fn">move</span>()   <span class="cm"># 🐾 step 1 → Karel trots to column 1</span>\n'
-    '<span class="fn">move</span>()   <span class="cm"># 🐾 step 2 → Karel trots to column 2</span>\n'
-    '<span class="fn">move</span>()   <span class="cm"># 🐾 step 3 → Karel trots to column 3</span>'
-  )}
+  {ex1_code}
 
   <div class="callout tip">
     <strong>Key idea — Sequential Execution 📜</strong><br>
@@ -482,14 +512,7 @@ def _generate_karel_notes_html() -> str:
     <div class="wp-cell">{ex2_end}</div>
   </div>
 
-  {_code("fetch_balls.py",
-    '<span class="cm"># Karel drops a ball, then moves — and repeats!</span>\n'
-    '<span class="fn">put_ball</span>()  <span class="cm"># 🎾 drop ball on square 0</span>\n'
-    '<span class="fn">move</span>()      <span class="cm"># 🐾 trot to square 1</span>\n'
-    '<span class="fn">put_ball</span>()  <span class="cm"># 🎾 drop ball on square 1</span>\n'
-    '<span class="fn">move</span>()      <span class="cm"># 🐾 trot to square 2</span>\n'
-    '<span class="fn">put_ball</span>()  <span class="cm"># 🎾 drop ball on square 2</span>'
-  )}
+  {ex2_code}
 
   <div class="callout fun">
     <strong>Can you spot the pattern? 🔍</strong><br>
@@ -530,18 +553,7 @@ def _generate_karel_notes_html() -> str:
     <div class="wp-cell">{fn_end}</div>
   </div>
 
-  {_code("turn_right.py",
-    '<span class="cm"># ── DEFINE the new trick first ──────────────────</span>\n'
-    '<span class="kw">def</span> <span class="fn">turn_right</span>():          <span class="cm"># "def" means DEFINE a new command</span>\n'
-    '    <span class="fn">turn_left</span>()  <span class="cm"># 🔄 1st left (90°)</span>\n'
-    '    <span class="fn">turn_left</span>()  <span class="cm"># 🔄 2nd left (180°)</span>\n'
-    '    <span class="fn">turn_left</span>()  <span class="cm"># 🔄 3rd left = 270° = turned right! ✅</span>\n'
-    '\n'
-    '<span class="cm"># ── NOW use the new trick ───────────────────────</span>\n'
-    '<span class="fn">move</span>()           <span class="cm"># 🐾 Karel steps forward</span>\n'
-    '<span class="fn">turn_right</span>()    <span class="cm"># ↻ Karel uses our new trick to turn right</span>\n'
-    '<span class="fn">move</span>()           <span class="cm"># 🐾 Karel steps forward again</span>'
-  )}
+  {fn_code}
 
   <div class="callout">
     <strong>📋 Rules for writing a function (teaching a new trick):</strong><br>
